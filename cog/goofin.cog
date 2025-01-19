@@ -1,0 +1,87 @@
+# Cog
+
+symbols
+
+thing		player				local
+
+template	Dum=+rbot			local
+thing		Dummy				local
+
+template	Ren=+renzoku		local
+template	Blast=+kiblast		local
+
+int			move=4				local
+
+message		startup
+message		activated
+message		pulse
+message		killed
+message		timer
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	mode=-1;
+
+return;
+
+activated:
+
+	mode=mode+1;
+	
+	PrintInt(Mode);
+	
+	if(mode==0)
+	{
+		Dummy=CreateThing(Dum, player);
+		CaptureThing(Dummy);
+		//SetTimer(1);
+	}
+	else if(mode==1)
+	{SetPulse(0.1);}
+	else if(mode==2)
+	{SetPulse(1);}
+	else if(mode==3)
+	{
+		SetPulse(0);
+		mode=0;
+	}
+
+return;
+
+pulse:
+
+	//SetThingLook(Dummy, VectorSub(GetThingPos(Player), GetThingPos(Dummy)));
+
+	//SetThingThrust(Dummy, vectorSet(move, 0, 0));
+
+	if(mode==1)
+	{FireProjectile(Dummy, Ren, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);}
+	else if(mode==2)
+	{FireProjectile(Dummy, Blast, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);}
+	
+return;
+
+timer:
+
+	Move=-Move;
+
+	SetTimer(2);
+
+return;
+
+killed:
+
+	if(GetSenderRef()==Dummy)
+	{
+		SetPulse(0);
+		mode=-1;
+	}
+
+return;
+
+end

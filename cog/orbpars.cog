@@ -1,0 +1,61 @@
+# Jedi Knight Cog Script
+#
+# OrbPars.COG
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+template	 MorePars=+OrbParRed2		local
+
+message      created
+message      timer
+message		 pulse
+
+end                                                                           
+
+# ========================================================================================
+
+code
+
+created:
+
+	SetThingPos(GetSenderRef(), VectorAdd(GetThingPos(GetThingParent(GetSenderRef())), VectorSet(0, 0, 0.1)));
+	SetThingLook(GetSenderRef(), GetThingLvec(GetThingParent(GetSenderRef())));
+	AttachThingToThingEx(GetSenderRef(), GetThingParent(GetSenderRef()), 0xc);
+	//SetTimerEx(0.01, 1, GetSenderRef(), GetThingSignature(GetSenderRef()));
+	//SetThingPulse(GetSenderRef(), 0.01);
+   
+Return;
+
+# ........................................................................................
+
+pulse:
+
+	SetThingPos(GetSenderRef(), VectorAdd(GetThingPos(GetThingParent(GetSenderRef())), VectorSet(0, 0, 0.1)));
+
+return;
+
+timer:
+
+	if(GetParam(1) == GetThingSignature(GetParam(0)))
+	{
+		if(GetSenderID() == 1)
+		{
+			SetParticleGrowthSpeed(GetParam(0), 5.0);
+			SetTimerEx(0.2, 2, GetParam(0), GetThingSignature(GetParam(0)));
+		}
+		else if(GetSenderID() == 2)
+		{
+			SetParticleGrowthSpeed(GetParam(0), -5.0);
+			SetTimerEx(0.2, 1, GetParam(0), GetThingSignature(GetParam(0)));
+		}
+	}
+	
+return;
+
+end   
+
+

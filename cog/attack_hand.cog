@@ -1,0 +1,376 @@
+# ========================================================================================
+# weap_fist.cog
+# Weapon Fist script
+# ========================================================================================
+
+symbols
+
+sound		fireSound1=SwingFist01.wav	local
+sound		fireSound2=SwingFist04.wav	local
+
+thing		player					local
+
+flex		DelayTime				local
+
+int			OkToFire=1				local
+
+vector		FoVel					local
+vector		NewVel					local
+vector		PlayerVel				local
+
+int			i						local
+
+keyframe	punch0=elbowsmash.key	local
+keyframe	punch1=fastpunch.key	local
+keyframe	punch2=fastpunch.key	local
+keyframe	punch3=righthook.key	local
+keyframe	punch4=uppercut.key		local
+
+keyframe	kick0=continualkick.key	local
+keyframe	kick1=flyingknee.key	local
+keyframe	kick2=legsweep.key		local
+keyframe	kick3=roundhouse.key	local
+keyframe	kick4=backflipkick.key	local
+
+int			KeyNum					local
+int			KeyMode					local
+
+#keyframe	counter=dropkick.key	local
+
+#keyframe	fph=superpunchhold.key	local
+#keyframe	fpt=superpunchthrow.key	local
+#keyframe	fk=flyingkick.key		local
+
+#keyframe	fphit=superpunchhit.key local
+#keyframe	fkhit=flyingkickhit.key local
+
+int			PunchID					local
+int			KickID					local
+int			PBlockID				local
+int			KBlockID				local
+
+int			fpht					local
+int			fkt						local
+
+int			punchnum=-1				local
+int			kicknum=-1				local
+
+int			p0						local
+int			p1						local
+int			p2						local
+int			p3						local
+int			p4						local
+
+int			k0						local
+int			k1						local
+int			k2						local
+int			k3						local
+int			k4						local
+
+int			r0=0					local
+int			r1=0					local
+int			r2=0					local
+int			r3=0					local
+int			r4=0					local
+
+int			RandomNum				local
+int			x						local
+
+flex		FireWaitTime			local
+
+template    proj=+strongpunch		local
+
+thing		LTarget					local
+
+message		activated
+message		deactivated
+message		selected
+message		deselected
+message		autoselect
+message		fire
+message		timer
+message		startup
+message		user0
+message		user5
+message		pulse
+
+end
+
+# ========================================================================================
+
+code
+
+startup:
+
+	call RandomizeP;
+	call RandomizeK;
+
+	Player=GetLocalPlayerThing();
+
+return;
+
+fire:
+
+	player=GetSourceRef();
+	mode = GetSenderRef();	
+
+	if(GetThingHealth(player) <= 0)
+	{Return;}
+
+	if(mode)
+	{
+		KickNum=KickNum+1;
+		if(KickNum==5)
+		{
+			call RandomizeK;
+			KickNum=0;
+		}
+		PlayKey(player, Kick0[k0[KickNum]], 5, 0x38);
+
+		//PrintInt(k0[KickNum]);
+	}
+	else
+	{
+		PunchNum=PunchNum+1;
+		if(PunchNum==5)
+		{
+			call RandomizeP;
+			PunchNum=0;
+		}
+		PlayKey(player, Punch0[p0[PunchNum]], 5, 0x38);
+
+		//PrintInt(p0[PunchNum]);
+	}
+
+	if(mode)
+	{FireWaitTime=GetKeyLen(Kick0[k0[KickNum]]);}
+	else
+	{FireWaitTime=GetKeyLen(Punch0[P0[PunchNum]]);}
+
+	SetTimerEx(FireWaitTime, 1337, -1, -1);
+	SetFireWait(player, FireWaitTime);
+
+	//Tell kyle.cog that we can't block
+	SendMessageEx(GetThingClassCog(player), user4, 0,-1,-1,-1);
+
+	//Fire the projectile
+	SendTrigger(-1, 11, player, -1, -1, -1);
+	
+	PlaySoundThing(FireSound1[mode], player, 1, -1, -1, 0x80);
+
+	//FireProjectile(player, proj, FireSound1[mode], -1, '0.0 0.01 0', '0 0 0', 1.0, 0, 0.0, 0.0);
+
+
+Return;
+
+# ........................................................................................
+
+activated:
+
+	player = GetSourceRef();
+	mode = GetSenderRef();
+
+   if(GetInv(player, 122) == 1)
+   {
+	SendMessageEx(GetThingClassCog(player), user1, mode, 0, 0, 0);
+	return;
+   }
+
+	jkSetWaggle(player, '0.0 0.0 0.0', 0);
+	ActivateWeapon(player, 0.1, mode);
+//	SetPulse(1);
+	//PrintInt(GetInv(player, 13));
+
+	//Print("Activated");
+
+	SetActorFlags(player, 0x40000);
+
+	Return;
+
+# ........................................................................................
+
+deactivated:
+
+	player = GetSourceRef();
+	mode = GetSenderRef();
+    if(GetInv(player, 122) == 1) return;
+
+	jkSetWaggle(player, '10.0 7.0 0.0', 350);
+	DelayTime=DeactivateWeapon(player, mode );
+	SetMountWait(player, 0.5);
+	if (GetCurWeaponMode() != -1) Return;
+
+//	if(DelayTime >= 1  && OkToFire)
+//	{
+//		if(mode)
+//		{fkt=PlayKey(player, fk, 1, 0x38);}
+//		else
+//		{fpht=PlayKey(player, fph, 1, 0x38);}  //14 before
+
+//		if(DelayTime > 5) DelayTime=5;
+
+//		ApplyForce(player, VectorScale(GetThingLVec(player), 1000 * DelayTime));
+//		OkToFire=0;
+//		SetTimerEx(DelayTime, 420, mode, player); //stop the key
+//		SendMessageEx(GetThingClassCog(player), user6, mode,-1,-1,-1);
+//	}
+//	else
+//	{call Fire;}
+
+//	SetPulse(0);
+	//SetInv(player, 13, 0);
+
+	//Print("Deactivated");
+	//PrintFlex(DelayTime);
+
+	ClearActorFlags(player, 0x40000);
+
+	Return;
+
+# ........................................................................................
+
+pulse:
+
+	ChangeInv(player, 13, 40);
+	//PrintInt(GetInv(player, 13));
+
+return;
+
+# ........................................................................................
+
+timer:
+
+	if(GetSenderID()==420)
+	{
+		if(GetParam(0))
+		{StopKey(GetParam(1), fkt, 0);}
+		else
+		{StopKey(GetParam(1), fpht, 0);}
+
+		SendMessageEx(GetThingClassCog(player), user6, -1,-1,-1,-1);
+		OkToFire=1;
+	}
+
+	//Tell kyle.cog that we can block now
+	if(GetSenderID()==1337)
+	{SendMessageEx(GetThingClassCog(player), user4, 1,-1,-1,-1);}
+
+return;
+
+# ........................................................................................
+
+selected:
+
+	player = GetSourceRef();
+
+    jkPrintUNIString(player, 1);
+
+	if(IsInvActivated(player, 41))
+	{SetArmedMode(player, 1);}
+	else
+	{SetArmedMode(player, 0);}
+
+	// Clear saber flags, and allow activation of the weapon
+	jkClearFlags(player, 0x5);
+	SetCurWeapon(player, 2);
+	SetPulse(0);
+
+Return;
+
+# ........................................................................................
+
+deselected:
+
+	player = GetSourceRef();
+
+	jkSetWaggle(player, '0.0 0.0 0.0', 0);
+	
+	//Tell kyle.cog that we can't block
+	SendMessageEx(GetThingClassCog(player), user4, 0,-1,-1,-1);
+
+
+Return;
+
+# ........................................................................................
+
+autoselect:
+
+	// Select fists when out of everything else...
+	ReturnEx(100.0);
+
+Return;
+
+# ........................................................................................
+
+RandomizeP:
+
+	//(4 - 0 + 1)*RND + 0
+
+	for(x=0;x<=4;x=x+1)
+	{
+		RandomNum=5*rand(); //Random int, 0-4
+		While(r0[RandomNum]==1)
+		{
+			RandomNum=5*rand(); //Random int, 0-4
+		}
+
+		p0[x]=RandomNum;
+		r0[RandomNum]=1;
+	}
+
+	call Reset_Rand;
+
+return;
+
+RandomizeK:
+
+	for(x=0;x<=4;x=x+1)
+	{
+		RandomNum=5*rand(); //Random int, 1-5
+		While(r0[RandomNum]==1)
+		{
+			RandomNum=5*rand(); //Random int, 1-5
+		}
+
+		k0[x]=RandomNum;
+		r0[RandomNum]=1;
+	}
+
+	call Reset_Rand;
+
+return;
+
+Reset_Rand:
+
+	for(x=0;x<=4;x=x+1)
+	{r0[x]=0;}
+
+return;
+
+user5:
+
+	//Print("user5 recieved");
+	KillTimerEx(420); //No, don't kill 420! ;) :D
+	if(GetParam(0)==1)
+	{
+		StopKey(GetParam(1), fkt, 0);
+		DamageThing(GetParam(2), 50 , 0x1, GetParam(1));
+		PlayKey(GetParam(2), fkhit, 1, 0x38);
+		SendMessageEx(GetThingClassCog(player), user6, -1,-1,-1,-1);
+		OkToFire=1;
+	}
+	else if(GetParam(0)==0)
+	{
+		StopKey(GetParam(1), fpht, 0);
+		PlayKey(player, fpt, 1, 0x38);
+		DamageThing(GetParam(2), 50 , 0x1, GetParam(1)); 
+		PlayKey(GetParam(2), fphit, 1, 0x38);
+		SendMessageEx(GetThingClassCog(player), user6, -1,-1,-1,-1);
+		OkToFire=1;
+	}
+
+return;
+
+end
+
+

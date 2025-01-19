@@ -1,0 +1,116 @@
+# Jedi Knight Cog Script
+#
+# Instant_Projectile.cog
+#
+# Created By: Hell Raiser
+
+flags=0x240
+
+symbols
+
+#Equivilant of trailthing= in a template
+template	Trail=+TrailThing		local
+
+#Explosion template
+template	Explosion=+Explode		local
+
+#Equivilant of timer= in a template
+int			AliveTime=10			local
+
+message		startup
+message		created
+message		pulse
+message		touched
+message		damaged
+message		killed
+message		timer
+message		removed
+
+end
+
+code
+
+startup:
+
+	HeapNew(0, 99);
+
+return;
+
+created:
+
+	SetThingPulse(0.001, GetSenderRef());
+	SetTimerEx(AliveTime, 5, GetSenderRef(), GetThingSignature(GetSenderRef()));
+
+return;
+
+pulse:
+
+	//Check for attachment
+	
+	if(GetAttachFlags(GetSenderRef()) & 0x1 || GetAttachFlags(GetSenderRef()) & 0x2)
+	{
+		KillTimerEx(5);
+		SetTimerEx(0.01, 5, GetSenderRef(), GetThingSignature(GetSenderRef()));
+		return;
+	}
+
+return;
+
+touched:
+
+	//It was touched by an actor, or 3do geometry
+	KillTimerEx(5);
+	SetTimerEx(0.01, 5, GetSenderRef(), GetThingSignature(GetSenderRef()));
+
+return;
+
+damaged:
+
+	//Not really neccessary if it's going umpteen hundred
+	//jku's a second with only 1 health, but it makes me
+	//feel all warm and fuzzy to know I have it all covered
+	returnEx(1000);
+
+return;
+
+killed:
+
+	//It got killed
+	SetTimerEx(0.01, 5, GetSenderRef(), GetThingSignature(GetSenderRef()));
+
+return;
+
+timer:
+
+	if(GetParam(1) == GetThingSignature(GetParam(0)) && GetSenderID() == 5)
+	{
+		FireProjectile(GetParam(0), Explosion, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+
+		//I've had JK do funky stuff when a thing is fired from another thing
+		//That is destroyed just a few lines down, so we destroy the thing in 0.1 seconds
+		SetTimerEx(0.1, 10, GetParam(0), GetThingSignature(GetParam(0)));
+	}
+	else if(GetParam(1) == GetThingSignature(GetParam(0)) && GetSenderID() == 10)
+	{DestroyThing(GetParam(0));}
+	
+return;
+
+removed:
+
+	//Create the trailthings
+
+	Distance=VectorDist(GetThingPos(GetThingParent(GetSenderRef())), GetThingPos(GetSenderRef()));
+	Distance=Distance*2;
+
+	TailThing=FireProjectile(GetThingParent(GetSenderRef()), Trail, -1, -1, '0 0.5 0', '0 0 0', 0, 0, 0, 0);
+	HeapSet(0, TailThing);
+
+	for(x=1; x<=Distance; x=x+1)
+	{
+		TailThing=FireProjectile(HeapGet(x-1), Trail, -1, -1, '0 0.5 0', '0 0 0', 0, 0, 0, 0);
+		HeapSet(x, TailThing);
+	}
+
+return;
+
+end

@@ -1,0 +1,97 @@
+# Jedi Knight Cog Script
+#
+# invindicate.cog
+# bin 180
+#
+# This little ditty prevents the player from switching/firing weapons
+# in situations where he/she isn't allowed to.  Also prevents
+# certian functions from working under certian conditions
+#
+# Created by Hell Raiser [Jon Harmon]
+
+symbols
+
+thing		player			local
+
+int			bin0		local
+int			bin1		local
+int			bin2		local
+int			bin3		local
+int			bin4		local
+int			bin5		local
+int			bin6		local
+
+
+message		startup
+message		user0
+message		user1
+message		user2
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+
+return;
+
+user0:
+
+	//GetParam(0) - Invintory #
+	//GetParam(1) - Ammount
+	//GetParam(2) - SetInv or SetInvAvailable
+
+	if(GetParam(2))
+	{SetInv(player, GetParam(0), GetParam(1));}
+	else
+	{SetInvAvailable(player, GetParam(0), GetParam(1));}
+
+return;
+
+user1:
+
+	//Disable functions based on GetParam(0)
+	//0 - Charging/Firing Beam
+	//1 - Falling
+	//2 - Full Disable
+		
+	if(GetParam(0) == 0)
+	{
+		SetInv(player, 2, 0);
+		SetInv(player, 3, 0);
+		SetInv(player, 174, 0);
+		SetInv(player, 5, 0);
+		SetInv(player, 6, 0);
+		SetInv(player, 7, 0);
+		SetInv(player, 178, 0);
+		
+		//Disable everything else except charge ki, senzu bean, kaioken
+	}
+	else if(GetParam(0) == 1)
+	{
+		//Cant do anything that'll use StopThing(player);
+	}
+	else if(GetParam(0) == 2)
+	{
+		SetInv(player, 148, 0);
+		SetInv(player, 149, 0);
+	}
+
+return;
+
+user2:
+
+	//Re-enable all functions
+	SetInv(player, 2, 1);
+	SetInv(player, 3, 1);
+	SetInv(player, 174, 1);
+	SetInv(player, 5, 1);
+	SetInv(player, 6, 1);
+	SetInv(player, 7, 1);
+	SetInv(player, 178, 1);
+
+return;
+
+end

@@ -1,0 +1,40 @@
+symbols
+
+int		PulsePerSec=0	local
+
+message	startup
+message	pulse
+message	timer
+
+end
+
+code
+
+startup:
+
+	SetPulse(0.001);
+	SetTimer(1);
+
+return;
+
+pulse:
+
+	//for(x=1; x<1000; x=x+1)
+	//{PulsePerSec=PulsePerSec+1;}
+
+	PulsePerSec=PulsePerSec+1;
+
+return;
+
+timer:
+
+	//for(x=0; x<100; x=x+1)
+	//{PulsePerSec=PulsePerSec+1;}
+	
+	PrintInt(PulsePerSec);
+	PulsePerSec=0;
+	SetTimer(1);
+
+return;
+
+end

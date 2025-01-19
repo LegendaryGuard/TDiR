@@ -1,0 +1,500 @@
+# Jedi Knight Cog Script
+#
+# item_challange.cog
+#
+# Jedi Outcast came in handy for something! ;D
+#
+# This operates just like Jedi Outcasts challange
+# button, but this goes a bit further. Once
+# in a challange, it goes 3d fighter game-ish.
+#
+# The basics of the "side scrolling" camera
+# code was created by Riska for Showdown, and
+# given to me by Jepman to spiffy up.
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+thing		player				local
+thing		victim				local
+thing		Camera				local
+
+template	Cam_Tpl=+MeleeCam	local
+template	AP_tpl=+APGhost		local
+
+template	CameraTpl=+camera	local
+
+template	ERectile=+RectileRed	local
+template	PRectile=+targetplayer	local
+
+thing		CamPos				local
+thing		CamLook				local
+
+int			Mode				local
+
+int			Active				local
+int			Fight				local
+
+flex		zoomfactor=1.5		local
+flex		minZoom=0.75		local
+
+template	texttpl=+challange	local
+material	text=startfight.mat	local
+
+Sector		SectorPos			local
+
+int			P					local
+
+message		startup
+message		activated
+message		pulse
+message		trigger
+message		timer
+message		killed
+message		touched
+message		user0
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	Mode=0;
+	Position_Vec = VectorSet(0.0, -0.4, 0.14);
+	Active=0;
+	Fight=0;
+	P=0;
+
+return;
+
+activated:
+
+	//mode=mode+1;
+	//if(Mode==2) mode=0;
+
+	//PrintInt(Mode);
+
+	if(Active) return;
+
+	if(Mode==0)
+	{
+		Victim=SendMessageEx(GetInvCog(player, 116), user0, -1, -1, -1, -1);
+
+		if(Victim == -1)
+		{
+			Print("No one to challange");
+			//mode=0;
+			return;
+		}
+
+		jkStringClear();
+		jkStringConcatAsciiString("You have challanged ");
+		if(GetThingType(Victim) == 10)
+		{jkStringConcatPlayerName(Victim);}
+		else
+		{jkStringConcatAsciiString("Roshibot");}
+		jkStringOutput(player, -1);
+
+		SendTrigger(Victim, 30001, player, -1, -1, -1);
+		SetTimerEx(3, 1, -1, -1);
+		if(GetThingType(Victim) != 10) Call StartCamera;
+	}
+	else if(Mode==1)
+	{
+		//Victim=Thing;
+		SendTrigger(Victim, 30000, player, -1, -1, -1);
+
+		call StartCamera;
+	}
+
+return;
+
+killed:
+
+	if(player == GetSenderRef() && Active==1)
+	{
+		jkStringClear();
+		jkStringConcatPlayerName(Victim);
+		jkStringConcatAsciiString(" has won the challange!");
+		jkStringOutput(-1, -1);
+		if(Active==1) call StopCamera;
+	}
+
+return;
+
+StopCamera:
+
+	Active=0;
+	SetPulse(0);
+	SendMessage(GetInvCog(player, 126), user1); //Re-enable the camera
+	SetTimerEx(1, 2, -1, -1); //Destroy melee cam
+	//SetPhysicsFlags(player, 0x2);
+	SetInv(player, 134, 0);
+	ParseArg(player, "minheadpitch=-80.00");
+	ParseArg(player, "maxheadpitch=80.00");
+	Mode=0;
+	Fight=0;
+	Victim=-1;
+
+	SetThingLook(player, VectorSet(VectorX(GetThingLVec(player)), VectorY(GetThingLVec(player)), 0));
+
+	SendMessageEx(GetInvCog(player, 135), user0, 0, -1, -1, -1);
+	SendMessageEx(GetInvCog(player, 135), user0, 1, -1, -1, -1);
+
+	VecX = VectorX(GetThingLVec(player));
+	VecY = VectorY(GetThingLVec(player));
+	SetThingLook(Player, VectorSet(VecX, VecY, 0));
+
+return;
+
+StartCamera:
+
+	SetActorFlags(player, 0x40000);
+	Active=1;
+	SetInv(player, 134, 1);
+
+	Mode=2;
+
+	Target=0;
+
+	SendMessage(GetInvCog(player, 126), user0); //Stop the camera
+	
+	Camera=FireProjectile(Player, Cam_Tpl, -1, -1, '1 0 0', '0 0 0', 0, 0, 0, 0);
+	CamPos=FireProjectile(Player, AP_Tpl, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+
+	ThingerMode=0;
+
+	viewVec = VectorSub(GetThingPos(player), GetThingPos(victim));
+	viewVec = VectorScale(viewVec, 0.5);
+	viewVec = VectorAdd(GetThingPos(victim), viewVec);
+
+	SetThingLook(camera, VectorSub(viewVec,GetThingPos(camera)));
+
+	SetCurrentCamera(0);
+	SetCameraFocus(0, camera);
+	SetCameraFocus(1, camera);
+
+	//SendTrigger(victim, 10000+ShowdownID, camera, player1, victim, -1);
+
+	SendMessage(GetInvCog(player, 116), user1);
+
+	ParseArg(player, "minheadpitch=0.00");
+	ParseArg(player, "maxheadpitch=0.00");
+	SetActorFlags(player, 0x2);
+
+	//ClearPhysicsFlags(player, 0x2);
+
+	SetMaterialCel(text, 0);
+	FireProjectile(Camera, TextTpl, -1, -1, '0 0.1 0', '0 0 0', 0, 0, 0, 0);
+	ShowText=1;
+
+	SendMessageEx(GetInvCog(player, 135), user0, 0, Victim, 0, -1);
+	SendMessageEx(GetInvCog(player, 135), user0, 1, player, 1, -1);
+
+	SetPulse(0.001);
+
+	SetTimerEx(2, 3, -1, -1);
+
+	//jkStringClear();
+	//jkStringConcatAsciiString("GET READY!");
+	//jkStringOutput(player, -1);
+
+	LastPosFlex=0;
+
+	Scalar=-1;
+
+	Correct=1;
+
+return;
+
+pulse:
+
+	//if(GetPhysicsFlags(player) & 0x2) ClearPhysicsFlags(player, 0x2);
+	
+	if(GetThingFlags(Victim) & 0x200) call StopCamera;
+	
+	if(GetCurrentCamera()==1)
+	{CycleCamera();}
+
+	if(ShowText) FireProjectile(Camera, TextTpl, -1, -1, '0 0.1 0', '0 0 0', 0, 0, 0, 0);
+
+	PlayerPos=GetThingPos(player);
+	VictimPos=GetThingPos(victim);
+	CameraPos=GetThingPos(camera);
+
+	viewVec = VectorSub(GetThingPos(victim), GetThingPos(player));
+	viewVec = VectorScale(viewVec, 0.5);
+	//viewVec = VectorAdd(viewVec, '0 0 0.2');
+
+	vectorA = VectorSet(0, 0, 1);
+	vectorB = VectorNorm(VectorScale(VectorCross(viewVec, vectorA), -scalar));
+
+	//After all this, vectorB is the camera position, 1jku away from the middle of the players.
+
+	viewVec = VectorAdd(GetThingPos(player), viewVec); //Positon halfway between the two players
+
+	playerDist = VectorDist(GetThingPos(player), GetThingPos(victim));
+
+	if (playerDist > minZoom)
+	{zoomDist = playerDist / zoomFactor;}
+	else
+	{zoomDist = minZoom / zoomFactor;}
+
+	vectorB = VectorScale(vectorB, zoomDist);
+
+	VectorA = VectorAdd(viewVec, vectorB);
+
+
+	if(VectorDist(VectorA, LastVec) > LastPosFlex && Fight==1)
+	{LastPosFlex=VectorDist(VectorA, LastVec);}
+	
+	//jkStringClear();
+	//jkStringConcatAsciiString("Greatest Distance: ");
+	//jkStringConcatFlex(LastPosFlex);
+	//jkStringOutput(-1, -1);
+
+	if(VectorDist(VectorA, LastVec) >= MinZoom && Fight==1)
+	{
+		Correct=Correct+1;
+		if(Correct==2) Correct=0;
+	
+		if(Correct==0)
+		{
+			//Print("NO!");
+			viewVec = VectorSub(GetThingPos(player), GetThingPos(victim));
+			viewVec = VectorScale(viewVec, 0.5);
+			//viewVec = VectorAdd(viewVec, '0 0 0.2');
+
+			vectorA = VectorSet(0, 0, 1);
+			vectorB = VectorNorm(VectorCross(viewVec, vectorA));
+
+			//After all this, vectorB is the camera position, 1jku away from the middle of the players.
+
+			viewVec = VectorAdd(GetThingPos(victim), viewVec); //Positon halfway between the two players
+			Scalar=1;
+		}
+		else
+		{
+
+			viewVec = VectorSub(GetThingPos(victim), GetThingPos(player));
+			viewVec = VectorScale(viewVec, 0.5);
+			//viewVec = VectorAdd(viewVec, '0 0 0.2');
+
+			vectorA = VectorSet(0, 0, 1);
+			vectorB = VectorNorm(VectorCross(viewVec, vectorA));
+
+			//After all this, vectorB is the camera position, 1jku away from the middle of the players.
+
+			viewVec = VectorAdd(GetThingPos(player), viewVec); //Positon halfway between the two players
+			Scalar=-1;
+		}
+		
+		playerDist = VectorDist(GetThingPos(player), GetThingPos(victim));
+
+		if (playerDist > minZoom)
+		{zoomDist = playerDist / zoomFactor;}
+
+		vectorB = VectorScale(vectorB, zoomDist);
+
+		VectorA = VectorAdd(viewVec, vectorB);
+	}
+
+	//Call GetSectorAtPos;
+
+	SetThingVel(camera, VectorScale(VectorSub(vectorA, GetThingPos(camera)), 5));
+	SetThingLook(camera, VectorSub(viewVec, GetThingPos(camera)));
+
+	//SetThingPos(camera, vectorA);
+	
+	//camera2=CreateThingAtPos(CameraTpl, SectorPos, VectorA, '0 0 0');
+	//SetThingLook(camera2, VectorSub(viewVec, GetThingPos(camera2)));
+
+
+
+	SetThingPos(CamPos, VectorA);
+	SetThingLook(CamPos, GetThingLVec(Camera2));//VectorSub(viewVec, GetThingPos(CamPos)));
+	SetThingLook(CamPos, GetThingRVec(CamPos));
+	LastVec=VectorA;
+	ThingerMode=1;
+	
+#End camera stuff, start movement stuff
+
+	playerlook=VectorSub(GetThingPos(Victim), GetThingPos(player));
+
+	if(GetInv(player, 171) < 2 && Dashing == 0)
+	{playerlook=VectorSet(VectorX(playerlook), VectorY(playerlook), 0);}
+
+	if(!(GetActorFlags(player) & 40000000)) SetThingLook(player, playerlook);
+
+	Thrust=GetThingThrust(player);
+	ZThrust=SendMessageEx(GetInvCog(player, 34), user1, -1, -1, -1, -1);
+	ZThrust2=SendMessageEx(GetInvCog(player, 33), user1, -1, -1, -1, -1);
+	Dashing=SendMessageEx(GetInvCog(player, 34), user2, -1, -1, -1, -1);
+
+	if(IsInvActivated(player, 32) || (GetThingFlags(player) & 0x40000000)) return;
+	//if(ZThrust != 0 || ZThrust2 != 0) return;
+	
+	//Diff operations for diff movement
+	
+	Speed=IsInvActivated(player, 42);
+	
+	NewVel=VectorSet(0, 0, 0);
+	
+	if(VectorY(Thrust) > 0)
+	{NewVel=VectorScale(GetThingLVec(player), 1.2 + Speed);}
+	if(VectorY(Thrust) < 0 && playerDist < 2.5)
+	{NewVel=VectorScale(GetThingLVec(player), -0.5 + -Speed);}
+
+	if(GetInv(player, 171) == 2)
+	{Speed=0.2;}
+	else
+	{Speed=0.5;}
+
+	if(ZThrust > 0 && GetInv(player, 171) > 0 && playerDist < 2.5)
+	{
+		//Print("Up");
+		NewVel=VectorAdd(NewVel, VectorSet(0, 0 , Speed));
+	}
+	if(ZThrust2 > 0 && GetInv(player, 171) > 1 && playerDist < 2.5)
+	{
+		//Print("Down");
+		NewVel=VectorAdd(NewVel, '0 0 -0.2');
+	}
+	
+	//PrintFlex(playerDist);
+	
+	if(Dashing && playerDist > 0.2)
+	{
+		//NewVel=VectorScale(VectorNorm(VectorAdd(GetThingLVec(player), GetThingVel(player))), 2.2 + Speed);
+		DetachThing(player);
+	}
+
+	//if(VectorY(Thrust) == 0 && GetInv(player, 171) > 0 && ZThrust == 0 && ZThrust2 == 0)
+	//{
+	//	if(VectorX(NewVel) == 0 && VectorY(NewVel) == 0 && VectorZ(NewVel) == 0)
+	//	StopThing(player);	
+	//}
+
+	NewVel=VectorAdd(VectorSet(0, 0, VectorZ(GetThingVel(player))), NewVel);
+
+	//SetThingVel(Player, NewVel);
+
+return;
+
+GetSectorAtPos:
+
+	pos=viewVec;
+
+	posGhost=CreateThingAtPos(AP_tpl, 0, pos, '0 0 0');
+	for(i=0; i < GetSectorCount(); i=i+1) SetSectorAdjoins(i, 0);
+
+	for(i=0; i < GetSectorCount(); i=i+1)
+	{
+		for(e=0; e <= GetNumSectorVertices(i); e=e+1)
+		{
+			If(VectorDist(GetSectorCenter(i), GetSectorVertexPos(i, e)) >= VectorDist(GetSectorCenter(i), pos))
+			{
+				secGhost=CreateThingAtPos(AP_Tpl, i, GetSectorCenter(i), '0 0 0');
+				If(Haslos(secGhost, posGhost))
+				{
+					SectorPos=i;
+					call turnoff;
+					Return;
+				}
+				Destroything(secGhost);
+			}
+		}
+	}
+
+return;
+
+turnoff:
+
+	For(i=0; i <= GetSectorCount(); i=i+1) SetSectorAdjoins(i, 1);
+	DestroyThing(posGhost);
+	Destroything(secGhost);
+	
+return;
+
+
+timer:
+
+	if(GetSenderId()==1)
+	{Mode=0;}
+	else if(GetSenderId()==2)
+	{DestroyThing(camera);}
+	else if(GEtSenderId()==3)
+	{
+		ClearActorFlags(player, 0x40000);
+		//jkStringClear();
+		//jkStringConcatAsciiString("FIGHT!");
+		//jkStringOutput(player, -1);
+		SetMaterialCel(text, 1);
+		Fight=1;
+		SetTimerEx(1, 4, -1, -1);
+	}
+	else if(GetSenderId()==4)
+	{ShowText=0;}
+	
+return;
+
+trigger:
+
+	if(GetSourceRef() == 30000)
+	{
+		//Print(": has accepted your challange");
+
+		jkStringClear();
+		jkStringConcatPlayerName(GetParam(0));
+		jkStringConcatAsciiString(" has accepted your one on one challange");
+		jkStringOutput(player, -1);
+
+		Print("Fight!");
+		//Victim=Thing;
+		call StartCamera;
+	}
+
+	if(GetSourceRef() == 30001)
+	{
+		//Print(": has challanged you");
+
+		if(Active==0)
+		{
+			jkStringClear();
+			jkStringConcatPlayerName(GetParam(0));
+			jkStringConcatAsciiString(" has challanged you to one on one");
+			jkStringOutput(player, -1);
+
+			KillTimerEx(1);
+			SetTimerEx(3, 1, -1, -1);
+			Victim=GetParam(0);
+			Mode=1;
+		}
+		else
+		{
+			SendTrigger(GetParam(0), 30002, player, -1, -1, -1);
+		}
+	}
+
+	if(GetSourceRef() == 30002)
+	{
+		jkStringClear();
+		jkStringConcatPlayerName(GetParam(0));
+		jkStringConcatAsciiString(" is already fighting one on one");
+		jkStringOutput(player, -1);
+	}
+
+return;
+
+user0:
+
+	returnEx(Victim);
+
+return;
+
+end

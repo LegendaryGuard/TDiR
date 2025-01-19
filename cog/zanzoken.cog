@@ -1,0 +1,37 @@
+# JK Cog Script
+
+flags=0x240
+
+symbols
+
+material	zanmat=zanzoken.mat		local
+
+message		startup
+message		created
+message		pulse
+
+end
+
+code
+
+startup:
+
+	MaterialAnim(zanmat, 15, 0x1);
+	player=GetLocalPlayerThing();
+	
+return;
+
+created:
+
+	Print("Meow!");
+	SetThingPulse(GetSenderRef(), 0.01);
+
+return;
+
+pulse:
+
+	SetThingLook(GetSenderRef(), VectorSub(GetThingPos(GetPrimaryFocus(0)), GetThingPos(player)));
+
+return;
+
+end

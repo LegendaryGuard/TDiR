@@ -1,0 +1,44 @@
+# Jedi Knight Cog Script
+#
+# item_senzu.cog
+#
+# Senzu bean cog, duh =P
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+
+sound			bactaSnd=BactaUse01.WAV
+thing			player
+
+message			activated
+message			selected
+
+end
+
+code
+
+activated:
+	player = GetSourceRef();
+	if(GetInv(player, 40) > 0.0)
+	{
+		if(GetThingHealth(player) < 100)
+		{
+			Print("Senzu Bean");
+			//jkPrintUNIString(player, 250);
+         	PlaySoundThing(bactaSnd, player, 1.0, -1, -1, 128);
+			HealThing(player, 100);
+			ChangeInv(player, 40, -1.0);
+			if(GetInv(player, 40) == 0) SetInvAvailable(player, 40, 0);
+		}
+	}
+	
+return;
+
+selected:
+
+	//Print("Senzu Bean");
+
+return;
+
+end

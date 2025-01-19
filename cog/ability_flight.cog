@@ -1,0 +1,169 @@
+# Jedi Knight Cog Script
+#
+# ability_flight.cog
+#
+# Flying for the player, wheeeeee *airplane noises*
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+
+thing       player
+vector      newVel                  local
+vector      upVel                   local
+vector      playerVel               local
+int         effectHandle=-1
+vector      thrust                  local
+
+keyframe 	launch=launch.key           local
+
+vector		RotVel					local
+vector		RotVel2					local
+
+int			SecFlag					local
+
+int			attachFlags				local
+
+template	AP_tpl=+APGhost			local
+thing		LookThing				local
+material    wing=wing.mat                      local
+
+message     activated
+message     pulse
+message     killed
+message		selected
+message		startup
+
+end
+
+# ========================================================================================
+
+code
+
+startup:
+
+	Look=-1;
+	Player=GetLocalPlayerThing();
+
+return;
+
+activated:
+
+	if(GetActorFlags(player) & 0x40000) return;
+
+	if(IsInvActivated(player, 41) == 0)
+	{
+		if(GetInv(player, 14) > 0)
+		{
+			// Print("You are flying!");
+			jkPrintUNIString(player, 254);
+			SetInvActivated(player, 41, 1);
+			wingfly = MaterialAnim(wing, 10, 1);  //flap wings :D
+
+			//ZThrust=SendMessageEx(GetInvCog(player, 34), user1, -1, -1, -1, -1);
+
+			if(GetInv(player, 171) == 1) // && ZThrust == 1)
+			{
+	       		PlayKey(player, launch, 1, 0x38);
+       		 	upVel = VectorSet(0.0, 0.0, 1.0);
+		       	playerVel = GetThingVel(player);
+   	    	 	newVel = VectorAdd(upVel, playerVel);
+         		DetachThing(player);
+         		SetThingVel(player, newVel);
+			}
+
+			//ClearPhysicsFlags(player, 0x441);
+			ClearPhysicsFlags(player, 0x401);
+			SetPhysicsFlags(Player, 0x2000);
+			SetArmedMode(Player, 1);
+			//0x10 and 0x80
+			//Uber Walk On Walls? 
+			//SetPhysicsFlags(player, 0x400090); 
+			//ClearPhysicsFlags(player, 0x800);
+			//ParseArg(player, "minheadpitch=-1");
+			//ParseArg(player, "maxheadpitch=1");
+
+			SendTrigger(-1, 50000, player, 1, -1, -1);
+
+			//parseArg(player, "puppet=kyfly.pup");
+
+			//SetPulse(0.01); 
+
+		}
+		else
+		{
+			// Print("Out of Ki");
+			jkPrintUNIString(player, 256);
+		}
+     }
+	else
+	{
+		//Print("No more fly");
+		call NoFly;
+	}
+
+return;
+
+# ........................................................................................
+
+pulse:
+
+	//if(Look != -1)
+	//{
+	//	DestroyThing(Look);
+	//	Look=-1;
+	//}
+	//FirstThing=CreateThing(AP_Tpl, player);
+	//Look=FireProjectile(FirstThing, AP_tpl, -1, -1, '0 0.1 0', '0 0 0', 0, 0);
+	//if(ThingViewDot(player, Look) != 1)
+	//{SetThingLook(Player, VectorSub(GetThingPos(Look), GetThingPos(Player)));}
+	//SetActorFlags(player, 0x2);
+	//DestroyThing(FirstThing);
+	
+	jkStringClear();
+	jkStringConcatAsciiString("Speed: ");
+	jkStringConcatFlex(VectorLen(GetThingVel(player)));
+	jkStringOutput(-1, -1);
+	
+Return;
+
+# ........................................................................................
+
+killed:
+
+	player = GetLocalPlayerThing();
+	if(GetSenderRef() != player) Return;
+
+	if(IsInvActivated(player, 41) == 1)
+	{Call NoFly;}
+return;
+
+NoFly:
+
+	//SetPulse(0);
+
+	//SetPhysicsFlags(player, 0x441);
+	SetPhysicsFlags(player, 0x401);
+	ClearPhysicsFlags(player, 0x2000);
+
+	SetInvActivated(player, 41, 0);
+
+	//ParseArg(player, "minheadpitch=-80");
+	//ParseArg(player, "maxheadpitch=80");
+	SendTrigger(-1, 50000, player, 0, -1, -1);
+	//parseArg(player, "puppet=ky.pup");
+	StopAnim(wingfly); //stop flaaping wings
+
+	SetArmedMode(player, 0);
+
+return;
+
+selected:
+
+	//Print("Flight");
+
+return;
+
+end
+
+

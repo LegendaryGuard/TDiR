@@ -1,0 +1,177 @@
+# Jedi Knight Cog Script
+#
+# hud.cog
+#
+# Fuck yea, a NEW HUD WITH NEW NUMBERS HAHAHAHA!
+#
+# Created By: Hell Raiser, 3dos & mats by Shred
+
+flags=0x240
+
+symbols
+
+material		chargebar=chargebar.mat		local
+
+material		ki=ki_represent.mat			local
+
+material		kipercent0=kipercentnum01.mat	local
+material		kipercent1=kipercentnum02.mat	local
+material		kipercent2=kipercentnum03.mat	local
+
+material		life0=lifenum01.mat			local
+material		life1=lifenum02.mat			local
+material		life2=lifenum03.mat			local
+
+material		pl0=plnum01.mat				local
+material		pl1=plnum02.mat				local
+material		pl2=plnum03.mat				local
+material		pl3=plnum04.mat				local
+material		pl4=plnum05.mat				local
+material		pl5=plnum06.mat				local
+material		pl6=plnum07.mat				local
+material		pl7=plnum08.mat				local
+material		pl8=plnum09.mat				local
+
+material		block0=shieldnum01.mat		local
+material		block1=shieldnum02.mat		local
+material		block2=shieldnum03.mat		local
+
+material		kilight=sidelight.mat		local
+material		health=st_left.mat			local
+
+thing			player						local
+
+int				CanLevel					local
+
+int				Powerlevel					local
+
+int				ScoreDiff					local
+
+message			created
+message 		timer
+message			startup
+message			pulse
+
+end
+
+code
+
+startup:
+
+	//SetInv(player, 198, 0);
+
+	Player=GetLocalPlayerThing();
+	SetPulse(0.1);
+	CanLevel=0;
+	LevelInc=10000;
+
+return;
+
+created:
+
+	//SetCameraFocus(0, GetSenderRef());
+	SetThingTimer(GetSenderRef(), 0.01);
+	//ChangeInv(player, 198, 1);
+	//PrintInt(GetInv(Player, 198));
+	//Print("It's a me, HUD");
+
+return;
+
+timer:
+
+	if(GetSenderRef() != GetPrimaryFocus(0))
+	{
+		DestroyThing(GetSenderRef());
+		//ChangeInv(player, 198, -1);
+	}
+
+return;
+
+pulse:
+
+	//Bin 13 changes in 40 units
+	if(GetInv(player, 13) == 0) SetMaterialCel(chargebar, 5);
+	if(GetInv(player, 13) == 40) SetMaterialCel(chargebar, 4);
+	if(GetInv(player, 13) == 80) SetMaterialCel(chargebar, 3);
+	if(GetInv(player, 13) == 120) SetMaterialCel(chargebar, 2);
+	if(GetInv(player, 13) == 160) SetMaterialCel(chargebar, 1);
+	if(GetInv(player, 13) == 200) SetMaterialCel(chargebar, 0);
+	
+	if(GetInv(player, 14) == 0) SetMaterialCel(ki, 9);
+	if(GetInv(player, 14) >= 44) SetMaterialCel(ki, 8);
+	if(GetInv(player, 14) >= 88) SetMaterialCel(ki, 7);
+	if(GetInv(player, 14) >= 132) SetMaterialCel(ki, 6);
+	if(GetInv(player, 14) >= 176) SetMaterialCel(ki, 5);
+	if(GetInv(player, 14) >= 220) SetMaterialCel(ki, 4);
+	if(GetInv(player, 14) >= 264) SetMaterialCel(ki, 3);
+	if(GetInv(player, 14) >= 308) SetMaterialCel(ki, 2);
+	if(GetInv(player, 14) >= 352) SetMaterialCel(ki, 1);
+	CanLevel=SendMessageEx(GetInvCog(player, 60), user2, -1, -1, -1, -1);
+	if((GetInv(player, 14) >= 400) && CanLevel == 1)
+	{
+		if(jkGetSuperFlags(player) & 0x1)
+		{
+			SetMaterialCel(ki, 0);
+		}
+		else
+		{
+			SetMaterialCel(ki, 1);
+		}
+	}
+
+	
+	
+
+	SetMaterialCel(kipercent2, (GetInv(player, 14) / 4) / 100);
+	SetMaterialCel(kipercent1, ((GetInv(player, 14) / 4) % 100) / 10);
+	SetMaterialCel(kipercent0, (GetInv(player, 14) / 4) % 10);
+	
+	SetMaterialCel(life2, GetThingHealth(player) / 100);
+	SetMaterialCel(life1, (GetThingHealth(player) % 100) /10);
+	SetMaterialCel(life0, GetThingHealth(player) % 10);
+
+	SetMaterialCel(block2, GetInv(player, 60) / 100);
+	SetMaterialCel(block1, (GetInv(player, 60) % 100) /10);
+	SetMaterialCel(block0, GetInv(player, 60) % 10);
+	
+	//PowerLevel=GetInv(player, 12)*1000000;
+	//PowerLevel=GetThingHealth(player)*1000+PowerLevel;
+	//PowerLevel=GetInv(player, 14)+PowerLevel;
+
+	//PowerLevel=GetInv(player, 20);
+
+	//500,000,000  No more.
+	//Powerlevel=123456789;
+
+	Level=GetInv(Player, 20) * 1000000;
+
+	LevelInc=LevelInc+0.1;
+	
+	PowerLevel=Level+LevelInc;
+
+	SendMessageEx(GetInvCog(player, 60), user3, PowerLevel, -1, -1, -1);
+
+	SetMaterialCel(pl8, PowerLevel / 100000000);
+	SetMaterialCel(pl7, (PowerLevel % 100000000) / 10000000);
+	SetMaterialCel(pl6, (PowerLevel % 10000000) / 1000000);
+	SetMaterialCel(pl5, (PowerLevel % 1000000) / 100000);
+	SetMaterialCel(pl4, (PowerLevel % 100000) / 10000);
+	SetMaterialCel(pl3, (PowerLevel % 10000) / 1000);
+	SetMaterialCel(pl2, (PowerLevel % 1000) / 100);
+	SetMaterialCel(pl1, (PowerLevel % 100) / 10);
+	SetMaterialCel(pl0, PowerLevel % 10);
+	
+	if(IsInvActivated(player, 42) == 1) SetMaterialCel(Kilight, 0);
+	if(IsInvActivated(player, 42) == 0) SetMaterialCel(Kilight, 1);
+
+	if(GetThingHealth(player) == 0) SetMaterialCel(health, 5);
+	if(GetThingHealth(player) >= 20) SetMaterialCel(health, 4);
+	if(GetThingHealth(player) >= 40) SetMaterialCel(health, 3);
+	if(GetThingHealth(player) >= 60) SetMaterialCel(health, 2);
+	if(GetThingHealth(player) >= 80) SetMaterialCel(health, 1);
+	if(GetThingHealth(player) >= 100) SetMaterialCel(health, 0);
+		
+
+return;
+
+end

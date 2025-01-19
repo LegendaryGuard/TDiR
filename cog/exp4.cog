@@ -1,0 +1,43 @@
+# Explosion
+
+symbols
+
+template	Sphere0=+SmExp0		local
+template	Sphere1=+SmExp1		local
+template	Sphere2=+SmExp2		local
+template	Sphere3=+SphrExp0	local
+template	Sphere4=+SphrExp1	local
+template	Sphere5=+SphrExp2	local
+template	Sphere6=+SphrExp3	local
+template	Sphere7=+SphrExp4	local
+template	Sphere8=+SphrExp5	local
+template	Sphere9=+SphrExp6	local
+template	Sphere10=+SphrExp7	local
+template	Sphere11=+SphrExp8	local
+template	Sphere12=+SphrExp9	local
+
+int			x					local
+
+message		created
+message		pulse
+
+end
+
+code
+
+created:
+
+	SetThingPulse(GetSenderRef(), 0.05);
+
+return;
+
+pulse:
+
+	x=GetThingUserData(GetSenderRef());
+	FireProjectile(GetSenderRef(), Sphere0[x], -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+	SetThingUserData(GetSenderRef(), x+1);
+	if(GetThingUserData(GetSenderRef())==8) DestroyThing(GetSenderRef());
+
+return;
+
+end

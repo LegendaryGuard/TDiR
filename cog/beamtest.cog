@@ -1,0 +1,353 @@
+# cog
+
+symbols
+
+thing		player			local
+
+template	Head=+head3	local
+template	Tail=+tail3	local
+int			TailCount		local
+
+template	Look=+APGhost	local
+thing		LookThing		local
+
+template	AP_tpl=+APGhost	local
+
+thing		Bhead=-1			local
+
+int			size=4			local
+
+thing     Tail0     local
+thing     Tail1     local
+thing     Tail2     local
+thing     Tail3     local
+thing     Tail4     local
+thing     Tail5     local
+thing     Tail6     local
+thing     Tail7     local
+thing     Tail8     local
+thing     Tail9     local
+thing     Tail10     local
+thing     Tail11     local
+thing     Tail12     local
+thing     Tail13     local
+thing     Tail14     local
+thing     Tail15     local
+thing     Tail16     local
+thing     Tail17     local
+thing     Tail18     local
+thing     Tail19     local
+thing     Tail20     local
+thing     Tail21     local
+thing     Tail22     local
+thing     Tail23     local
+thing     Tail24     local
+thing     Tail25     local
+thing     Tail26     local
+thing     Tail27     local
+thing     Tail28     local
+thing     Tail29     local
+thing     Tail30     local
+thing     Tail31     local
+thing     Tail32     local
+thing     Tail33     local
+thing     Tail34     local
+thing     Tail35     local
+thing     Tail36     local
+thing     Tail37     local
+thing     Tail38     local
+thing     Tail39     local
+thing     Tail40     local
+thing     Tail41     local
+thing     Tail42     local
+thing     Tail43     local
+thing     Tail44     local
+thing     Tail45     local
+thing     Tail46     local
+thing     Tail47     local
+thing     Tail48     local
+thing     Tail49     local
+thing     Tail50     local
+thing     Tail51     local
+thing     Tail52     local
+thing     Tail53     local
+thing     Tail54     local
+thing     Tail55     local
+thing     Tail56     local
+thing     Tail57     local
+thing     Tail58     local
+thing     Tail59     local
+thing     Tail60     local
+thing     Tail61     local
+thing     Tail62     local
+thing     Tail63     local
+thing     Tail64     local
+thing     Tail65     local
+thing     Tail66     local
+thing     Tail67     local
+thing     Tail68     local
+thing     Tail69     local
+thing     Tail70     local
+thing     Tail71     local
+thing     Tail72     local
+thing     Tail73     local
+thing     Tail74     local
+thing     Tail75     local
+thing     Tail76     local
+thing     Tail77     local
+thing     Tail78     local
+thing     Tail79     local
+thing     Tail80     local
+thing     Tail81     local
+thing     Tail82     local
+thing     Tail83     local
+thing     Tail84     local
+thing     Tail85     local
+thing     Tail86     local
+thing     Tail87     local
+thing     Tail88     local
+thing     Tail89     local
+thing     Tail90     local
+thing     Tail91     local
+thing     Tail92     local
+thing     Tail93     local
+thing     Tail94     local
+thing     Tail95     local
+thing     Tail96     local
+thing     Tail97     local
+thing     Tail98     local
+thing     Tail99     local
+
+template	Bot=+rbot		local
+
+template	ExpPos=+ExplodePos		local
+template	Exp=+Explode5			local
+
+template	Smack0=+knockback		local
+template	Smack1=+knockup			local
+template	Smack2=+knockdown		local
+
+keyframe	bf=backflipkick.key	local
+
+keyframe	Hit0=superkick1.key		local
+keyframe	Hit1=uppercut.key	local
+keyframe	Hit2=doublearmhit.key	local
+
+message		activated
+message		startup
+message		pulse
+message		touched
+message		damaged
+message		killed
+message		selected
+message		timer
+
+template	Punch0=+punch1		local
+keyframe	CrouchL=fastpunch.key		local
+sound		Swing0=swinghigh.wav	local
+
+
+end
+
+code
+
+selected:
+
+	//Print("New Beady Beam Test");
+	Print("Roshi Bot (Experimental)");
+
+return;
+
+startup:
+
+	Player=GetLocalPlayerThing();
+	Tailcount=0;
+	Rbot=-1;
+	Mode=-1;
+	RNum=0;
+
+return;
+
+activated:
+
+	mode=mode+1;
+	
+	PrintInt(mode);
+	
+	if(Mode==0)
+	{
+		//if(Rbot != -1) DestroyThing(Rbot);
+		RNum=RNum+1;
+		Rbot=CreateThing(Bot, Player);
+		SetThingUserData(Rbot, RNum);
+		//PrintInt(Rbot);
+		//SetThingMass(Rbot, 100000);
+		//Sleep(2);
+		SetPulse(1);
+	}
+	else if(Mode==3)
+	{
+		Mode=-1;
+		SetPulse(0);
+	}
+
+return;
+
+	Mode=Mode+1;
+	
+	if(Mode==1)
+	{
+		Rbot=FireProjectile(player, AP_Tpl, -1, -1, '0 3 0', '0 0 0', 0, 0, 0, 0);
+		SetThingLook(Rbot, VectorSub(GetThingPos(player), GetThingPos(Rbot)));
+		Go=0;
+		SetTimer(3);
+	}
+	else if(Mode==2)
+	{
+		//SetThingThrust(BHeadP, '0 5 0');
+		//SetPulse(0.01);
+		Trust=0;
+
+	}
+	else if(Mode==3)
+	{
+		SetPulse(0);
+	}
+
+return;
+
+pulse:
+
+	SetThingLook(Rbot, VectorSub(GetThingPos(Player), GetThingPos(rbot)));
+	if(Mode==0)
+	{
+		CurrKey=PlayKey(rbot, CrouchL, 3, 0x38);
+		FireProjectile(rbot, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		Sleep(0.1);
+		FireProjectile(rbot, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		Sleep(0.1);
+		FireProjectile(rbot, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+
+		//PlayKey(rbot, Hit0[Mode], 3, 0x38);
+		//Crap=FireProjectile(Rbot, Smack0[Mode], -1, -1, '0 0 0.02', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Mode==1)
+	{
+		PlayKey(rbot, Hit0[Mode], 3, 0x38);
+		Crap=FireProjectile(Rbot, Smack0[Mode], -1, -1, '0 0 0.02', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Mode==2)
+	{
+		PlayKey(rbot, Hit0[Mode], 3, 0x38);
+		Crap=FireProjectile(Rbot, Smack0[Mode], -1, -1, '0 0 0.02', '0 0 0', 0, 0, 0, 0);
+	}
+
+return;
+
+	#Try SetThingVel
+
+	//Print("Go?");
+
+	SetLifeLeft(BHeadP, 3);
+	SetLifeLeft(BHeadB, 1);
+
+	jkStringClear();
+	jkStringConcatAsciiString("BeamP: ");
+	jkStringConcatFlex(VectorLen(GetThingVel(BHeadP)));
+	//jkStringConcatFlex(VectorY(GetThingThrust(BHeadP)));
+	jkStringConcatAsciiString(" BeamB: ");
+	jkStringConcatFlex(VectorLen(GetThingVel(BHeadB)));
+	//jkStringConcatFlex(VectorY(GetThingThrust(BHeadB)));
+	jkStringOutput(-1, -1);
+	
+
+	//Trust=Trust+0.5;
+	//SetThingThrust(BHeadP, VectorSet(0, Trust, 0));
+
+return;
+
+timer:
+
+	TB=0;
+	TP=0;
+
+	BHeadB=FireProjectile(Rbot, Head, -1, -1, '0 0.6 0', '0 0 0', 0, 0, 0, 0);
+	Rbot2=FireProjectile(player, AP_Tpl, -1, -1, '0 1 0', '0 0 0', 0, 0, 0, 0);
+	BHeadP=FireProjectile(Rbot2, Head, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+
+	SetLifeLeft(BHeadP, 10);
+	SetLifeLeft(BHeadB, 6);
+
+	//CaptureThing(BHeadB);
+	//CaptureThing(BHeadP);
+	
+	SetThingLook(BHeadB, VectorSub(GetThingPos(BHeadP), GetThingPos(BHeadB)));
+	SetThingLook(BHeadP, VectorSub(GetThingPos(BHeadB), GetThingPos(BHeadP)));
+
+	Go=1;
+
+	//SetThingThrust(BHeadP, VectorSet(0, 10, 0));
+	//SetThingThrust(BHeadB, VectorSet(0, 6, 0));
+
+	SetThingVel(BHeadP, VectorScale(GetThingLVec(BHeadP), 2));
+	SetThingVel(BHeadB, VectorScale(GetThingLVec(BHeadB), 1));
+
+	SetPulse(0.01);
+	
+return;
+
+touched:
+
+	if(GetSenderRef()==BHeadB && TB==0)
+	{
+		StopThing(BHeadB);
+		TB=1;
+		SetThingThrust(BHeadB, '0 5 0');
+		Print("TB!");
+	}
+
+	if(GetSenderRef()==BHeadP && TP==0)
+	{
+		StopThing(BHeadP);
+		TP=1;
+		SetThingThrust(BHeadP, '0 10 0');
+		Print("TP!");
+	}
+
+return;
+
+tooched:
+
+	Head=GetSenderRef();
+	Cause=GetSourceRef();
+	
+	HeadT=VectorX(GetThingThrust(Head));
+	CauseT=VectorX(GetThingThrust(Cause));
+	
+	if(HeadT > CauseT)
+	{NewT=HeadT-CauseT;}
+	else
+	{NewT=CauseT-HeadT;}
+	
+	SetThingThrust(Head, VectorSet(0, NewT, 0));
+
+return;
+
+damaged:
+
+	returnEx(0);
+
+return;
+
+dpulse:
+
+	jkStringClear();
+	jkStringConcatAsciiString("P - ");
+	jkStringConcatInt(GetThingHealth(BHeadP));
+	jkStringConcatAsciiString("   B - ");
+	jkStringConcatInt(GetThingHealth(BHeadB));
+	jkStringOutput(-1, -1);
+
+return;
+
+end

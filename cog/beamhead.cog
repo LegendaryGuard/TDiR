@@ -1,0 +1,259 @@
+# All in one beam handling cog...
+#
+# ...for all beam attacks.
+#
+# Say wha?!??  Every beam?!??
+#
+# Daaaamn skippy! >=]
+#
+# Created by Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+template    Beam0=+beamhead0    local
+template    Beam1=+beamhead1    local
+template    Beam2=+beamhead2    local
+template    Beam3=+beamhead3    local
+template    Beam4=+beamhead4    local
+template    Beam5=+beamhead5    local
+template    Beam6=+beamhead6    local
+template    Beam7=+beamhead7    local
+template    Beam8=+beamhead8    local
+template    Beam9=+beamhead9    local
+template    Beam10=+beamhead10    local
+template    Beam11=+beamhead11    local
+template    Beam12=+beamhead12    local
+template    Beam13=+beamhead13    local
+template    Beam14=+beamhead14    local
+template    Beam15=+beamhead15    local
+template    Beam16=+beamhead16    local
+template    Beam17=+beamhead17    local
+template    Beam18=+beamhead18    local
+template    Beam19=+beamhead19    local
+template    Beam20=+beamhead20    local
+template    Beam21=+beamhead21    local
+template    Beam22=+beamhead22    local
+template    Beam23=+beamhead23    local
+template    Beam24=+beamhead24    local
+template    Beam25=+beamhead25    local
+template    Beam26=+beamhead26    local
+template    Beam27=+beamhead27    local
+template    Beam28=+beamhead28    local
+template    Beam29=+beamhead29    local
+template    Beam30=+beamhead30    local
+template    Beam31=+beamhead31    local
+template    Beam32=+beamhead32    local
+template    Beam33=+beamhead33    local
+template    Beam34=+beamhead34    local
+template    Beam35=+beamhead35    local
+template    Beam36=+beamhead36    local
+template    Beam37=+beamhead37    local
+template    Beam38=+beamhead38    local
+template    Beam39=+beamhead39	  local
+
+template    Tail0=+beamtail0    local
+template    Tail1=+beamtail1    local
+template    Tail2=+beamtail2    local
+template    Tail3=+beamtail3    local
+template    Tail4=+beamtail4    local
+template    Tail5=+beamtail5    local
+template    Tail6=+beamtail6    local
+template    Tail7=+beamtail7    local
+template    Tail8=+beamtail8    local
+template    Tail9=+beamtail9    local
+template    Tail10=+beamtail10    local
+template    Tail11=+beamtail11    local
+template    Tail12=+beamtail12    local
+template    Tail13=+beamtail13    local
+template    Tail14=+beamtail14    local
+template    Tail15=+beamtail15    local
+template    Tail16=+beamtail16    local
+template    Tail17=+beamtail17    local
+template    Tail18=+beamtail18    local
+template    Tail19=+beamtail19    local
+template    Tail20=+beamtail20    local
+template    Tail21=+beamtail21    local
+template    Tail22=+beamtail22    local
+template    Tail23=+beamtail23    local
+template    Tail24=+beamtail24    local
+template    Tail25=+beamtail25    local
+template    Tail26=+beamtail26    local
+template    Tail27=+beamtail27    local
+template    Tail28=+beamtail28    local
+template    Tail29=+beamtail29    local
+template    Tail30=+beamtail30    local
+template    Tail31=+beamtail31    local
+template    Tail32=+beamtail32    local
+template    Tail33=+beamtail33    local
+template    Tail34=+beamtail34    local
+template    Tail35=+beamtail35    local
+template    Tail36=+beamtail36    local
+template    Tail37=+beamtail37    local
+template    Tail38=+beamtail38    local
+template    Tail39=+beamtail39    local
+
+thing		TailPiece			local
+int			Piece				local
+int			x					local
+int			flags				local
+
+material	BeamCore=core.mat	local
+
+template	Fire_Tpl			local
+
+message		created
+message		pulse
+#message		damaged
+#message		touched
+message		timer
+#message		removed
+
+message		startup
+
+end
+
+code
+
+startup:
+
+	HeapNew(0, 48);
+	MaterialAnim(BeamCore, 25, 0x1); 
+
+return;
+
+created:
+
+	//Because JK ignores the fireoffset in FP for actor proj's
+
+	//PrintVector(VectorSub(GetThingPos(GetThingParent(GetSenderRef())), GetThingPos(GetSenderRef())));
+
+	for(x=0;x<=39;x=x+1)
+	{
+		if(GetThingTemplate(GetSenderRef()) == Beam0[x])
+		{SetThingUserData(GetSenderRef(), x);}
+	}
+	//Piece=GetThingUserData(GetSenderRef());
+	//TailPiece=FireProjectile(GetSenderRef(), Tail0[Piece], -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+	//SetThingUserData(TailPiece, GetThingUserData(GetSenderRef()));
+
+	//if((GetThingUserData(GetSenderRef()) % 10) >= 5)
+	//{PrintInt((GetThingUserData(GetSenderRef()) % 10)-5);}
+	//else
+	//{PrintInt(GetThingUserData(GetSenderRef()) % 10);}
+
+	//PrintInt(GetThingParent(GetSenderRef()));
+	//PrintInt(GetLocalPlayerThing());
+
+	//if(GetThingParent(GetSenderRef()) == GetLocalPlayerThing())
+	//{SetThingPulse(GetSenderRef(), 0.5);}
+	
+	SetTimerEx(11, 5, GetSenderRef(), GetThingSignature(GetSenderRef()));
+	Fire_Tpl=SendMessageEx(GetInvCog(GetLocalPlayerThing(), 131), user0, GetThingUserData(GetSenderRef()), -1, -1, -1);
+
+	TailThing=FireProjectile(GetSenderRef(), Fire_Tpl, -1, -1, '0 0.0 0', '0 0 0', 0, 0, 0, 0);
+
+	HeapSet(GetPlayerNum(GetThingParent(GetSenderRef())), TailThing);
+	HeapSet(GetPlayerNum(GetThingParent(GetSenderRef()))+16, 0);
+	HeapSet(GetPlayerNum(GetThingParent(GetSenderRef()))+32, TailThing);
+
+	SetThingVel(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), 20));
+
+	SetThingPulse(GetSenderRef(), 0.1);
+
+return;
+
+removed:
+
+	DataTail=HeapGet(GetPlayerNum(GetThingParent(GetSenderRef())));
+	FireProjectile(DataTail, Tail0[GetThingUserData(GetSenderRef())], -1, -1, '0 0.99 0', '0 0 0', 0, 0, 0, 0);
+	DestroyThing(HeapGet(GetPlayerNum(GetThingParent(GetSenderRef()))+32));
+
+return;
+
+pulse:
+
+	//Piece=GetThingUserData(GetSenderRef());
+	//TailPiece=FireProjectile(GetSenderRef(), Tail0[Piece], -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+	//SetThingUserData(TailPiece, GetThingUserData(GetSenderRef()));
+
+	//SetThingVel(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), 5));
+	
+	//SyncThingState(GetSenderRef());
+
+	DataTail=HeapGet(GetPlayerNum(GetThingParent(GetSenderRef())));
+
+	While((VectorDist(GetThingPos(GetSenderRef()), GetThingPos(DataTail)) > 1) && DataTail != -1) // && (DataCount <= 100))
+	{
+		DataCount=HeapGet(GetPlayerNum(GetThingParent(GetSenderRef()))+16);
+		if(DataCount > 100)
+		{
+			SendMessage(GetInvCog(GetThingParent(GetSenderRef()), GetCurWeapon(GetThingParent(GetSenderRef()))), user2);
+			SetThingPulse(GetSenderRef(), 0);
+		}
+		if(DataTail==HeapGet(GetPlayerNum(GetThingParent(GetSenderRef()))+32))
+		{
+			TailThing=FireProjectile(DataTail, Tail0[GetThingUserData(GetSenderRef())], -1, -1, '0 0.50 0', '0 0 0', 0, 0, 0, 0);
+			SetThingType(GetSenderRef(), 2);
+		}
+		else
+		{TailThing=FireProjectile(DataTail, Tail0[GetThingUserData(GetSenderRef())], -1, -1, '0 1.00 0', '0 0 0', 0, 0, 0, 0);}
+		HeapSet(GetPlayerNum(GetThingParent(GetSenderRef())), TailThing);
+		DataTail=HeapGet(GetPlayerNum(GetThingParent(GetSenderRef())));
+		HeapSet(GetPlayerNum(GetThingParent(GetSenderRef()))+16, DataCount+1);
+		SetThingLook(DataTail, VectorSub(GetThingPos(GetSenderRef()), GetThingPos(DataTail)));
+	}
+	
+	SetThingVel(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), 20));
+
+return;
+
+timer:
+
+	if(GetParam(1) == GetThingSignature(GetParam(0)))
+	{
+		DestroyThing(GetParam(0));
+	}
+
+return;
+
+touched:
+
+//	Print("Touchy!");
+
+	//if(GetThingType(GetSourceRef()) == 2)
+	//{
+	//	if(BeamBattleReady)
+	//	{}
+	//}
+
+	if(GetSenderRef() == Attack)
+	{
+		//PrintInt(GetSourceType());
+		KillTimerEx(5);
+		SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));
+	}
+
+return;
+
+damaged:
+
+	if(GetSenderRef() == Attack)
+	{
+		//if damage was caused by another player
+		if(GetThingType(GetThingParent(GetSourceRef()))==10)
+		{returnEx(GetParam(0)/2);} //return the damage
+		else
+		{returnEx(1000);} //make it die
+	}
+	//else if(GetSenderRef() == Player)
+	//{
+	//	if(fired) //if we've fired, explode the beam
+	//	{SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));}
+	//	returnEx(GetParam(0));
+	//}
+	
+return;
+
+end

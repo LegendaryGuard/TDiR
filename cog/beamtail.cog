@@ -1,0 +1,154 @@
+# Beam tail cog, handles dissapearing of the tail
+#
+# Created by Hell Raiser [Jon Harmon]
+
+symbols
+
+template    Tail0=+beamtail0    local
+template    Tail1=+beamtail1    local
+template    Tail2=+beamtail2    local
+template    Tail3=+beamtail3    local
+template    Tail4=+beamtail4    local
+template    Tail5=+beamtail5    local
+template    Tail6=+beamtail6    local
+template    Tail7=+beamtail7    local
+template    Tail8=+beamtail8    local
+template    Tail9=+beamtail9    local
+template    Tail10=+beamtail10    local
+template    Tail11=+beamtail11    local
+template    Tail12=+beamtail12    local
+template    Tail13=+beamtail13    local
+template    Tail14=+beamtail14    local
+template    Tail15=+beamtail15    local
+template    Tail16=+beamtail16    local
+template    Tail17=+beamtail17    local
+template    Tail18=+beamtail18    local
+template    Tail19=+beamtail19    local
+template    Tail20=+beamtail20    local
+template    Tail21=+beamtail21    local
+template    Tail22=+beamtail22    local
+template    Tail23=+beamtail23    local
+template    Tail24=+beamtail24    local
+template    Tail25=+beamtail25    local
+template    Tail26=+beamtail26    local
+template    Tail27=+beamtail27    local
+template    Tail28=+beamtail28    local
+template    Tail29=+beamtail29    local
+template    Tail30=+beamtail30    local
+template    Tail31=+beamtail31    local
+template    Tail32=+beamtail32    local
+template    Tail33=+beamtail33    local
+template    Tail34=+beamtail34    local
+template    Tail35=+beamtail35    local
+template    Tail36=+beamtail36    local
+template    Tail37=+beamtail37    local
+template    Tail38=+beamtail38    local
+template    Tail39=+beamtail39    local
+
+thing		Owner				local
+thing		Tailpiece			local
+
+int			Size				local
+int			Color				local
+int			MultiStat			local
+
+message		created
+message		pulse
+message		timer
+message		removed
+
+end
+
+code
+
+created:
+
+	//for(x=0;x<=39;x=x+1)
+	//{
+	//	if(GetThingTemplate(GetSenderRef()) == Tail0[x])
+	//	{SetThingUserData(GetSenderRef(), x);}
+	//}
+
+	//Size of the beam
+
+	SetThingPulse(GetSenderRef(), 0.01);
+	//if(GetThingParent(GetSenderRef()) == GetLocalPlayerThing())
+	//{SetThingTimer(GetSenderRef(), 0.5);}
+
+return;
+
+pulse:
+
+	if(GetThingParent(GetSenderRef()) == GetSenderRef())
+	{
+		DestroyThing(GetSenderRef());
+	}
+	
+return;
+
+timer:
+
+	SyncThingState(GetSenderRef());
+	SetThingTimer(GetSenderRef(), 0.5);
+
+return;
+
+removed:
+
+	SetThingTimer(GetSenderRef(), 0);
+	
+return;
+
+//		if((GetThingUserData(GetSenderRef()) % 10) >= 5)
+//		{
+//			//SetThingUserData(GetSenderRef(), ();
+//			if(((GetThingUserData(GetSenderRef()) % 10)-5) != 0)
+//			{
+//				FireProjectile(GetSenderRef(), Tail0[GetThingUserData(GetSenderRef())-1], -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+//				DestroyThing(GetSenderRef());
+//			}
+//			else
+//			{DestroyThing(GetSenderRef());}
+//		}
+//		else
+//		{
+//			//SetThingUserData(GetSenderRef(), GetThingUserData(GetSenderRef()) % 10);
+//			if((GetThingUserData(GetSenderRef()) % 10) != 0)
+//			{
+//				FireProjectile(GetSenderRef(), Tail0[GetThingUserData(GetSenderRef())-1], -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+//				DestroyThing(GetSenderRef());
+//			}
+//			else
+//			{DestroyThing(GetSenderRef());}
+//		}
+//	}
+//	
+//return;
+
+//		if(GetThingUserData(GetSenderRef()) != 0)
+//		{
+//			FireProjectile(GetSenderRef(), (GetThingTemplate(GetSenderRef())-2), -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+//			
+//			DestroyThing(GetSenderRef());
+//		}
+//		else
+//		{DestroyThing(GetSenderRef());}
+//
+//		Size=(GetThingUserData(GetSenderRef()));
+//		Size=Size-1;
+//		if(Size>0)
+//		{
+//			MultiStat=GetThingUserData(GetSenderRef());
+//			Color=((SendMessageEx(GetInvCog(player, 135), user0, MultiStat, 4, -1, -1))*5)+Size;
+//			MultiStat=MultiStat-1;
+//			Tailpiece=CreateThing(Tail0[Color], GetSenderRef());
+//			SetThingUserData(Tailpiece, MultiStat);
+//			DestroyThing(GetSenderRef());
+//		}
+//		else
+//		DestroyThing(GetSenderRef());
+//	}
+
+//return;
+
+end

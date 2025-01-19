@@ -1,0 +1,174 @@
+# Jedi Knight Cog Script
+#
+# ability_sense.cog
+#
+# PL Sensing, what else? =)
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+
+thing		Player			local
+
+thing		Victim0			local
+thing		Victim1			local
+thing		Victim2			local
+thing		Victim3			local
+thing		Victim4			local
+thing		Victim5			local
+thing		Victim6			local
+thing		Victim7			local
+
+int			VicCount		local
+
+int			Expired			local
+
+int			Colors			local
+
+int			Cost=10			local
+
+message		trigger
+message		activated
+message		timer
+message		startup
+message		pulse
+
+end
+
+code
+
+startup:
+
+	Player=GetLocalPlayerThing();
+	SetInvActivated(player, 31, 0);
+
+return;
+
+activated:
+
+	if(IsInvActivated(player, 31)) return;
+	SetInvActivated(player, 31, 1);
+
+	ChangeInv(Player, 14, -cost);
+
+	Print("PL Sense");
+
+	VicCount=0;
+
+	Colors=NewColorEffect(1, 0, 0, 1, 0, 0, 0, 0, 0, 0.5);
+	//Colors=NewColorEffect(0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+	x=1;
+	//SetPulse(0.01);
+	EnableIRMode(1, 0.5);
+	Expired=0;
+
+	Potential = FirstThingInView(player, 80, 1000, 0x400);
+	if(Potential!=-1)
+	{Call Search;}
+	else
+	{SetTimerEx(3, 31, -1, -1);}
+
+return;
+
+pulse:
+
+	OldColor=Colors;
+	x=x-0.01;
+	Printflex(x);
+	Colors=NewColorEffect(0, 0, 0, 0, 0, 0, 0, 0, 0, x);
+	DisableIRMode();
+	EnableIRMode(x+0.5, x+0.5);
+	FreeColorEffect(OldColor);
+	if(x<=0.2)
+	{
+		SetPulse(0);
+		SetTimerEx(3, 31, -1, -1);
+	}
+
+return;
+
+Search:
+
+	//Print("1");
+
+	// Check all things for our victim.
+	victim = -1;
+	maxDot = 0;
+	VicCount=0;
+	// Search for all players and actors.
+
+	KillTimerEx(31);
+	SetTimerEx(3, 31, -1, -1);
+
+	if(potential==-1)
+	{
+		//SetPulse(0);
+		KillTimerEx(31);
+		SetTimerEx(0.1, 31, -1, -1);
+		return;
+	}
+
+	//Print("2");
+	
+	if(
+		//HasLOS(player, potential) &&
+		(potential != player) &&
+		(VectorDist(GetThingPos(player), GetThingPos(potential)) <= 1000) &&
+		!(GetThingFlags(potential) & 0x200) &&
+		!(GetActorFlags(potential) & 0x100) &&
+		!((jkGetFlags(potential) & 0x20))
+		)
+	{
+		//jkSetTargetColors(6, 7, 8);
+		//jkSetTarget(potential);
+		SendMessageEx(GetInvCog(player, 135), user0, 3, potential, 0, -1);
+		SendTrigger(potential, 10000, player, -1, -1, -1);
+		//Print("3");
+		potential = NextThingInView();
+	}
+	else
+	{
+		potential = NextThingInView();
+		Call Search;
+	}	
+
+
+return;
+
+trigger:
+
+	if(Expired) return;
+
+	if(GetSourceRef()==10001)
+	{
+		jkStringClear();
+		jkStringConcatPlayerName(GetParam(1));
+		jkStringConcatAsciiString(" - PL: ");
+		jkStringConcatInt(GetParam(0));
+		jkStringConcatAsciiString(" Distance: ");
+		jkStringConcatFlex(VectorDist(GetThingPos(player), GetThingPos(GetParam(1))));
+
+		if(GetThingFlags(GetParam(1)) & 0x40000000)
+		{jkStringConcatAsciiString(" has 0x40000000");}
+
+		jkStringOutput(player, -1);
+		Sleep(1.5);
+		Call Search;
+	}
+	
+
+return;
+
+timer:
+
+	DisableIRMode();
+	if(Colors!=-1) FreeColorEffect(Colors);
+	Expired=1;
+	SetInvActivated(player, 31, 0);
+	//jkEndTarget();
+	SendMessageEx(GetInvCog(player, 135), user0, 3, -1, -1, -1);
+	SetPulse(0);
+
+return;
+
+end

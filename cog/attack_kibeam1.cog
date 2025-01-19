@@ -1,0 +1,276 @@
+# Jedi Knight Cog Script
+#
+# Attack 4: Ki Beam
+
+symbols
+
+template	KiBeam=+KiBeam		local
+
+keyframe	kfire0=kibeam.key			local
+keyframe	kfire1=kibeamfly.key		local
+int			Flying=0							local
+
+int			kchargeID=-1						local
+
+int			Size=-1								local
+int			AddPower=0							local
+int			Fired=0								local
+int			FireAgain=1							local
+int			Wait=0								local
+int			CanFire=1							local
+int			Effect=0							local
+int			PulseMode=0							local
+int			bin=178								local
+int			Stuff=0								local
+
+int			MultiStat							local
+int			Ki									local
+int			Color								local
+
+sound		mountSound=SwingFist01.wav			local
+sound		dismountSound=SwingFist01.wav		local
+
+sound       chargeSound=beamcharge.wav			local
+sound		loopsound=beamloop.wav				local
+sound       fireSound=beamfire.wav				local
+sound       outSound=SwingFist01.wav			local
+
+template	Ghost=+APGhost						local
+template	Par=+ypar							local
+
+thing       player                              local
+thing		Attack								local
+thing		FirePos								local
+
+int         trackID=-1                          local
+int         channel=-1                          local
+int         holsterTrack                        local
+
+int			Fire								local
+int			Attached							local
+
+Int			CUser1								local
+
+message     startup
+message     activated
+message     deactivated
+message     selected
+message     deselected
+message     newplayer
+message     autoselect
+message     killed
+message     timer
+message		fire
+
+end
+
+# ========================================================================================
+
+code
+
+startup:
+
+	player = GetLocalPlayerThing();
+
+return;
+
+# ........................................................................................
+
+timer:
+
+	if(GetSenderID() == 10)
+	{
+		ChangeFireRate(player, 1);
+		ChangeInv(player, 14, -20);
+		FireProjectile(Player, Par, -1, -1, '0 0.09 0.025', '0 0 0', 0, 0, 0, 0);
+		FireProjectile(Player, KiBeam, firesound, -1, '0 0.09 0.025', '0 0 0', 0, 0, 0, 0);
+
+	}
+
+return;
+
+# ........................................................................................
+
+activated:
+
+	Attached=GetInv(player, 171);
+	if(Attached==0) return;
+	
+	mode = GetSenderRef();
+	if(mode==1) return;
+
+	// Check Ammo - If we are out, autoselect best weapon.
+	if(GetInv(player, 14) < 40)
+	{
+		if((GetAutoSwitch() & 1))
+			SelectWeapon(player, AutoSelectWeapon(player, 1));
+		else
+			PlaySoundThing(outSound, player, 1.0, -1, -1, 0x80);
+		return;
+	}
+
+	Flying=GetMajorMode(player);
+	if(Flying>2) Flying=Flying-3; //Compensate for underwater
+
+	kfireID=PlayKey(player, kfire0[Flying], 4, 0x14);
+
+	StopThing(player);
+	SetActorFlags(player, 0x40000);
+
+	SendMessageEx(GetInvCog(player, 180), user1, 0, -1, -1, -1);
+
+	ActivateWeapon(player, 1, 0);
+	
+	Print("Activated?");
+	SetTimerEx(GetKeyLen(kfire0[Flying])-0.1, 10, -1, -1);
+
+return;
+
+# ........................................................................................
+
+deactivated:
+
+	if(Attached==0) return;
+
+	mode = GetSenderRef();
+	if(mode==1) return;
+
+	KillTimerEx(10);
+
+	Call Stop_Effects;
+	DeactivateWeapon(player, mode);
+
+return;
+
+# ........................................................................................
+
+fire:
+
+	player = GetSourceRef();
+
+	// Check that the player is still alive.
+	if(GetThingHealth(player) <= 0)
+	{
+		Return;
+	}
+
+	// Check Ammo - If we are out, autoselect best weapon.
+	if(GetInv(player, 14) < 20)
+	{
+		PlaySoundThing(outSound, player, 1.0, -1.0, -1.0, 0x80);
+		if(GetAutoSwitch() & 1)
+			SelectWeapon(player, AutoSelectWeapon(player, 1));
+		Return;
+	}
+
+	Print("Fire?");
+
+	ChangeInv(player, 14, -20);
+	FireProjectile(Player, Par, -1, -1, '0 0.09 0.025', '0 0 0', 0, 0, 0, 0);
+	FireProjectile(Player, KiBeam, firesound, -1, '0 0.09 0.025', '0 0 0', 0, 0, 0, 0);
+
+return;
+
+# ........................................................................................
+
+selected:
+
+	//jkPrintUNIString(player, 7);
+	
+	Print("Ki Beam");
+
+	if(IsInvActivated(player, 41) == 1)
+	{SetArmedMode(player, 1);}
+	else
+	{SetArmedMode(player, 0);}
+
+	// Set flags, etc.
+	jkClearFlags(player, 0x5);
+	SetCurWeapon(player, 5);
+
+   // Check Ammo - If we are out, autoselect best weapon.
+// if(GetInv(player, 14) < 60.0)
+// {
+//    if((GetAutoSwitch() & 1))
+//       SelectWeapon(player, AutoSelectWeapon(player, 1));
+// }
+
+   Return;
+
+# ........................................................................................
+
+deselected:
+
+	call Stop_Effects;
+
+return;
+
+# ........................................................................................
+
+killed:
+
+	if (player == GetSenderRef())
+	{
+		Call Stop_Effects;
+	}
+
+return;
+
+# ........................................................................................
+
+newplayer:
+//   // Make sure that if the player is respawning, the old mount isn't playing anymore.
+//   if (trackID != -1)
+//   {
+//      jkStopPOVKey(player, trackID, 0);
+//      trackID = -1;
+//   }
+
+   Return;
+
+# ........................................................................................
+
+autoselect:
+   // If the player has the weapon
+   if(GetInv(player, 178) != 0.0)
+   {
+      // If the player has ammo
+      if(GetInv(player, 14) > 40.0)
+      {
+         ReturnEx(700.0);
+      }
+      else
+      {
+         ReturnEx(-1.0);
+      }
+   }
+   else
+   {
+      ReturnEx(-1.0);
+   }
+
+   Return;
+
+Stop_Effects:
+
+	if(channel != -1)
+	{
+		StopSound(channel, 0.1);
+		channel = -1;
+	}
+
+	if(kfireID != -1)
+	{
+		StopKey(player, kfireID, 0);
+		kfireID = -1;
+	}
+
+	SetActorFlags(player, 0x1);
+	ClearActorFlags(player, 0x40000);
+
+	SendMessageEx(GetInvCog(player, 180), user2, -1, -1, -1, -1);
+
+return;
+
+end
+

@@ -1,0 +1,50 @@
+# Jedi Knight Cog Script
+#
+# ability_disk.cog
+#
+# Hell Raiser [Jon Harmon]
+
+symbols
+
+thing		player			local
+
+thing		disk			local
+template	disk_tpl=+disk	local
+
+message		startup
+message		activated
+message		pulse
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	SetInvActivated(player, bin, 0);
+
+return;
+
+activated:
+
+	if(IsInvActivated(player, bin))
+	{
+		//FP the disk
+		SetPulse(0.1)
+		ChangeInv(player, 14, cost);
+	}
+	else
+	{
+		SetPulse(0);
+	}
+
+return;
+
+pulse:
+
+	ChangeInv(player, 14, -4);
+
+return;
+
+end

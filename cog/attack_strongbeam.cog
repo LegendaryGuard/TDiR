@@ -1,0 +1,780 @@
+# Jedi Knight Cog Script
+#
+# Attack 7: Strong Beam
+
+# 2nd Fire no longer supported in TDiR
+# Fix bug when pressing other mode while already charging.
+
+symbols
+
+template	Par0=+bpar				local
+template	Par1=+gpar				local
+template	Par2=+opar				local
+template	Par3=+ppar				local
+template	Par4=+rpar				local
+template	Par5=+spar				local
+template	Par6=+tpar				local
+template	Par7=+ypar				local
+
+template	ExpPos=+ExplodePos		local
+thing		ExpP					local
+
+template	Exp0=+Explode1						local
+template	Exp1=+Explode3						local
+template	Exp2=+Explode5						local
+template	Exp3=+Explode7						local
+template	Exp4=+Explode9						local
+
+int			Flying=0							local
+
+keyframe	kcharge0=kamehacharge.key				local
+keyframe	kcharge1=bigbangcharge.key				local
+keyframe	kcharge2=finalflashcharge.key			local
+keyframe	kcharge3=galicguncharge.key				local
+keyframe	kcharge4=cannoncharge.key				local
+keyframe	kcharge5=masenkocharge.key				local
+keyframe	kcharge6=fingerbeamcharge.key			local
+keyframe	kcharge7=onehandcharge.key				local
+keyframe	kcharge8=kamehachargeflying.key			local
+keyframe	kcharge9=bigbangchargeflying.key		local
+keyframe	kcharge10=finalflashchargeflying.key	local
+keyframe	kcharge11=galicgunchargeflying.key		local
+keyframe	kcharge12=cannonchargeflying.key		local
+keyframe	kcharge13=masenkochargeflying.key		local
+keyframe	kcharge14=fingerbeamchargeflying.key	local
+keyframe	kcharge15=onehandchargeflying.key		local
+
+keyframe	kfire0=kamehafire.key					local
+keyframe	kfire1=bigbangfire.key					local
+keyframe	kfire2=finalflashfire.key				local
+keyframe	kfire3=galicgunfire.key					local
+keyframe	kfire4=cannonfire.key					local
+keyframe	kfire5=masenkofire.key					local
+keyframe	kfire6=fingerbeamfire.key				local
+keyframe	kfire7=onehandfire.key					local
+keyframe	kfire8=kamehafireflying.key				local
+keyframe	kfire9=bigbangfireflying.key			local
+keyframe	kfire10=finalflashfireflying.key		local
+keyframe	kfire11=galicgunfireflying.key			local
+keyframe	kfire12=cannonfireflying.key			local
+keyframe	kfire13=masenkofireflying.key			local
+keyframe	kfire14=fingerbeamfireflying.key		local
+keyframe	kfire15=onehandfireflying.key			local
+
+template	BeamCharge0=+kmhchargeblue	local
+template	BeamCharge1=+bbcharge		local
+#template	BeamCharge2=+ffcharge		local
+template	BeamCharge2=+APGhost		local
+template	BeamCharge3=+ggcharge		local
+template	BeamCharge4=+sbccharge		local
+template	BeamCharge5=+mascharge		local
+template	BeamCharge6=+fbcharge		local
+template	BeamCharge7=+ohcharge		local
+
+template	NewTail=+newtail			local
+
+thing		Chrg					local
+
+template	Attack_Tpl				local
+template	Fire_Tpl				local
+template	Charge_Tpl				local
+
+template	SHead=+beamhead40		local
+template	STail=+beamtail40		local
+
+#Kamehameha
+#BigBang
+#FinalFlash
+#GalicGun
+#SpecialBeamCannon
+#Masenko
+#FingerBeam
+#OneHanded
+
+
+int			kchargeID=-1						local
+int			kfireID=-1							local
+int			kfireID2=-1							local
+
+int			Size=-1								local
+int			AddPower=0							local
+int			Fired=0								local
+int			FireAgain=1							local
+int			Wait=0								local
+int			CanFire=1							local
+int			Effect=0							local
+int			PulseMode=0							local
+int			bin=178								local
+int			Stuff=0								local
+
+int			MultiStat							local
+int			Ki									local
+int			Color								local
+
+sound		mountSound=SwingFist01.wav			local
+sound		dismountSound=SwingFist01.wav		local
+
+sound       chargeSound=beamcharge2.wav			local
+sound		loopsound=beamloop2.wav				local
+sound       fireSound=beamfire.wav				local
+sound       outSound=SwingFist01.wav			local
+
+flex        fireWait=2.5                        local
+flex        delayTime=0                         local
+flex        error                               local
+
+template	Ghost=+APGhost						local
+
+thing       player                              local
+thing		Attack								local
+thing		FirePos								local
+
+int         trackID=-1                          local
+int         channel=-1                          local
+int         holsterTrack                        local
+
+int			OkToFire							local
+
+int			Attached							local
+
+int			KeepLook=-1							local
+template	Look=+lookkeep						local
+
+template	DummyTpl=+Dummy						local
+thing		Dummy								local
+int			Geo									local
+
+int			TailCount							local
+int			TailPiece							local
+thing		TailThing							local
+
+template	FirePosTpl=+FireGhost				local
+
+message     startup
+message     activated
+message     pulse
+message     deactivated
+message     selected
+message     deselected
+message     newplayer
+message     autoselect
+message     killed
+message     timer
+message		user0
+message		user1
+message		user2
+message		damaged
+message		touched
+message		user7
+
+end
+
+# ========================================================================================
+
+code
+
+timer:
+
+	if(GetParam(1) == GetThingSignature(GetParam(0)))
+	{
+		ExpP=FireProjectile(player, ExpPos, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+		//SetThingPos(ExpP, GetThingPos(GetParam(0)));
+		TeleportThing(ExpP, GetParam(0));
+		FireProjectile(ExpP, Exp0[Size], -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+		//Call Stop_Effects;
+		Call user0;
+		DestroyThing(GetParam(0));
+		//DestroyThing(FirePos);
+		Attack=-1;
+		SendMessage(GetInvCog(player, 172), user0);
+		if(KeepLook!=-1)
+		{
+			SetActorFlags(player, 0x1);
+			DestroyThing(KeepLook);
+			KeepLook=-1;
+		}
+		DestroyThing(Thingie);
+	}
+
+return;
+
+
+startup:
+
+	player = GetLocalPlayerThing();
+	Fired=0;
+	Effect=0;
+	SetInv(Player, 149, 1);
+	Stuff=0;
+	Attack=-1;
+	Animation=-1;
+	HeapNew(0, 99);
+
+return;
+
+# ........................................................................................
+
+activated:
+
+	Attached=GetInv(player, 171);
+	if(Attached==0) return;
+	
+	//Shared check inventory between both beam
+	//attacks indicating if we can fire or not
+	CanFire=GetInv(Player, 149);
+	if(CanFire==0) return;
+
+	mode = GetSenderRef();
+	
+	if(mode==1) return;
+	
+	if(Fired==0)
+	{
+		// Check Ammo - If we are out, autoselect best weapon.
+		if(GetInv(player, 14) < 80)
+		{
+			if((GetAutoSwitch() & 1))
+				SelectWeapon(player, AutoSelectWeapon(player, 1));
+			else
+				PlaySoundThing(outSound, player, 1.0, -1, -1, 0x80);
+			return;
+		}
+
+		ActivateWeapon(player, 0, mode);
+
+		if(channel == -1)
+		{
+			channel = PlaySoundThing(chargeSound, player, 0.0, -1, -1, 0x181);
+
+			if(channel != -1)
+			{
+				ChangeSoundPitch(channel, 0.5, 0.01);
+				ChangeSoundVol(channel, 0.8, 0.5);
+				ChangeSoundPitch(channel, 1.0, 1);
+			}
+			
+			Flying=GetMajorMode(player);
+			if(Flying>2) Flying=Flying-3; //Compensate for underwater
+
+			//Hide the player and create dummy actor
+			//so when looking up/down while charging
+			//doesn't move the arms.
+
+			//Geo=GetThingCurGeoMode(player);
+			//SetThingCurGeoMode(player, 0);
+			Dummy=FireProjectile(Player, DummyTpl, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+			//Dummy=CreateThing(DummyTpl, player);
+			//SetThingUserData(Dummy, player);
+			//SetThingModel(Dummy, GetThingModel(player));
+
+			Animation2=Animation+(Flying*8);
+			//kchargeID=PlayKey(player, kcharge0[Animation2], 4, 0x14); //Try this->0x14
+			kchargeID=PlayKey(Dummy, kcharge0[Animation2], 4, 0x14); //Try this->0x14
+
+			StopThing(player);
+			SetActorFlags(player, 0x40000);
+			Charge_Tpl=SendMessageEx(GetInvCog(player, 132), user0, ((Animation*8)+Color), -1, -1, -1);
+			Chrg=FireProjectile(Player, Charge_Tpl, -1, -1, '0.03 -0.014 -0.011', '0 0 0', 1.0, 0x20, 0, 0);
+			//PrintInt(Animation);
+			//PrintInt(BeamCharge0[Animation]);
+			Effect=1;
+		}
+		PulseMode=0;
+		SetPulse(1);
+		SetInv(player, 147, 1);
+
+		SendMessageEx(GetInvCog(player, 180), user1, 0, -1, -1, -1);
+		Activate=1;
+	}
+	else if(Fired==1)
+	{
+		Activate=2;
+		ActivateWeapon(player, 0, mode);
+		//Initiate controlly
+		//SendMessageEx(GetInvCog(player, 172), user1, Attack, 5, 0, 0);
+		SetActorFlags(player, 0x1);
+		if(KeepLook!=-1)
+		{
+			DestroyThing(KeepLook);
+			KeepLook=-1;
+		}
+		
+	}
+
+return;
+
+# ........................................................................................
+
+deactivated:
+
+	mode = GetSenderRef();
+
+	if(Activate==2 && Attack==-1)
+	{
+		DeactivateWeapon(player, mode);
+		return;
+	}
+	if(Attached==0) return;
+	if(CanFire==0) return;
+
+	if(mode==1) return;
+
+	if(Fired==0)
+	{
+		delayTime = DeactivateWeapon(player, mode);
+		//PrintFlex(delayTime);
+
+        if(delayTime < 1)
+        {
+			DestroyThing(Chrg);
+			DestroyThing(Dummy);
+			//SetThingCurGeoMode(player, Geo);
+			Effect=0;
+			SetPulse(0);
+			Call Stop_Effects;
+			SendMessageEx(GetInvCog(player, 180), user2, -1, -1, -1, -1);
+        	return;
+        }
+
+		if(channel != -1)
+		{
+			StopSound(channel, 0);
+			channel = -1;
+		}
+
+		// Make sure both keys are up before continuing.
+		//if (GetCurWeaponMode() != -1) Return;
+
+		DestroyThing(Chrg);
+		Effect=0;
+		//StopKey(player, kchargeID, 0);
+		StopKey(Dummy, kchargeID, 0);
+		kchargeID=-1;
+
+		Flying=GetMajorMode(player);
+		if(Flying>2) Flying=Flying-3; //Compensate for underwater
+
+		DestroyThing(Dummy);
+		//SetThingCurGeoMode(player, Geo);
+
+		Flying=GetMajorMode(player);
+		if(Flying>2) Flying=Flying-3; //Compensate for underwater
+			
+		Animation2=Animation+(Flying*8);
+		kfireID=PlayKey(player, kfire0[Animation2], 4, 0x14);
+
+		//Add in check for closeness to walls, ect
+		//SendMessage(GetInvCog(player, 170), user0); //beam distance check
+		Call user1;
+		Fired=1;
+		SetPulse(0);
+	}
+	else if(Fired == 1)
+	{
+		delayTime = DeactivateWeapon(player, mode);
+		
+		//if(delayTime > 1) return;
+
+		KillTimerEx(5);
+		SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));
+	}
+	else
+	{Fired=0;}
+
+return;
+
+# ........................................................................................
+
+pulse:
+
+	if(GetSenderRef() != 0)
+	{
+		//PrintInt(GetAttachFlags(GetSenderRef()));
+		if(GetAttachFlags(GetSenderRef()) & 0x1 || GetAttachFlags(GetSenderRef()) & 0x2)
+		{
+			KillTimerEx(5);
+			SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));
+			return;
+		}
+
+		if(Activate==2)
+		{
+			HeadPitch=FireProjectile(player, Ghost, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+
+			//pos1=VectorAdd(GetThingPos(HeadPitch), VectorSet(0, 0, 0.037));
+			pos1=VectorAdd(GetThingPos(HeadPitch), VectorSet(0.0, 0.0, 0.14));
+			//Distance=VectorDist(GetThingPos(Player), GetThingPos(HeapGet(TailCount)));
+			Distance=VectorDist(GetThingPos(Player), GetThingPos(Attack));
+			pos2=VectorScale(VectorNorm(GetThingLVec(HeadPitch)), Distance+40);
+
+			CHPos=VectorAdd(pos2, pos1);
+			SetThingPos(HeadPitch, CHPos);
+			
+			//ProjDir=VectorSub(GetThingPos(HeadPitch), GetThingPos(HeapGet(TailCount)));
+			ProjDir=VectorSub(GetThingPos(HeadPitch), GetThingPos(Attack));
+	
+			if(HeadPitch!=-1) DestroyThing(HeadPitch);
+	
+			//SetThingLook(HeapGet(TailCount), ProjDir);
+			SetThingLook(Attack, ProjDir);
+			//SyncThingState(Attack);
+		}
+
+		//TailCount=TailCount+1;
+		//TailPiece=SendMessageEx(GetInvCog(player, 131), user2, ((Color*5)+Size), -1, -1, -1);
+		//TailThing=FireProjectile(HeapGet(TailCount-1), TailPiece, -1, -1, '0 0.5 0', '0 0 0', 0, 0, 0, 0);
+
+		//HeapSet(TailCount, TailThing);
+		
+		//AttachThingToThingEx(TailThing, HeapGet(TailCount-1), 0x8);
+		
+		//PrintInt(TailCount);
+		
+		//TeleportThing(Attack, TailThing);
+		//SetThingVel(Attack, VectorScale(GetThingLVec(Attack), 3));
+		
+		return;
+	}
+
+	if(PulseMode==0)
+	{
+		if(GetInv(player, 14) > 80) // Return;
+		{
+			Size=Size+1;
+			if(Size>4)
+			{Size=4;}
+			else
+			{
+				ChangeInv(player, 14, -80);
+				ChangeInv(player, 13, 40);
+			}
+		}
+	}
+	else
+	{
+		Size=Size-1;
+		ChangeInv(player, 13, -40);
+		if(Size==-1) 
+		{
+			SetInv(Player, 149, 1);
+			SetPulse(0);
+			//Print("j00 can fire!");
+			SendMessageEx(GetInvCog(player, 180), user2, -1, -1, -1, -1);
+		}
+	}
+		
+
+return;
+
+# ........................................................................................
+
+selected:
+
+	if(GetInv(player, bin) != 1) return;	//st00p ass Sequencer chargers,
+											//their bin ammount is also their
+											//ammo ammount, therefore, bin 8 (and 4)
+											//don't act like normal weapons -_-
+	//jkPrintUNIString(player, 7);
+	
+	Print("Strong Beam");
+
+	if(IsInvActivated(player, 41) == 1)
+	{SetArmedMode(player, 1);}
+	else
+	{SetArmedMode(player, 0);}
+
+	// Set flags, etc.
+	jkClearFlags(player, 0x5);
+	SetCurWeapon(player, 8);
+
+   // Check Ammo - If we are out, autoselect best weapon.
+// if(GetInv(player, 14) < 60.0)
+// {
+//    if((GetAutoSwitch() & 1))
+//       SelectWeapon(player, AutoSelectWeapon(player, 1));
+// }
+
+	//Get custom stuff from the character.cog
+	
+	Color=SendMessageEx(GetInvCog(player, 127), User1, 2, -1, -1, -1);
+	Animation=SendMessageEx(GetInvCog(player, 127), User2, 2, -1, -1, -1);
+	
+	//Animation=Animation+1;
+	//if(Animation==8)Animation=0;
+
+	//if(Animation==6) Animation=0;
+
+	//Animation=1;
+
+#Kamehameha
+#BigBang
+#FinalFlash
+#GalicGun
+#SpecialBeamCannon
+#Masenko
+#FingerBeam
+#OneHanded
+
+#mouthbeam 0, 0.038, 0.019
+
+	if(Animation==0)
+	{FireVec=VectorSet(0, 0.07, 0.005);}
+	else if(Animation==1)
+	{FireVec=VectorSet(0.009, 0.086, 0.019);}
+	else if(Animation==2)
+	{FireVec=VectorSet(0.0, 0.073, 0.017);}
+	else if(Animation==3)
+	{FireVec=VectorSet(0.007, 0.075, 0.016);}
+	else if(Animation==4)
+	{FireVec=VectorSet(-0.006, 0.083, 0.013);}
+	else if(Animation==5)
+	{FireVec=VectorSet(0.0, 0.066, 0.024);}
+	else if(Animation==6)
+	{FireVec=VectorSet(0.006, 0.074, 0.013);}
+	else if(Animation==7)
+	{FireVec=VectorSet(0.026, 0.066, 0.017);}
+	else if(Animation==8)
+	{FireVec=VectorSet(0.0, 0.038, 0.019);}
+	
+	
+   Return;
+
+# ........................................................................................
+
+deselected:
+
+	//returnEx(0);
+	//SetInv(player, 13, 0);
+	//Size=-1;
+	//SetPulse(0);   
+	call Stop_Effects;
+
+return;
+
+# ........................................................................................
+
+killed:
+
+	if (player == GetSenderRef())
+	{
+		Call Stop_Effects;
+		Call Cleanup;
+		if(Attack != -1)
+		{
+			KillTimerEx(5);
+			SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));
+		}
+	}
+	else if(Attack==GetSenderRef())
+	{
+		KillTimerEx(5);
+		SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));
+	}
+
+return;
+
+# ........................................................................................
+
+newplayer:
+//   // Make sure that if the player is respawning, the old mount isn't playing anymore.
+//   if (trackID != -1)
+//   {
+//      jkStopPOVKey(player, trackID, 0);
+//      trackID = -1;
+//   }
+
+   Return;
+
+# ........................................................................................
+
+autoselect:
+   // If the player has the weapon
+   if(GetInv(player, 178) != 0.0)
+   {
+      // If the player has ammo
+      if(GetInv(player, 14) > 80.0)
+      {
+         ReturnEx(700.0);
+      }
+      else
+      {
+         ReturnEx(-1.0);
+      }
+   }
+   else
+   {
+      ReturnEx(-1.0);
+   }
+
+   Return;
+
+Stop_Effects:
+
+	if(channel != -1)
+	{
+		StopSound(channel, 0.1);
+		channel = -1;
+	}
+
+	if(kchargeID != -1)
+	{
+		StopKey(dummy, kchargeID, 0);
+		kchargeID = -1;
+	}
+	
+	if(kfireID != -1)
+	{
+		StopKey(player, kfireID, 0);
+		kfireID = -1;
+	}
+
+	//ParseArg(player, "pup=ky.pup");
+
+	//SetActorFlags(player, 0x1);
+	ClearActorFlags(player, 0x40000);
+
+	if(Effect) DestroyThing(Chrg);
+
+	AddPower=0;
+	Fired=0;
+
+	//sometimes there's no keyframe applied to the model
+	//this fixes that
+	//PlayMode(player, 0);
+
+return;
+
+User0:
+
+	call Stop_Effects;
+	SetInv(Player, 149, 0);
+	PulseMode=1;
+	SetPulse(FireWait/5);
+	SetInv(player, 147, 0);
+	
+return;
+
+cleanup:
+
+	SetPulse(0);
+	SetInv(player, 13, 0);
+	SetInv(Player, 149, 1);
+
+	SendMessageEx(GetInvCog(player, 180), user2, -1, -1, -1, -1);
+
+return;
+
+user1:
+
+	//if(GetParam(0) == 0)
+	//{
+	//	//check beam distance again, 0 shouldn't happen
+	//	SendMessage(GetInvCog(player, 170), user0);
+	//	return;
+	//}
+
+	FireProjectile(Player, Par0[Color], -1, -1, FireVec, '0 0 0', 0, 0, 0, 0);
+	Fire_Tpl=SendMessageEx(GetInvCog(player, 131), user0, ((Color*5)+Size), -1, -1, -1);
+	//FirePos=FireProjectile(Player, Fire_Tpl, firesound, -1, FireVec, '0 0 0', 1.0, 0x20, 0, 0);
+
+	//TailCount=0;
+	//TailPiece=SendMessageEx(GetInvCog(player, 131), user2, ((Color*5)+Size), -1, -1, -1);
+	//TailThing=FireProjectile(FirePos, TailPiece, -1, -1, '0 0.5 0', '0 0 0', 0, 0, 0, 0);
+
+	//HeapSet(TailCount, TailThing);
+
+	//AttachThingToThingEx(TailThing, FirePos, 0x8);
+
+
+	KeepLook=FireProjectile(Player, Look, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+	ClearActorFlags(player, 0x1);
+	channel = PlaySoundThing(loopSound, FirePos, 0.2, -1, -1, 0x181);
+	ChangeSoundVol(channel, 0.5, GetSoundLen(firesound));
+	Attack_Tpl=SendMessageEx(GetInvCog(player, 131), user1, ((Color*5)+Size), -1, -1, -1);
+	//Attack=FireProjectile(FirePos, Attack_Tpl, -1, -1, '0 1.5 0', '0 0.5 0', 1.0, 0x20, 0, 0);
+	Thingie=FireProjectile(player, FirePosTpl, -1, -1, FireVec, '0 0 0', 0, 0, 0, 0);
+	Attack=FireProjectile(Thingie, Attack_Tpl, firesound, -1, FireVec, '0 0 0', 0, 0, 0, 0);
+
+	//SendMessageEx(GetInvCog(player, 172), user1, Attack, 5, 0, 0);
+
+	CaptureThing(Attack);
+	//SetThingPulse(Attack, 0.1);
+	//SetTimerEx(10, 5, Attack, GetThingSignature(Attack));
+
+	//if(GetParam(0)>=0.77)
+	//{SetTimerEx(10, 5, Attack, GetThingSignature(Attack));}
+	//else
+	//{SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));}
+
+return;
+
+touched:
+
+//	Print("Touchy!");
+
+	if(GetSenderRef() == Attack)
+	{
+		//PrintInt(GetSourceType());
+		KillTimerEx(5);
+		SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));
+	}
+
+return;
+
+damaged:
+
+	if(GetSenderRef() == Attack)
+	{
+		//if damage was caused by another player
+		if(GetThingType(GetThingParent(GetSourceRef()))==10)
+		{returnEx(GetParam(0)/2);} //return the damage
+		else
+		{returnEx(1000);} //make it die
+	}
+	else if(GetSenderRef() == Player)
+	{
+		if(fired==1) //if we've fired, explode the beam
+		{SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));}
+		returnEx(GetParam(0));
+	}
+	
+return;
+
+user2:
+
+	KillTimerEx(5);
+	SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));
+	return;
+
+return;
+
+user7:
+
+	if(Fired==0 && Effect==1)
+	{
+		delayTime = DeactivateWeapon(player, mode);
+		DestroyThing(Chrg);
+		DestroyThing(Dummy);
+		//SetThingCurGeoMode(player, Geo);
+		Effect=0;
+		SetPulse(0);
+		Call Stop_Effects;
+		Call cleanup;
+		SendMessageEx(GetInvCog(player, 180), user2, -1, -1, -1, -1);
+		Fired=2;
+       	return;
+	}
+	else if(Fired==1)
+	{
+		delayTime = DeactivateWeapon(player, mode);
+		
+		//if(delayTime > 1) return;
+
+		KillTimerEx(5);
+		SetTimerEx(0.01, 5, Attack, GetThingSignature(Attack));
+	}
+
+return;
+
+end
+

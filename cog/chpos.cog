@@ -1,0 +1,30 @@
+symbols
+
+vector		P			local
+
+thing		player		local
+
+message		startup
+message		created
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	
+return;
+
+created:
+
+	Print("created");
+
+	P=GetThingPos(GetSenderRef());
+
+	SendMessageEx(GetInvCog(player, 126), user4, VectorX(P), VectorY(P), VectorZ(P), -1);
+
+return;
+
+end

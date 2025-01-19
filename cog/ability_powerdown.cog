@@ -1,0 +1,18 @@
+# Jedi Knight Cog Script
+#
+# ability_powerdown.cog
+#
+# Created by: Son of the Damned
+
+symbols
+
+thing		player				local
+
+message		startup
+message		activated
+
+end
+
+code
+
+end

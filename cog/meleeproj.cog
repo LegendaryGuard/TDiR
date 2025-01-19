@@ -1,0 +1,32 @@
+#
+
+symbols
+
+message		created
+message		pulse
+message		touched
+
+end
+
+code
+
+created:
+
+	SetThingPulse(GetSenderRef(), 0.01);
+
+return;
+
+pulse:
+
+	SetThingVel(GetSenderRef(), GetThingVel(GetThingParent(GetSenderRef())));
+
+return;
+
+touched:
+
+	Print("BYEBYE!");
+	//SendMessage to melee cog to StopThing(player);
+
+return;
+
+end

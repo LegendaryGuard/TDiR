@@ -1,0 +1,50 @@
+# Jedi Knight Cog Script
+#
+# crosshair.cog
+#
+# Crosshair, yea, cuz JK sucks ;P
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+thing		player			local
+
+template	CH=+crosshair	local
+
+vector		CH_Pos			local
+
+message		startup
+message		pulse
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	//SetPulse(0.001);
+
+return;
+
+pulse:
+
+	if(GetInv(player, 190) == 0)
+	{CH_Pos=VectorSet(0, 0.3, 0.08);}
+	else if(GetInv(player, 190) == 1)
+	{CH_Pos=VectorSet(0, 0.2, 0.1);}
+	else if(GetInv(player, 190) == 2)
+	{CH_Pos=VectorSet(0, 0.1, 0.12);}
+	else if(GetInv(player, 190) == 3)
+	{CH_Pos=VectorSet(0, 0, 0.14);}
+
+
+
+	FireProjectile(player, CH, -1, -1, CH_Pos, '0 0 0', 0, 0, 0, 0);
+
+return;
+
+end

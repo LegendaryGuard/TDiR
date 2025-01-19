@@ -1,0 +1,56 @@
+# Kamehameha Charging Pos Sync
+#
+# Created By: Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+template	AP_tpl=+APGhost	local
+thing		AP_thng1		local
+thing		AP_thng2		local
+thing		Kameball		local
+thing		Parent			local
+thing		Player			local
+
+keyframe	Rot=beamcharge.key	local
+
+vector		Opos			local
+
+message		startup
+message		created
+message		pulse
+
+end
+
+code
+
+startup:
+
+	Player=GetLocalPlayerThing();
+
+return;
+
+created:
+
+	//DestroyThing(GetSenderRef());
+
+	PlayKey(GetSenderRef(), Rot, 5, 0);
+	SetThingPulse(GetSenderRef(), 0.01);
+	
+return;
+
+pulse:
+
+	Parent=GetThingParent(GetSenderRef());
+	AP_thng1=CreateThing(AP_tpl, Parent);
+	SetThingLook(AP_thng1, GetThingLVec(Parent));
+	AP_thng2=FireProjectile(AP_thng1, AP_tpl, -1, -1, '-0.081 0.025 0.143', '0 0 0', 1.0, 0x20, 0, 0);
+	//SetThingPos(GetSenderRef(), GetThingPos(AP_thng2));
+	TeleportThing(GetSenderRef(), AP_thng2);
+	DestroyThing(AP_thng1);
+	DestroyThing(AP_thng2);
+
+return;
+
+end

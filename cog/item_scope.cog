@@ -1,0 +1,130 @@
+# Jedi Knight Cog Script
+#
+# ITEM_SCOPE.COG
+#
+# Script - Scope
+#
+# Created 9/8/99:
+# This is the only scope type Item I've ever seen so this is the original.
+#
+# Edited 9/9/99: 5 Updates
+# 1: Made a View Set Cog so you can make the scope look certain ways.
+# 2: Now when you fire the scope you will see through the scopes eyes. Giving the user better handling.
+# 3: Added a View Toggle Cog to toggle view from the scope or the player.
+# 4: Added code to go into the Internal view when player shoots Scope.
+# 5: The game will now let you know when the scope is activated or not.
+#
+#  [Mo Limit]
+#
+# (C) 1999 Mo Limit
+# LucasArts Entertainment Company doesn't support this cog in any way
+
+
+symbols
+thing       player                              local
+template    scope_shot=+scope               local
+template    ghost_shot=scope_ghost          local
+
+int         scghost=-1                              local
+int         gscope=-1                              local
+int         scope=-1                              local
+int         psview=-1                              local
+
+message     activated
+message     startup
+message     newplayer
+message     killed
+message     pulse
+message     user0
+message     user1
+
+end
+
+# ========================================================================================
+
+code
+startup:
+   player = GetLocalPlayerThing();
+   SetPulse(0);
+   Return;
+
+activated:
+   if(GetThingHealth(player) <= 0) Return;
+	if(scope != -1)
+	{
+	Print("Scope Set");
+	gscope = scghost;
+	DestroyThing(scope);
+	scghost = -1;
+	scope = -1;
+	SetCameraFocus(0, gscope);
+	SetPulse(0);
+	} else if(gscope != -1) {
+	Print("Scope Deactivated");
+	SetCameraFocus(0, player);
+	DestroyThing(gscope);
+	gscope = -1;
+	SetPulse(0);
+    SendMessage(GetInvCog(player, 126), user1);
+	} else {
+	Print("Scope Activated");
+	   SendMessage(GetInvCog(player, 126), user0);
+	   if(GetCurrentCamera() != 0) CycleCamera();
+	scope = FireProjectile(player, scope_shot, -1, -1, '0.0 0.0 0', '0 0 0', 1.0, 0x20, 30, 10);
+	SetThingCurGeoMode(scope, 0);
+	scghost = CreateThing(ghost_shot, scope);
+	SetThingLook(scghost, GetThingLVec(scope));
+	AttachThingToThingEx(scghost, scope, 0x8);
+	SetCameraFocus(0, scghost);
+	psview = 0;
+	SetPulse(0.01);
+	}
+   Return;
+# .....................................
+newplayer:
+killed:
+   if(GetSenderRef() != player) Return;
+   //Print("Scope Deactivated");
+   SetCameraFocus(0, player);
+	if(scope != -1) DestroyThing(scope);
+	if(gscope != -1) DestroyThing(gscope);
+	if(scghost != -1) DestroyThing(scghost);
+   scope = -1;
+   scghost = -1;
+   gscope = -1;
+	if(GetCurrentCamera() != 0) CycleCamera();
+   Return;
+# .....................................
+
+pulse:
+   if(GetThingHealth(player) <= 0) {SetPulse(0); Return;}
+	if(scope == -1) Return;
+	if((IsThingMoving(scope) == 0) || (GetThingAttachFlags(scope) != 0))
+	{
+	Print("Scope Deactivated");
+	SetCameraFocus(0, player);
+	DestroyThing(scope);
+	scope = -1;
+		if(gscope != -1) DestroyThing(gscope);
+		if(scghost != -1) DestroyThing(scghost);
+	scghost = -1;
+	gscope = -1;
+	   if(GetCurrentCamera() != 0) CycleCamera();
+	}
+      Return;
+
+user0:
+   if(GetThingHealth(player) <= 0) Return;
+   if(gscope != -1) SetThingLook(gscope, GetThingLVec(player));
+   Return;
+
+user1:
+   if(GetThingHealth(player) <= 0) Return;
+   if(GetCurrentCamera() != 0) CycleCamera();
+   if(gscope != -1 && psview == 1)
+	SetCameraFocus(0, gscope);
+   else if(gscope != -1 && psview == 0)
+	SetCameraFocus(0, player);
+   psview = 1 - psview;
+   Return;
+end

@@ -1,0 +1,2 @@
+#material		type	width	height  geo     light   tex	extralight	xoff    yoff	zoff
+RectileRed.mat	0		0.002	0.002	4       0       0  	0.0       	0.0   	 0.0	0.0

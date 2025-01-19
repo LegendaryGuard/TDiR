@@ -1,0 +1,66 @@
+# Jedi Knight Cog Script
+#
+# physics_call.cog
+#
+# Created By: Hell Raiser [Jon Harmon]
+#
+# The purpose of this little ditty is to handle the ParseArg()'ing
+# of a players physics so that they're not jumping everywhere in MP.
+
+flags=0x240
+
+symbols
+
+message		trigger
+
+end
+
+code
+
+trigger:
+
+	if(GetSourceRef() == 50000) //Flight
+	{
+		//jkStringClear();
+		//jkStringConcatPlayerName(GetParam(0));
+
+		if(GetParam(1) == 1)
+		{
+			//jkStringConcatAsciiString(" flight ON");
+			
+			ParseArg(GetParam(0), "maxthrust=2.00");
+			ParseArg(GetParam(0), "airdrag=1.5");
+			ParseArg(GetParam(0), "surfdrag=3.0");
+			ParseArg(GetParam(0), "soundclass=kyfly.snd");
+		}
+		else
+		{
+			//jkStringConcatAsciiString(" flight OFF");
+
+			ParseArg(GetParam(0), "maxthrust=2.00");
+			ParseArg(GetParam(0), "surfdrag=3.000000");
+			ParseArg(GetParam(0), "airdrag=0.500000");
+			ParseArg(GetParam(0), "soundclass=ky.snd");
+		}
+		
+		//if(IsServer()) jkStringOutput(GetPlayerThing(0), -1);
+	}
+	else if(GetSenderRef() == 50001) //Knockback
+	{
+		if(GetParam(1) == 1)
+		{
+			ParseArg(GetParam(0), "surfdrag=1.000000");
+			ParseArg(GetParam(0), "airdrag=0.100000");
+			ParseArg(GetParam(0), "staticdrag=0.500000");
+		}
+		else
+		{
+	   		ParseArg(GetParam(0), "surfdrag=3.000000");
+			ParseArg(GetParam(0), "airdrag=0.5000000");
+			ParseArg(GetParam(0), "staticdrag=0.300000");
+		}
+	}
+
+return;
+
+end

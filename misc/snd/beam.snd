@@ -1,0 +1,11 @@
+# Foley description for rail det
+create 		beamloop.WAV     0x89
+enterwater	splash1.wav
+enterwaterslow	splash1.wav
+
+
+
+
+
+
+

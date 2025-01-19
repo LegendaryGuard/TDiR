@@ -1,0 +1,102 @@
+# Jedi Knight Cog Script
+#
+# new_rectile.cog
+#
+# Basically replacement functions for the 
+# JK Rectile functions
+#
+# Created by: Hell Raiser [Jon Harmon]
+#
+# I am quite aware of my mispelling the
+# word reticule... live with it. =P
+
+flags=0x240
+
+symbols
+
+thing		player			local
+
+thing		Target0			local	#Player in challange mode
+thing		Target1			local	#Enemy in challange mode
+thing		Target2			local	#Lock-On
+thing		Target3			local
+thing		Target4			local
+thing		Target5			local
+thing		Target6			local
+thing		Target7			local
+thing		Target8			local
+thing		Target9			local
+thing		Target10		local
+
+template	TRectile0		local
+template	TRectile1		local
+template	TRectile2		local
+template	TRectile3		local
+template	TRectile4		local
+template	TRectile5		local
+template	TRectile6		local
+template	TRectile7		local
+template	TRectile8		local
+template	TRectile9		local
+template	TRectile10		local
+
+template	Rectile0=+RectileRed	local
+template	Rectile1=+RectileGreen	local
+template	Rectile2=+RectileGrey	local
+template	Rectile3=+RectileOrange	local
+
+material	RecAnim0=RectileRed.mat		local
+material	RecAnim1=RectileGreen.mat		local
+
+
+flex		Dist=0.025		local
+
+int			x				local
+
+vector		RecVec			local
+
+message		startup
+message		user0
+message		pulse
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+
+	for(x=0; x<2; x=x+1)
+	{MaterialAnim(RecAnim0[x], 30, 0x1);}
+
+	for(x=0; x<11; x=x+1)
+	{Target0[x]=-1;}
+	
+	Sleep(0.1);
+	SetPulse(0.001);
+
+return;
+
+user0:
+
+	Target0[GetParam(0)]=GetParam(1);
+	TRectile0[GetParam(0)]=Rectile0[GetParam(2)];
+
+return;
+
+pulse:
+
+	for(x=0; x<11; x=x+1)
+	{
+		if(Target0[x] != -1)
+		{
+			RecVec=VectorScale(VectorNorm(VectorSub(GetThingPos(Target0[x]), GetThingPos(GetPrimaryFocus(0)))), Dist);
+			RecVec=VectorAdd(GetThingPos(GetPrimaryFocus(0)), RecVec);
+			CreateThingAtPos(TRectile0[x], GetThingSector(GetPrimaryFocus(0)), RecVec, '0 0 0');		
+		}
+	}
+
+return;
+
+end

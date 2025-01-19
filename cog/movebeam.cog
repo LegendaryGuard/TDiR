@@ -1,0 +1,101 @@
+# Control teh beem!
+#
+# Bin 131
+
+flags=0x240
+
+symbols
+
+thing		player			local
+thing		CrossHair=-1	local
+thing		HeadPitch=-1	local
+thing		Proj=-1			local
+template	AP_tpl=+APGhost	local
+
+thing		GoThing=-1		local
+
+thing		Projectile		local
+
+model		Def=dflt.3do	local
+
+vector		pos1			local
+vector		pos2			local
+vector		CHPos			local
+vector		ProjDir			local
+
+flex		Distance=0.5		local
+
+flex		Speed			local
+int			SetVel			local
+
+message		user0
+message		user1
+message		user2
+message		pulse
+message		startup
+
+end
+
+code
+
+startup:
+
+	//Sleep(2);
+	//Call user1;
+	Player=GetLocalPlayerThing();
+
+return;
+
+pulse:
+
+	//pos1=VectorAdd(GetThingPos(HeadPitch), VectorSet(0, 0, 0));
+	//Distance=Distance+0.001;
+	//pos2=VectorScale(VectorNorm(GetThingLVec(HeadPitch)), Distance);
+	//pos2=VectorScale(VectorNorm(GetThingLVec(HeadPitch)), 0.15);
+
+	SetThingVel(GoThing, VectorScale(GetThingLVec(GoThing), Speed+1));
+
+	HeadPitch=FireProjectile(player, AP_tpl, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+
+	pos1=VectorAdd(GetThingPos(HeadPitch), VectorSet(0, 0, 0.037));
+	Distance=VectorDist(GetThingPos(Player), GetThingPos(GoThing));
+	pos2=VectorScale(VectorNorm(GetThingLVec(HeadPitch)), Distance);
+
+	CHPos=VectorAdd(pos2, pos1);
+	SetThingLook(CrossHair, GetThingLVec(HeadPitch));
+	SetThingPos(CrossHair, CHPos);
+	if(HeadPitch!=-1) DestroyThing(HeadPitch);
+
+	ProjDir=VectorSub(GetThingPos(CrossHair), GetThingPos(Proj));
+	//ProjDir=VectorSub(VectorScale(VectorNorm(GetThingLVec(CrossHair)), 0.15), GetThingPos(Proj));
+	
+	SetThingLook(Proj, ProjDir);
+	//SendTrigger(-1, 15000, Proj, VectorX(ProjDir), VectorY(ProjDir), VectorZ(ProjDir));
+	if(SetVel) SetThingVel(Proj, VectorScale(GetThingLVec(Proj), Speed));
+	
+return;
+
+user1:
+
+	Player=GetLocalPlayerThing();
+
+	//Print("Go go control?");
+
+	CrossHair=FireProjectile(player, AP_tpl, -1, -1, '0 1 0', '0 0 0', 1.0, 0x20, 0, 0);
+	GoThing=FireProjectile(player, AP_tpl, -1, -1, '0 2 0', '0 0 0', 1.0, 0x20, 0, 0);
+	Speed=GetParam(1);
+	SetVel=GetParam(2);
+	SetThingVel(GoThing, VectorScale(GetThingLVec(GoThing), Speed+1));
+	Proj=GetParam(0);
+	
+	SetPulse(0.1);
+	
+return;
+
+user0:
+	SetPulse(0);
+	if(GoThing != -1) DestroyThing(GoThing);
+	if(CrossHair != -1) DestroyThing(CrossHair);
+return;
+
+end

@@ -1,0 +1,56 @@
+# Jedi Knight Cog Script
+#
+# faura.cog
+#
+# Attach the flying aura to the player
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+template	tail=+kitail		local
+
+message		created
+message		pulse
+message		removed
+message		timer
+
+end
+
+code
+
+created:
+
+	TeleportThing(GetSenderRef(), GetThingParent(GetSenderRef()));
+	SetThingPos(GetSenderRef(), VectorAdd(GetThingPos(GetThingParent(GetSenderRef())), '0 0 0.02'));
+	SetThingLook(GetSenderRef(), GetThingLVec(GetThingParent(GetSenderRef())));
+	AttachThingToThingEx(GetSenderRef(), GetThingParent(GetSenderRef()), 0xc);
+	//SetThingTimer(GetSenderRef(), 0.1);
+	SetThingPulse(GetSenderRef(), 0.01);
+
+return;
+
+pulse:
+
+	SetThingLook(GetSenderRef(), GetThingLVec(GetThingParent(GetSenderRef())));
+
+return;
+
+timer:
+
+	
+	crap=FireProjectile(GetThingParent(GetSenderRef()), Tail, -1, -1, '0 -0.1 0', '0 0 0', 0, 0, 0, 0);
+	PrintInt(crap);
+	SetThingTimer(GetSenderRef(), 0.1);
+	
+return;
+
+removed:
+
+	SetThingTimer(GetSenderRef(), 0);
+	
+return;
+
+end

@@ -1,0 +1,87 @@
+# Cog
+
+symbols
+
+thing		player				local
+
+int			PosNum				local
+
+thing		Pos0				local
+thing		Pos1				local
+thing		Pos2				local
+thing		Pos3				local
+thing		Pos4				local
+thing		Pos5				local
+thing		Pos6				local
+thing		Pos7				local
+thing		Pos8				local
+thing		Pos9				local
+thing		Pos10				local
+thing		Pos11				local
+thing		Pos12				local
+thing		Pos13				local
+thing		Pos14				local
+thing		Pos15				local
+thing		Pos16				local
+thing		Pos17				local
+thing		Pos18				local
+thing		Pos19				local
+
+model		DB=dragonball.3do	local
+template	Ghost=+APGhost		local
+
+int			CurDB				local
+
+message		activated
+message		pulse
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	mode=-1;
+	PosNum=-1;
+
+return;
+
+activated:
+
+	PosNum=PosNum+1;
+	if(PosNum==20)
+	{
+		Print("Finished with DBs");
+		SetPulse(0.1);
+		CurDB=0;
+	}
+	else if(PosNum<=19)
+	{
+		Pos0[PosNum]=FireProjectile(Player, Ghost, -1, -1, '0 0 -0.05', '0 0 0', 1.0, 0x20, 0, 0);
+		SetThingModel(Pos0[PosNum], DB);
+	}
+	else if(PosNum>20)
+	{
+		CurDB=CurDB+1;
+		if(CurDB==19)
+		{PosNum=0;}
+	}
+
+return;
+
+pulse:
+
+	jkStringClear();
+	jkStringConcatAsciiString("DB ");
+	jkStringConcatInt(CurDB);
+	jkStringConcatAsciiString(": Pos: ");
+	jkStringConcatVector(GetThingPos(Pos0[CurDB]));
+	jkStringConcatAsciiString(" Sector: ");
+	jkStringConcatInt(GetThingSector(Pos0[CurDB]));
+	jkStringOutput(-1, -1);	
+	
+return;
+
+
+end

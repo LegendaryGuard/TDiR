@@ -1,0 +1,30 @@
+# JK Script
+
+flags=0x240
+
+symbols
+
+message		created
+message		pulse
+
+end
+
+code
+
+created:
+
+	if(GetThingParent(GetSenderRef())==GetLocalPlayerThing())
+	{
+		SetThingLook(GetSenderRef(), GetThingLVec(GetThingParent(GetSenderRef())));
+		SetThingPulse(GetSenderRef(), 0.01);
+	}
+
+return;
+
+pulse:
+
+	SetThingLook(GetThingParent(GetSenderRef()), GetThingLVec(GetSenderRef()));
+
+return;
+
+end

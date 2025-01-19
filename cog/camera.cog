@@ -1,0 +1,46 @@
+# Jedi Knight Cog Script
+#
+# camera.cog
+#
+# Handle the camera
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+message	created
+message timer
+message	startup
+
+end
+
+code
+
+startup:
+
+	//SetInv(player, 198, 0);
+
+return;
+
+created:
+
+	SetCameraFocus(0, GetSenderRef());
+	SetThingTimer(GetSenderRef(), 0.1);
+	//ChangeInv(player, 198, 1);
+	//PrintInt(GetInv(Player, 198));
+
+return;
+
+timer:
+
+	if(GetSenderRef() != GetPrimaryFocus(0))
+	{
+		DestroyThing(GetSenderRef());
+		//ChangeInv(player, 198, -1);
+	}
+
+return;
+
+end

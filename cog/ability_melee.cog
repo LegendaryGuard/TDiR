@@ -1,0 +1,489 @@
+# Jedi Knight Cog Script
+#
+# ability_melee.cog
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+
+#keyframe	NormF=roundhouse.key	local
+#keyframe	NormR=righthook.key		local
+#keyframe	NormL=elbowsmash.key	local
+#keyframe	NormB=
+
+keyframe	Linker0=continualkickL.key	local
+keyframe	Linker1=righthookcombo.key	local
+
+keyframe	NormF=continualkick2.key	local
+keyframe	NormR=kneecombo.key		local
+keyframe	NormL=elbowsmash2.key	local
+keyframe	NormB=block.key			local
+
+keyframe	JumpF=doublearmhit.key	local
+keyframe	JumpR=superkick1.key		local
+keyframe	JumpL=superkick2.key		local
+keyframe	JumpB=uppercut2.key	local
+
+keyframe	CrouchF=flyingknee.key		local
+keyframe	CrouchR=continualkick.key	local
+keyframe	CrouchL=fastpunch.key		local
+keyframe	CrouchB=backflipkick2.key	local
+
+template	Smack0=+knockback		local
+template	Smack1=+knockup			local
+template	Smack2=+knockdown		local
+
+int			KBWait=0			local
+
+int			Mode				local
+
+thing		player				local
+int			Jump				local
+int			Crouch				local
+
+flex		ThrustX				local
+flex		ThrustY				local
+
+int			wait				local
+
+template	AP_Tpl=+APGhost		local
+thing		Look				local
+
+template	Hit=+flykick		local
+thing		Proj				local
+
+
+template	Punch0=+punch1		local
+template	Punch1=+punch2		local
+template	Punch2=+punch3		local
+
+sound		Swing0=swinghigh.wav	local
+sound		Swing1=swingmed.wav	local
+sound		Swing2=swinglow.wav	local
+sound		FP=fastpunch.wav	local
+int			GoId				local
+
+int			HitType				local
+
+int			MoveCount			local
+
+int			CurrKey=-1			local
+
+int			QueCount=0			local
+int			CurQue=0			local
+int			QuePoints=0			local
+
+int			Move				local
+
+message		startup
+message		activated
+message		deactivated
+message		pulse
+message		timer
+message		user0
+message		user1
+message		user2
+message		killed
+message		damaged
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	SetInvActivated(player, 32, 0);
+	Wait=0;
+	KBWait=0;
+	PrevMode=-1;
+
+	QueCount=-1;
+	MoveCount=0;
+
+	LastCount=0;
+	CanBlock=1;
+	Block=0;
+	Igniting=0;
+	CurrKey=-1;
+
+return;
+
+activated:
+
+	if(IsInvActivated(player, 32)) return;
+	
+	SetInvActivated(player, 32, 1);
+
+	if(GetThingFlags(Player) & 0x40000000)
+	{
+		ChangeInv(player, 179, 1);
+		
+		if(VectorLen(GetThingVel(player)) > MaxVec)
+		{MaxVec=VectorLen(GetThingVel(player));}
+		
+		if(GetInv(player, 179) >= MaxVec)
+		{
+			//Do funky stuff
+			SendMessage(GetThingClassCog(player), user2);
+			SetThingVel(player, VectorScale(VectorNorm(GetThingVel(player)), 2));
+		}
+	}
+	else
+	{	
+		LastMove=-1;
+		MoveCount=0;
+		Call Pulse;
+		ClearPhysicsFlags(player, 0x2);
+		SetPulse(0.001);
+	}
+	
+return;
+
+killed:
+
+deactivated:
+
+	SetPulse(0);
+	//KillTimerEx(1);
+	//KillTimerEx(2);
+	//Wait=0;
+	//if(CurrKey != -1)
+	//{
+	//	StopKey(player, CurrKey, 0);
+	//	CurrKey=-1;
+	//}
+	SetPhysicsFlags(player, 0x2);
+	//if(IsInvActivated(player, 32) && !(GetThingFlags(Player) & 0x40000000)) SetBinWait(player, 32, 0.5); 
+	SetInvActivated(player, 32, 0);
+	if(Block==1) Call StopBlock;
+
+return;
+
+pulse:
+
+	if(IsInvActivated(player, 32)==0)
+	{
+		SetPhysicsFlags(player, 0x2);
+		SetPulse(0);
+	}
+
+	//PrintInt(Wait);
+
+	Jump=SendMessageEx(GetInvCog(player, 34), user1, -1, -1, -1, -1);
+	Crouch=SendMessageEx(GetInvCog(player, 33), user1, -1, -1, -1, -1);
+	
+	ThrustX=VectorX(GetThingThrust(player));
+	ThrustY=VectorY(GetThingThrust(player));
+
+	if(GetThingFlags(Player) & 0x40000000) //Knocked back
+	{
+		Call deactivated;
+		return;
+	}
+
+	Attached=GetInv(player, 171);
+	if(Attached == 0) return;
+
+	Charging=GetInv(Player, 147);
+	if(Charging==1) return;
+	
+	if(Wait)
+	{
+		if(LastMove==12)
+		{
+			if(ThrustY<0)
+			{
+				Block=1;
+				SendMessage(GetInvCog(player, 141), user1);
+				igniting=1;
+				SetTimerEx(0.5, 20, -1, -1);
+			}
+			else
+			{call StopBlock;}
+		}
+		return;
+	}
+
+	if(Jump==0 && Crouch==0 && ThrustX==0 && ThrustY==0)
+	{
+		StopThing(player);
+		return;
+	}
+	
+	Dashing=SendMessageEx(GetInvCog(player, 34), user2, -1, -1, -1, -1);
+
+	if(Dashing==1) return;	
+	if(Jump==1 && ThrustX==0 && ThrustY==0) return;
+	if(Crouch==1 && ThrustX==0 && ThrustY==0) return;
+	
+	if(Jump==1 && ThrustX>0) Move=1;
+	if(Jump==1 && ThrustX<0) Move=2;
+	if(Jump==1 && ThrustY>0) Move=3;
+	if(Jump==1 && ThrustY<0) Move=4;
+
+	if(Crouch==1 && ThrustX>0) Move=5;
+	if(Crouch==1 && ThrustX<0) Move=6;
+	if(Crouch==1 && ThrustY>0) Move=7;
+	if(Crouch==1 && ThrustY<0) Move=8;
+
+	if(Crouch==0 && Jump==0 && ThrustX>0) Move=9;
+	if(Crouch==0 && Jump==0 && ThrustX<0) Move=10;
+	if(Crouch==0 && Jump==0 && ThrustY>0) Move=11;
+	if(Crouch==0 && Jump==0 && ThrustY<0) Move=12;
+
+	if(LastMove==Move)
+	{MoveCount=MoveCount+2;}
+	else //if((LastMove % 2) == 0)
+	{MoveCount=MoveCount+1;}
+
+	WaitTime=0;
+
+	if(MoveCount >=5)
+	{
+		WaitTime=0.5;
+		MoveCount=0;
+	}
+
+	LastMove=Move;
+
+	Victim=SendMessageEx(GetInvCog(player, 116), user0, -1, -1, -1, -1);
+
+	if(Victim != -1)
+	{RetDist=VectorDist(GetThingPos(Victim), GetThingPos(player));}
+	else
+	{RetDist=1;}
+
+	if(Move == 12)
+	{
+		StopThing(player);
+	}
+	else if(RetDist >= 0.2)
+	{
+		StopThing(player);
+		Look=FireProjectile(player, AP_Tpl, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		ApplyForce(player, VectorScale(GetThingLVec(Look), 200)); //VectorAdd(GetThingVel(player), )
+		DestroyThing(Look);
+	}
+
+	Wait=1;
+	
+
+	
+	if(Move == 1)
+	{
+		CurrKey=PlayKey(player, JumpR, 3, 0x38);
+		SetTimerEx(GetKeyLen(JumpR)+1, 1, -1, -1);
+		MoveCount=0;
+		FireProjectile(player, Smack0, Swing2, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 2)
+	{
+		CurrKey=PlayKey(player, JumpL, 3, 0x38);
+		SetTimerEx(GetKeyLen(JumpL)+1, 1, -1, -1);
+		MoveCount=0;
+		FireProjectile(player, Smack0, Swing2, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 3)
+	{
+		CurrKey=PlayKey(player, JumpF, 3, 0x38);
+		SetTimerEx(GetKeyLen(JumpF)+1, 1, -1, -1);
+		MoveCount=0;
+		Sleep(0.5);
+		FireProjectile(player, Smack2, Swing2, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 4)
+	{
+		CurrKey=PlayKey(player, JumpB, 3, 0x38);
+		SetTimerEx(GetKeyLen(JumpB)+1, 1, -1, -1);
+		MoveCount=0;
+		Sleep(0.5);
+		FireProjectile(player, Smack1, Swing2, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 5)
+	{
+		CurrKey=PlayKey(player, CrouchR, 3, 0x38);
+		SetTimerEx(GetKeyLen(CrouchR)+WaitTime, 1, -1, -1);
+		Look=FireProjectile(player, AP_Tpl, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		Sleep(0.1);
+		FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		Sleep(0.1);
+		FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 6)
+	{
+		CurrKey=PlayKey(player, CrouchL, 3, 0x38);
+		SetTimerEx(GetKeyLen(CrouchL)+WaitTime, 1, -1, -1);
+		Look=FireProjectile(player, AP_Tpl, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		Sleep(0.1);
+		FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		Sleep(0.1);
+		FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 7)
+	{
+		CurrKey=PlayKey(player, CrouchF, 3, 0x38);
+		SetTimerEx(GetKeyLen(CrouchF)+WaitTime, 1, -1, -1);
+		FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 8)
+	{
+		CurrKey=PlayKey(player, CrouchB, 3, 0x38);
+		SetTimerEx(GetKeyLen(CrouchB)+WaitTime, 1, -1, -1);
+		Sleep(0.3);
+		FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 9)
+	{
+		CurrKey=PlayKey(player, NormR, 3, 0x38);
+		SetTimerEx(GetKeyLen(NormR)+WaitTime, 1, -1, -1);
+		Sleep(0.2);
+		FireProjectile(player, Punch1, Swing1, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		Sleep(0.6);
+		FireProjectile(player, Punch1, Swing1, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 10)
+	{
+		CurrKey=PlayKey(player, NormL, 3, 0x38);
+		SetTimerEx(GetKeyLen(NormL)+WaitTime, 1, -1, -1);
+		Sleep(0.4);
+		FireProjectile(player, Punch1, Swing1, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		Sleep(0.1);
+		FireProjectile(player, Punch1, Swing1, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 11)
+	{
+		CurrKey=PlayKey(player, NormF, 3, 0x38);
+		SetTimerEx(GetKeyLen(NormF)+WaitTime, 1, -1, -1);
+		Sleep(0.2);
+		FireProjectile(player, Punch1, Swing1, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		Sleep(0.2);
+		FireProjectile(player, Punch1, Swing1, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+	}
+	else if(Move == 12 && CanBlock==1)
+	{
+		if(CurrKey == -1) CurrKey=PlayKey(player, NormB, 3, 0x14);
+		SetTimerEx(0.5, 1, -1, -1);
+		Block=1;
+		//PrintInt(CurrKey);
+	}
+	
+	if(Move==20) //Combo
+	{
+		//SetTimerEx(0.1, 5, 1, -1);
+	}
+	
+return;
+
+damaged:
+
+	if(Block==1)
+	{
+		if(GetParam(0) > GetInv(player, 60))
+		{
+			remainder=GetParam(0)-GetInv(player, 60);
+			ChangeInv(player, 60, -GetParam(0));
+			returnEx(remainder);	
+		}
+		else
+		{
+			ChangeInv(player, 60, -GetParam(0));
+			returnEx(0);
+		}
+	}
+	else
+	{returnEx(GetParam(0));}
+	
+return;
+
+StopBlock:
+
+	//Print("Block");
+	//PrintInt(CurrKey);
+	if(CurrKey != -1)
+	{
+		StopKey(player, CurrKey, 0);
+		CurrKey=-1;
+	}
+	Wait=0;
+	Block=0;
+	SendMessage(GetInvCog(player, 141), user0);
+
+return;
+
+timer:
+
+	if(GetSenderID() == 1)
+	{
+		Wait=0;
+	}
+	else if(GetSenderID() == 2)
+	{
+		QueCount=-1;
+		QuePoints=0;
+	}
+	else if(GetSenderID() == 5)
+	{
+	
+		if(GetParam(0) == 1)
+		{
+			CurrKey=PlayKey(player, CrouchR, 3, 0x38);
+			SetTimerEx(GetKeyLen(CrouchR)-0.1, 5, 2, -1);
+			Look=FireProjectile(player, AP_Tpl, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+			FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+			Sleep(0.1);
+			FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+			Sleep(0.1);
+			FireProjectile(player, Punch0, Swing0, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		}
+		else if(GetParam(0) == 2)
+		{
+			CurrKey=PlayKey(player, NormF, 3, 0x38);
+			SetTimerEx(GetKeyLen(NormF)-0.1, 5, 3, -1);
+			Sleep(0.2);
+			FireProjectile(player, Punch1, Swing1, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+			Sleep(0.2);
+			FireProjectile(player, Punch1, Swing1, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		}
+		else if(GetParam(0) == 3)
+		{
+			CurrKey=PlayKey(player, JumpB, 3, 0x38);
+			SetTimerEx(GetKeyLen(JumpB)+3, 1, -1, -1);
+			MoveCount=0;
+			Sleep(0.5);
+			FireProjectile(player, Smack1, Swing2, -1, '0 0.03 0', '0 0 0', 0, 0, 0, 0);
+		}
+	}
+	else if(GetSenderID() == 10)
+	{
+		CanBlock=1;
+	}
+	else if(GetSenderID() == 20)
+	{
+		if(Block == 0) SendMessage(GetInvCog(player, 141), user0);
+	}
+
+return;
+
+user0:
+
+	StopThing(player);
+	StopKey(player, GoId, 0);
+
+return;
+
+user1:
+
+	returnEx(block);
+	
+return;
+
+user2:
+	
+	MaxVec=0;
+	
+return;
+
+end

@@ -1,0 +1,515 @@
+# Jedi Knight Cog Script
+#
+# KYLE.COG
+#
+# Main script for the player. Handles things like saber info,
+# saber blocking animations, invulnerability at respawn, etc.
+#
+#
+# (C) 2000 Shred18 & Hell Raiser
+
+symbols
+
+thing       roshibot                           local
+thing       camera                           local
+
+sound       alarmsnd=00AlarmLoop01.WAV       local
+template	CheckIt=+APGhost				 local
+thing		CheckIt2						 local
+
+keyframe	BlockAnim0=deflectl.key			local
+keyframe	BlockAnim1=deflectr.key			local
+
+int         nextBlock=0                      local
+int         bin                              local
+int         rank                             local
+int         ring                             local
+
+int         force_blinding=0                 local
+int         blindingEffectHandle=-1          local
+int         PulledWeapon                     local
+int         playersector                     local
+
+flex        camdamage=9999                   local
+
+vector      playerpos                        local
+vector      thrust                           local
+template    smoke=+flame                     local
+template    ki=+flame2                       local
+template    destructoblast=+destructoblast   local
+template    halo=+halo                       local
+
+int         beavis                           local
+int         bub                              local
+
+template    teleport_particles=+telesparks   local
+sound       teleportsnd=ForceThrow01.WAV     local
+sound       select=select.wav                local
+sound       granted=granted.wav              local
+
+template    bubble_tpl=bubble                local
+template    bubble_tpl2=bubble2              local
+template    bubble_tpl3=bubble3              local
+
+template    splash_tpl=+watersplash          local
+template    splash_tpl2=+watersplash2        local
+int         a_splash                         local
+int         sender                           local
+int         source                           local
+int         selection=0                      local 
+
+material    im=immortality.mat               local                         
+material    po=power.mat                     local                         
+material    li=life.mat                      local
+
+int         dummy=0                          local
+int         blockPOVTrack=-1                 local
+int         blockTrack=-1                    local
+
+int         griptrackID=-1                   local
+int         Score                            local
+
+template	skidpars=+skidpars				local
+
+template	Knockback=+knockback			local
+template	Knockup=+knockup				local
+template	Knockdown=+knockdown			local
+
+int			KnockedBack						 local
+thing		KnockedParent					 local
+
+sound		KnockBack_Snd=groundslam.wav	local
+
+keyframe	Getup=knockdowngetup.key		local
+keyframe	Knock0=skid.key					local
+keyframe	Knock1=knockback.key			local
+keyframe	Knock2=knockup.key				local
+keyframe	Knock3=knockdown.key			local
+
+int			FlyingAttack=-1					 local
+int			Block=1						local
+thing		damager						local
+thing		LTarget						local
+
+thing		ETarget						local
+int			KeyNum				local
+int			KeyMode				local
+
+int			Owner				local
+
+message     created
+message     pulse
+message     killed
+message     newplayer
+message     timer
+message     blocked
+message     skill
+message     damaged
+message     splash
+message     user0
+message     user1
+message		user2
+message     trigger
+message		touched
+
+end
+
+# ========================================================================================
+
+code
+
+created:
+   roshibot = GetSenderRef();
+
+	Print("It's a me, RoshiBot");
+
+	ParseArg(roshibot, "maxthrust=2.00");
+	ParseArg(roshibot, "airdrag=1.5");
+	ParseArg(roshibot, "surfdrag=3.0");
+	ParseArg(roshibot, "soundclass=kyfly.snd");
+
+   Return;
+
+# ........................................................................................
+
+touched:
+
+	StopThing(roshibot);
+
+return;
+
+killed:
+
+   if(roshibot != GetSenderRef()) Return;
+
+   if(IsMulti())
+   {CreateBackpack(roshibot);}
+
+   // clean up force powers stuff
+   if(blindingEffectHandle!=-1)
+   {
+      freeColorEffect(blindingEffectHandle);
+      blindingEffectHandle = -1;
+   }
+   ClearActorFlags(roshibot, 0x800);
+   KillTimerEx(27);
+   force_blinding = 0;
+
+   ClearActorFlags(roshibot, 0x40000);
+
+   if(griptrackID != -1)
+   {
+      StopKey(roshibot, griptrackID, 0.1);
+      griptrackID = -1;
+   }
+
+	SetPulse(0);
+
+	KillTimerEx(32);
+   
+	ParseArg(roshibot, "surfdrag=3.000000");
+	ParseArg(roshibot, "airdrag=0.5000000");
+	ParseArg(roshibot, "staticdrag=0.300000");
+	ParseArg(roshibot, "maxrotvel=200.000000");
+	SetThingMass(roshibot, 150);
+	ClearActorFlags(roshibot, 0x40010);
+	SetPhysicsFlags(roshibot, 0x1);
+
+	KnockedBack=0;
+	KnockedParent=-1;
+
+    ParseArg(roshibot, "minheadpitch=-80.00");
+   	ParseArg(roshibot, "maxheadpitch=80.00");
+	
+	ClearThingFlags(roshibot, 0x40000000);
+
+	Print("I R TEH DEAD!");
+
+   Return;
+
+# ........................................................................................
+
+damaged:
+
+   if(roshibot != GetSenderRef()) return;
+   if(GetParam(1) == 32) call make_bubbles;
+
+	// If it's physical damage 
+	if(GetParam(1)==64 && GetSourceRef() == roshibot)
+	{
+		if(KnockedBack>0)
+		{
+			//Print("Ow, you knocked me back!");
+			KBDamage=rand()*10;
+			//PrintInt(KBDamage);
+			PlaySoundThing(Knockback_Snd, roshibot, 1.0, -1, -1, 0x80);
+			SetPhysicsFlags(roshibot, 0x1);
+			SetThingLook(roshibot, VectorSet(VectorX(GetThingLVec(roshibot)), VectorY(GetThingLVec(roshibot)), 0));
+
+			if(KnockedBack==1)
+			{
+				SetThingVel(roshibot, VectorScale(VectorNorm(GetThingLVec(roshibot)), -5));
+
+				if(Knock_Id != -1)
+				{
+					StopKey(roshibot, Knock_Id, 0);
+					Knock_Id=-1;
+				}
+				Knock_Id=PlayKey(roshibot, Knock0, 5, 0x14);
+			}
+			else if(KnockedBack==2)
+			{
+				SetThingVel(player, VectorScale(VectorNorm(GetThingLVec(roshibot)), -0.1));
+				if(Knock_Id != -1)
+				{
+					StopKey(roshibot, Knock_Id, 0);
+					Knock_Id=-1;
+				}
+				//Randomize this
+				Knock_Id=PlayKey(roshibot, Knock0, 5, 0x14);
+			}
+			else if(KnockedBack==3)
+			{SetThingVel(roshibot, VectorScale(VectorNorm(GetThingLVec(roshibot)), -0.1));}
+
+			returnEx(0);
+			
+			DamageThing(roshibot, KBDamage, 16, KnockedParent);
+			KnockedBack=0;
+			return;
+		}
+		else
+		{
+			ReturnEx(0);
+			return;
+		}
+		
+		Print("Impact!");
+	}
+
+	if(GetParam(1) == 16)
+	{
+		if(GetParam(0) >= GetThingHealth(roshibot))
+	 	{
+			if(GetThingHealth(roshibot) == 1)
+			{
+				returnEx(0);
+				return;
+			}
+			else
+			{
+				ReturnEx(GetThingHealth(roshibot)-1);
+				return;
+			}
+		}
+		else
+		{
+			returnEx(GetParam(0));
+			return;
+		}
+	}
+
+	if(GetParam(1)==8) //Knock back hit
+	{
+		if(Knock_Id != -1)
+		{
+			StopKey(roshibot, Knock_Id, 0);
+			Knock_Id=-1;
+		}
+
+		//Let's not forget to add in where the projectile came from
+		//and play a keyframe based on that.
+
+		if(GetThingTemplate(GetSourceRef()) == Knockback)
+		{
+			DetachThing(roshibot);
+			SetThingVel(roshibot, VectorScale(VectorNorm(GetThingLVec(GetSourceRef())), 15));
+			Print("Back");
+			KnockedBack=1;
+			Knock_Id=PlayKey(roshibot, Knock1, 5, 0x14);
+		}
+		else if(GetThingTemplate(GetSourceRef()) == Knockup)
+		{	
+			//This is neccessary because just setting the velocity upwards causes HOM
+
+			Vector0=VectorSub(GetThingPos(GetSourceRef()), GetThingPos(roshibot));
+			Vector1=VectorSet(VectorX(Vector0), VectorY(Vector0), 0);
+			Vector2=VectorScale(Vector1, -0.2);
+			Vector3=VectorAdd(Vector2, '0 0 1');
+			DetachThing(roshibot);
+			SetThingVel(roshibot, VectorScale(VectorNorm(Vector3), 15)); //GetThingUVec(GetSourceRef())
+			Print("Up");
+			KnockedBack=2;
+			Knock_Id=PlayKey(roshibot, Knock2, 5, 0x14);
+			if(rand() > 0.5)
+			{RandFall=0;}
+			else
+			{RandFall=3;}
+		}
+		else if(GetThingTemplate(GetSourceRef()) == Knockdown)
+		{
+			Vector0=VectorSub(GetThingPos(GetSourceRef()), GetThingPos(roshibot));
+			Vector1=VectorSet(VectorX(Vector0), VectorY(Vector0), 0);
+			Vector2=VectorScale(Vector1, -0.2);
+			Vector3=VectorAdd(Vector2, '0 0 -1');
+			SetThingVel(roshibot, VectorScale(VectorNorm(Vector3), 15)); //GetThingUVec(GetSourceRef())
+			Print("Down");
+			KnockedBack=3;
+			Knock_Id=PlayKey(roshibot, Knock3, 5, 0x14);
+		}
+		else
+		{
+			Print("That ain't right.....");
+			return;
+		}
+		
+		//SetThingVel(roshibot, VectorScale(VectorNorm(GetThingLVec(GetSourceRef())), 15));
+
+		SetInv(roshibot, 179, 0);  //This is the breakout count
+	
+		//(Give full disable thing here)
+		//Set all inv available to 0
+		SetPhysicsFlags(roshibot, 0x10);
+		ClearPhysicsFlags(roshibot, 0x2000);
+		SetTimerEx(1, 321, -1, -1);
+
+		//SetInvActivated(roshibot, 41, 0);
+
+		//if(IsInvActivated(roshibot, 41))
+		//{crap=SendMessageEx(GetInvCog(roshibot, 41), activated, -1, -1, -1, -1);}
+
+		//SetArmedMode(roshibot, 2);
+		
+		SendTrigger(-1, 50001, roshibot, 1, -1, -1);
+		
+		SetActorFlags(roshibot, 0x40000);
+
+		SetThingFlags(roshibot, 0x40000000); //Look mommy, I can make up my own thing flags ;D
+
+		//ApplyForce(roshibot, VectorScale(VectorNorm(GetThingLVec(GetSourceRef())), 1500));
+
+		//SetThingVel(roshibot, VectorScale(VectorNorm(GetThingLVec(GetSourceRef())), 15));
+		//PrintVector(VectorScale(VectorNorm(GetThingLVec(GetSourceRef())), 1000));
+		//SetThingMass(roshibot, 5000);
+		
+		//SetTimerEx(5, 32, -1, -1);
+		//SetActorFlags(roshibot, 0x10);
+
+	    ParseArg(roshibot, "minheadpitch=0.00");
+    	ParseArg(roshibot, "maxheadpitch=0.00");
+
+		SetActorFlags(roshibot, 0x2);
+		SetPulse(0.01);
+
+		KnockedParent=GetThingParent(GetSourceRef());
+		//PrintInt(KnockedParent);
+
+		if(GetParam(0) >= GetThingHealth(roshibot))
+	 	{
+			if(GetThingHealth(roshibot) > 1)
+			{
+				ReturnEx(GetThingHealth(roshibot)-1);
+				return;
+			}
+			else
+			{
+				returnEx(0);
+				return;
+			}
+		}
+
+	}
+
+	//ReturnEx(GetParam(0));
+	ReturnEx(GetParam(0)/100);
+	Return;
+
+# ........................................................................................
+
+make_bubbles:
+   roshibotsector = GetThingSector(roshibot);
+   roshibotpos    = VectorAdd(GetThingPos(roshibot), '0 0 0.075');
+
+   for(bub = 1; bub < 1 + 3 * rand(); bub = bub + 1)
+   {
+      CreateThingAtPosNR(bubble_tpl[3 * rand()], roshibotsector, VectorAdd(roshibotpos, VectorScale(VectorNorm(VectorSet(rand()-0.5, rand()-0.5, rand()-0.5)), 0.05)), '0 0 0');
+      Sleep(0.05);
+
+      // Don't create too many bubbles over the network...
+      if(!IsMulti())
+      {
+         CreateThingAtPos(bubble_tpl3, roshibotsector, VectorAdd(roshibotpos, VectorScale(VectorNorm(VectorSet(rand()-0.5, rand()-0.5, rand()-0.5)), 0.05)), '0 0 0');
+         Sleep(0.05);
+      }
+   }
+
+   Return;
+
+# ........................................................................................
+
+pulse:
+	
+	attachFlags = GetAttachFlags(roshibot);
+	if(((attachFlags & 1) || (attachFlags & 2) || (GetPhysicsFlags(roshibot) & 0x100000)) && !(IsThingMoving(roshibot)))
+	{
+		SetTimerEx(1.5, 32, -1, -1);
+		//Print("Done!");
+		SetPulse(0);
+	}
+	dreturn;
+
+timer:
+
+   Halt = 0;
+
+   if(GetSenderId() == 1)                    // Invulnerable for a while
+   {
+      // jkSetInvulnerable(GetParam(0), 0);
+      ClearActorFlags(GetParam(0), 8);
+      Return;
+   }
+   else
+   if(GetSenderId() == 2)                    // Bubbles check
+   {
+      if(GetThingHealth(roshibot) < 1) Return;
+
+      if((GetThingFlags(roshibot) & 0x2000000) && !(GetPhysicsFlags(roshibot) & 0x100000))
+         call make_bubbles;
+
+      if(IsMulti())
+         SetTimerEx(4 + 5 * rand(), 2, 0, 0);
+      else
+         SetTimerEx(2 + 5 * rand(), 2, 0, 0);
+
+      Return;
+   }
+   else if(GetSenderId()==321)
+   {
+		SetPhysicsFlags(roshibot, 0x1);   
+   }
+   else if(GetSenderId()==32)
+   {
+		if(GetThingHealth(roshibot) == 1)
+		{
+	   		DamageThing(roshibot, 1, 1, KnockedParent);
+			return;
+	   	}
+		//Play Get up anim
+		SetThingLook(roshibot, VectorSet(VectorX(GetThingLVec(roshibot)), VectorY(GetThingLVec(roshibot)), 0));
+		//SetThingMass(roshibot, 150);
+		ApplyForce(roshibot, '0 0 40');
+
+		if(Knock_Id != -1)
+		{
+			StopKey(player, Knock_Id, 0);
+			Knock_Id=-1;
+		}
+
+		PlayKey(roshibot, Getup, 4, 0x38);
+		SetTimerEx(GetKeyLen(Getup), 33, -1, -1);
+		ClearPhysicsFlags(roshibot, 0x10);
+		ClearThingFlags(roshibot, 0x40000000);
+   }
+   else if(GetSenderId()==33)
+   {
+		SendTrigger(-1, 50001, roshibot, 0, -1, -1);
+		SetArmedMode(roshibot, 0);
+		ClearActorFlags(roshibot, 0x40010);
+		SetPulse(0);
+		KnockedBack=0;
+		KnockedParent=-1;
+	    ParseArg(roshibot, "minheadpitch=-80.00");
+    	ParseArg(roshibot, "maxheadpitch=80.00");
+
+   }
+
+   Return;
+
+# ........................................................................................
+
+splash:
+   // splash: messages are only sent to the local roshibot's cogs
+   // (class cog and capture cog) for performance reasons...
+
+   sender = GetSenderRef();
+   source = GetSourceRef();
+
+   // actor or roshibot ?
+   if((GetThingType(sender) == 2) || (GetThingType(sender) == 10) || (GetThingType(sender) == 3))
+   {
+      // whatever source (i.e. enter or leave, don't care)
+      a_splash = CreateThingAtPosNR(splash_tpl2, GetThingSector(sender), GetThingPos(sender), '0 0 0');
+   }
+   // these are mostly the projectiles...
+   else
+   {
+      // on entering only
+      if(source == 1)
+         // not if roshibot is submerged, but still do it if he's on the surface
+         if(!(GetThingFlags(roshibot) & 0x2000000) || (GetPhysicsFlags(roshibot) & 0x100000))
+            a_splash = CreateThingNR(splash_tpl, sender);
+   }
+
+   Return;
+
+end
+

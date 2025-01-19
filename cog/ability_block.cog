@@ -1,0 +1,76 @@
+# Jedi Knight Cog Script
+#
+# ability_block.cog
+#
+# Who'da thunk that the saber would come in handy? ;)
+#
+# Created by: Hell Raiser [Jon Harmon]
+# bin 23
+
+symbols
+
+thing		player			local
+
+material	black=blackmat.mat	local
+template	tpl=+blank		local
+
+template	test=+orbparred2	local
+
+keyframe	NormB=block.key			local
+
+thing		Pars			local
+
+message		startup
+message		user1
+message		user0
+message		pulse
+
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+
+return;
+
+user1:
+
+	if(IsInvActivated(player, 23)) return;
+
+	//Print("Block");
+
+	jkSetSaberInfo(player, black, black, 0.05, 0.05, 0.1, test, test, test);
+	jkSetFlags(player, 0x5);
+	SetActorFlags(player, 0x2000);
+	SetPulse(0.05);
+
+return;
+
+pulse:
+
+	ChangeInv(player, 14, -1);
+	
+	if(GetInv(player, 14) <= 0)
+	{Call user0;}
+
+return;
+
+killed:
+
+	if(player == GetSenderRef())
+	{Call user0;}
+
+return;
+
+user0:
+
+	jkSetFlags(player, 0x8);
+	ClearActorFlags(player, 0x2000);
+	SetPulse(0);
+
+return;
+
+end

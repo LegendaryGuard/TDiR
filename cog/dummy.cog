@@ -1,0 +1,45 @@
+#dummy cog
+
+flags=0x240
+
+symbols
+
+message		created
+message		pulse
+message		removed
+
+end
+
+code
+
+created:
+
+	SetThingModel(GetSenderRef(), GetThingModel(GetThingParent(GetSenderRef())));
+	SetThingCurGeoMode(GetThingParent(GetSenderRef()), 0);
+	SetThingLook(GetSenderRef(), GetThingLVec(GetThingParent(GetSenderRef())));
+	TeleportThing(GetSenderRef(), GetThingParent(GetSenderRef()));
+	SetThingPulse(GetSenderRef(), 0.01);
+
+return;
+
+pulse:
+
+	if(GetThingFlags(GetThingParent(GetSenderRef())) & 0x200)
+	{DestroyThing(GetSenderRef());}
+	
+	if(!(GetPhysicsFlags(GetThingParent(GetSenderRef())) & 0x4000))
+	{DestroyThing(GetSenderRef());}
+	
+	SetThingLook(GetSenderRef(), GetThingLVec(GetThingParent(GetSenderRef())));
+	//SetThingPos(GetSenderRef(), GetThingPos(GetThingParent(GetSenderRef())));
+	TeleportThing(GetSenderRef(), GetThingParent(GetSenderRef()));
+
+return;
+
+removed:
+
+	SetThingCurGeoMode(GetThingParent(GetSenderRef()), 4);
+
+return;
+
+end

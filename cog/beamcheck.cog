@@ -1,0 +1,48 @@
+# Checks to see if it's ok to fire a beam
+
+flags=0x240
+
+symbols
+
+thing		player			local
+template	Check=+beamchk	local
+
+flex		Distance		local
+
+message		created
+message		startup
+message		user0
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+
+return;
+
+created:
+
+	//Print("created");
+	Distance=VectorDist(GetThingPos(player), GetThingPos(GetSenderRef()));
+	//PrintFlex(Distance);
+	SendMessageEx(GetInvCog(Player, GetCurWeapon(player)), user1, Distance, -1, -1, -1);
+
+	DestroyThing(GetSenderRef());
+
+return;
+
+user0:
+
+	//print("user0");
+
+	if(GetCurWeapon(player)==5)
+	{FireProjectile(player, Check, -1, -1, '0 0 0.025', '0 0 0', 1.0, 0x20, 0, 0);}
+	else
+	{FireProjectile(player, Check, -1, -1, '0 0 0.005', '0 0 0', 1.0, 0x20, 0, 0);}
+
+return;
+
+end

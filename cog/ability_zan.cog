@@ -1,0 +1,226 @@
+# Jedi Knight Cog Script
+#
+# ability_zan.cog
+#
+# Make Zanzoken go WIZWHIR!
+#
+# Created by that one guy, y'know, me! -> Hell Raiser [Jon Harmon]
+
+symbols
+
+thing		player				local
+
+int			Ki					local
+int			Geo					local
+
+template	Zan=+Zan			local
+
+template	DB0=+dragonball1	local
+template	DB1=+dragonball2	local
+template	DB2=+dragonball3	local
+template	DB3=+dragonball4	local
+template	DB4=+dragonball5	local
+template	DB5=+dragonball6	local
+template	DB6=+dragonball7	local
+
+int			AttachFlags			local
+int			CanZan				local
+
+template	AP_Tpl=+APGhost		local
+sound		Zan_Snd=zanzoken.wav	local
+
+flex		ThrustX				local
+flex		ThrustY				local
+flex		ThrustZ				local
+int			ZThrust				local
+
+int			Scale				local
+int			Cost=150			local
+
+thing		ZanGhost=-1			local
+thing		ZanGhost2=-1		local
+
+Vector		Thrust				local
+vector		CurVel				local
+vector		ZanVel				local
+vector		NewVel				local
+
+message		startup
+message		activated
+message		killed
+message		timer
+message		selected
+
+end
+
+code
+
+startup:
+
+	player = GetLocalPlayerThing();
+	ZanGhost=-1;
+	ZanGhost2=-1;
+	//sleep(5);
+	//SetInvAvailable(player, 26, 1);
+	//SetPulse(0.1);
+	//Print("Zanzoken Time!");
+
+	DBNum=0;
+
+return;
+
+activated:
+
+	//FireProjectile(player, DB0[DBNum], -1, -1, '0 -0.5 0', '0 0 0', 0, 0, 0, 0);
+
+	//DBNum=DBNum+1;
+	//if(DBNum==7)DBNum=0;
+
+	if(IsInvActivated(player, 26)) return;
+	
+	//Don't want people jumping then zanning all over
+	if(GetInv(player, 171)==0) return;
+
+	if(GetActorFlags(player) & 0x40000) return;
+
+	Ki = GetInv(player, 14);
+
+	Scale=50;
+	if(IsInvActivated(player, 21)) Scale=Scale*2;
+	
+	if(Ki < Cost) return;
+	
+	Thrust=GetThingThrust(player);
+	ZThrust=SendMessageEx(GetInvCog(player, 34), user1, -1, -1, -1, -1);
+	ZThrust2=SendMessageEx(GetInvCog(player, 33), user1, -1, -1, -1, -1);
+
+	//PrintInt(ZThrust);
+	
+	//Not applying thrust, so can't tell where to go
+	if((VectorX(Thrust) == 0) && (VectorY(Thrust) == 0) && (ZThrust2 == 0) && (ZThrust==0)) return;
+
+	SetInvActivated(player, 26, 1);
+
+	ThrustX=0;
+	ThrustY=0;
+	ThrustZ=0;
+
+	if(VectorX(Thrust) > 0) ThrustX = 0.12;
+	if(VectorX(Thrust) < 0) ThrustX = -0.12;
+
+	if(VectorY(Thrust) > 0) ThrustY = 0.12;
+	if(VectorY(Thrust) < 0) ThrustY = -0.12;
+
+	if(ZThrust == 1) ThrustZ = 0.12;
+	if(ZThrust2 == 1) ThrustZ = -0.12;
+
+	if(GetInv(player, 134) == 0)
+	{Victim=SendMessageEx(GetInvCog(player, 116), user0, -1, -1, -1, -1);}
+	else
+	{Victim=SendMessageEx(GetInvCog(player, 40), user0, -1, -1, -1, -1);}
+
+	ZanVel = VectorSet(ThrustX, ThrustY, ThrustZ);
+
+	PlaySoundThing(Zan_Snd, player, 1.0, -1, -1, 0x80);
+	CreateThing(zan, player);
+
+	if(Victim != -1)
+	{
+		ZanGhost=FireProjectile(Victim, AP_Tpl, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		SetThingLook(ZanGhost, GetThingLVec(Victim));
+
+		ZanGhost2=FireProjectile(ZanGhost, AP_Tpl, -1, -1, ZanVel, '0 0 0', 0, 0, 0, 0);
+		
+		TeleportThing(Player, ZanGhost2);
+		
+		SetActorFlags(player, 0x40000);
+		StopThing(Player);
+		
+		//moved=VectorScale(GetThingVel(victim), 2);
+		//meetpos=VectorAdd(GetThingPos(victim), moved);
+
+		//SetThingPos(Player, meetpos);
+		
+		Cost2=VectorDist(GetThingPos(player), GetThingPos(victim)) * 10;
+		
+		ChangeInv(player, 14, -cost2);
+		
+		SetTimerEx(0.5, 2, -1, -1);
+		
+		return;
+	}
+
+	ChangeInv(player, 14, -cost);
+
+	ZanGhost = FireProjectile(Player, AP_Tpl, -1, -1, ZanVel, '0 0 0', 0, 0, 0, 0);
+	NewVel = VectorScale(VectorSub(GetThingPos(ZanGhost), GetThingPos(player)), Scale);
+
+	Geo=GetThingCurGeoMode(player);
+	SetThingCurGeoMode(player, 0);
+	//destroy flying aura
+	SetThingVel(player, NewVel);
+	
+	SetTimerEx(0.5, 1, -1, -1);
+
+return;
+
+timer:
+
+	if(GetSenderID() == 1) call stop_effects;
+	
+	if(GetSenderID() == 2) call stop_effects2;
+
+return;
+
+killed:
+
+	if(player != GetSenderRef()) return;
+	
+	if(IsInvActivated(player, 26)) call stop_effects;
+
+return;
+
+stop_effects:
+
+	SetInvActivated(player, 26, 0);
+	SetThingCurGeoMode(player, Geo);
+	CreateThing(zan, player);
+	//recreate flying aura
+	if(ZanGhost != -1)
+	{
+		DestroyThing(ZanGhost);
+		ZanGhost=-1;
+	}
+	if(GetInv(player, 171)>0)
+	{StopThing(player);}
+
+return;
+
+stop_effects2:
+
+	SetInvActivated(player, 26, 0);
+
+	if(ZanGhost != -1)
+	{
+		DestroyThing(ZanGhost);
+		ZanGhost=-1;
+	}
+
+	if(ZanGhost2 != -1)
+	{
+		DestroyThing(ZanGhost2);
+		ZanGhost2=-1;
+	}
+
+	ClearActorFlags(player, 0x40000);
+
+return;
+
+selected:
+
+	//Replace with uni crap
+	//Print("Zanzoken");
+
+return;
+
+end

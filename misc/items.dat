@@ -1,0 +1,303 @@
+# Item definition file for Jedi Knight
+# ========================================================================================
+# name                  id              min     max     flags   args
+# ========================================================================================
+
+###########
+# Weapons #
+###########
+
+# 2 - Spectator Mode
+# 3 - Ki Attack
+# 4 - Rapid Ki Attack
+# 5 - Ki Beam Attack
+# 6 - Ki Orb
+# 7 - Beam
+# 8 - Strong Beam
+# 9 - Use Dragonballs
+# 
+# ========================================================================================
+none                    0               0       0       0x004
+fists	                1               0       1       0x024   cog=
+bryar_pistol            2               0       1       0x024   cog=attack_nothing.cog
+stormtrooper_rifle      3               0       1       0x024   cog=attack_kiblast.cog
+thermal_detonator       4               0       999     0x024   cog=attack_kirapid.cog		#Bin 174
+tusken_prod             5               0       1       0x024   cog=attack_kiseek.cog
+repeater                6               0       1       0x024   cog=attack_kiorb.cog
+rail_detonator          7               0       1       0x034   cog=attack_beam.cog
+sequencer_charge        8               0       999     0x034   cog=attack_strongbeam.cog	#Bin 178
+concussion_rifle        9               1       1       0x024   cog=item_dragonballs.cog
+lightsaber              10              1       1       0x024   cog=
+# ========================================================================================
+
+
+###################
+# Ammo and Energy #
+###################
+
+# ========================================================================================
+#energy is used for bryar pistol and stormtrooper rifle.
+energy					11				0		999     0x000
+
+#power is used for the the bowcaster, repeater and concussion rifle.
+power                   12              0		999     0x000
+
+#battery is used for other inventory items.
+battery                 13              0		200		0x020
+
+#force is used for the force powers.
+forcemana               14              0		400		0x080
+
+#rail charges
+railcharges             15              0       999      0x000
+# ========================================================================================
+
+
+###########
+# Bonuses #
+###########
+
+#new force stars gained in a level.
+new_stars               16              0       32      0x000
+
+#spendable stars
+spend_stars             17              0       32      0x000
+
+#the choice
+choice                  18              0       2      0x000
+
+#############################
+# Damage multiplier powerup #
+#############################
+
+# ========================================================================================
+# Bin 19 is reserved !!!
+# Damage multiplier powerup should come before force powers...
+# ========================================================================================
+
+
+##############
+#Force Powers#
+##############
+
+# Note that the icon names are taken from these names:
+# ========================================================================================
+# Attributes
+tier					20				0      500     0x000   cog=ki_well.cog
+# ........................................................................................
+
+# Basic Powers
+#21-Ki
+#22-Kaoken
+#23-Block
+#24-Instantanious Movement
+#25-Charging
+#26-Zanzoken
+#27-Solar Flare
+#28-Disperse
+#29-Self Destruct
+#30-Force Throw
+#31-PL Sense
+#32-melee
+#33-crouch
+#34-jump
+
+#Everything for hotkeys are now out of order cuz I'm
+#too lazy to change bin numbers inside every frickin cog
+#just to organize this crap a bit more neater.
+
+#Change all the bin numbers -_-
+#Makes me wish I used the bin= statements
+
+#All our hotkeyable items
+
+ki						21              1       1     0x108   cog=ability_ki.cog
+kaioken                 22              1       1     0x108   cog=ability_kaioken.cog
+powerdown               23              1       1     0x100   cog=ability_powerdown.cog
+
+#***********
+instantmove             24              1       1     0x100   	#cog=force_pull.cog
+charging                25              1       1     0x108    cog=ability_charging.cog
+zanzoken                26              1  	    1     0x108    cog=ability_zan.cog
+
+#***********
+solarflare              27              1       1     0x100    	#cog=force_blinding.cog
+disperse                28              1       1     0x108    cog=ability_disperse.cog
+
+#***********
+selfdestruct            29              1       1     0x122    	#cog=item_targeting.cog
+
+meleekick               30             1       1     0x100    #cog=ability_powerdown.cog
+sense                   31              1       1     0x102    	cog=ability_sense.cog
+melee		            32             1       1     0x138    cog=ability_melee.cog
+crouch                  33              1       1     0x122    cog=new_crouch.cog
+jump                    34              1       1     0x122    cog=new_jump.cog
+senzu                   40              0       5     0x182   	cog=item_senzu.cog
+flight                  41              1       1     0x102   cog=ability_flight.cog
+meleeKB                 42             0       1     0x100   #cog=item_fieldlight.cog
+
+lockon   				116			    1		1     0x122		cog=item_lockon.cog
+challange				117				1		1	  0x120		cog=item_challange.cog 
+levelup                 118             1       1     0x122   cog=ability_levelup.cog
+
+#scope                   117             1       1       0x120   cog=item_scope.cog
+
+
+# ========================================================================================
+
+#################
+#Inventory Items#
+#################
+
+# Note that the icon names are taken from these names:
+# ========================================================================================
+keyimperial             43              0       1       0x042   cog=item_keyimperial.cog
+wrench                  44              0       1       0x042   cog=item_wrench.cog
+datadisk                45              0       1       0x042   cog=item_datadisk.cog
+keyred                  46              0       1       0x042   cog=item_keyred.cog
+keyblue                 47              0       1       0x042   cog=item_keyblue.cog
+keyyellow               48              0       1       0x042   cog=item_keyyellow.cog
+wrchblue                49              0       1       0x042   cog=item_wrenchblue.cog
+wrchyellow              50              0       1       0x042   cog=item_wrenchyellow.cog
+keygreen                51              0       1       0x042   cog=item_keygreen.cog
+# ========================================================================================
+
+
+#####################
+# Player Statistics #
+#####################
+
+# ========================================================================================
+stamina	                60              0      	  200   0x000   cog=system.cog
+force_armor             61              0         200   0x000
+supershields            62              0         1.0   0x010   cog=item_supershields.cog
+powerboost              63              0         2.0   0x000
+s_dark                  64              0         1.0   0x000
+s_light                 65              0         1.0   0x000
+revive                  66              0         1.0   0x000
+# ========================================================================================
+
+###########
+# Scoring #
+###########
+
+# ========================================================================================
+secrets                 70              0       20      0x000
+maxsecrets              71              0       20      0x000
+
+# morality
+
+peds_killed             72              0       1000    0x000
+peds_total              73              0       1000    0x000
+force_morality          74              -40     40      0x000
+alignment               75              -100    100     0x000
+
+# ========================================================================================
+
+
+#####################
+# Multiplayer Modes #
+#####################
+
+# ========================================================================================
+teamcolor               80              0       2       0x040
+redflag                 81              0       1       0x048
+goldflag                82              0       1       0x048
+redkey                  83              0       1       0x042    cog=ctf_itemkeyred.cog
+goldkey                 84              0       1       0x042    cog=ctf_itemkeygold.cog
+
+# ========================================================================================
+
+
+############################
+# Goals & Level Completion #
+############################
+
+# ========================================================================================
+# Bins 99 - 115 are RESERVED
+# ========================================================================================
+# They will store the number of the first goal description text in cogStrings.uni, and the
+# display status of up to 16 goals (0 to 15).
+# ========================================================================================
+
+stringOffset            99              0       99999   0x000
+
+goal00                  100             0       1000    0x040
+goal01                  101             0       1000    0x040
+goal02                  102             0       1000    0x040
+goal03                  103             0       1000    0x040
+goal04                  104             0       1000    0x040
+goal05                  105             0       1000    0x040
+goal06                  106             0       1000    0x040
+goal07                  107             0       1000    0x040
+goal08                  108             0       1000    0x040
+goal09                  109             0       1000    0x040
+goal10                  110             0       1000    0x040
+goal11                  111             0       1000    0x040
+goal12                  112             0       1000    0x040
+goal13                  113             0       1000    0x040
+goal14                  114             0       1000    0x040
+goal15                  115             0       1000    0x040
+
+#Flying360				125				1		1		0x000	cog=flying360.cog
+Camera					126				1		1		0x000	cog=New_Camera.cog
+
+Character				127				0		0		0x000	cog=character.cog
+
+AuraCall				130				1		1		0x000	cog=aura_call.cog
+Templates				131				1		1		0x000	cog=tpls_beam.cog
+Templates				132				1		1		0x000	cog=tpls_ball.cog
+Physics					133				1		1		0x000	cog=physics_call.cog
+
+#since we're not using activated inventory verbs
+challange				134				0		1		0x000
+
+Rectiles				135				1		1		0x000	cog=new_rectile.cog
+
+#Corpse					140				1		1		0x000	cog=corpses.cog
+stuff					140				0		0		0x000	cog=keeplook.cog
+Blocking				141				1		1		0x000   cog=ability_block.cog
+# Notification Bins
+Charging				147				0		1		0x000
+CanFire					148				0		1		0x000
+BeamRecharging			149				0		1		0x000
+
+hotkeyOffset            150             0       99999   0x000
+
+beamcheck				170				1		1		0x000	cog=beamcheck.cog
+attached				171				0		2		0x000
+
+movebeam				172				1		1		0x000	cog=MoveBeam.cog
+crosshair				173				1		1		0x000	cog=crosshair.cog
+target					175				-1		15		0x000
+
+#Invintory Place holders
+Weapon4					174				0		1		0x000
+Weapon8					178				0		1		0x000
+
+BreakFree				179				0		999		0x000
+
+InvIndicate				180				1		1		0x000	cog=invindicate.cog
+
+DragonBall1				181				0		1		0x000
+DragonBall2				182				0		1		0x000
+DragonBall3				183				0		1		0x000
+DragonBall4				184				0		1		0x000
+DragonBall5				185				0		1		0x000
+DragonBall6				186				0		1		0x000
+DragonBall7				187				0		1		0x000
+
+CameraMode				190				0		5		0x000
+
+#beamtest				191				1		1		0x022	cog=roshibot2.cog
+
+#PPS						192				1		1		0x000	cog=PulsePerSec.cog
+
+Counter					198				0		640		0x000
+
+# =============== #
+# MAX Bins =  199 #
+# =============== #
+
+end
+

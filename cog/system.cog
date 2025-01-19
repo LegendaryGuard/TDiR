@@ -1,0 +1,198 @@
+# Jedi Knight Cog Script
+#
+# System.cog
+#
+# The heart and soul of gameplay for DBZ: TDIR
+#
+# ©2001 Hell Raiser [Jon Harmon]
+
+symbols
+
+thing			player			local
+
+int				PL				local
+int				Ki				local
+int				Health			local
+int				Level=1			local
+
+int				AttachFlags		local
+int				Attached		local
+
+int				burble			local
+
+int				LevelUp			local
+int				NextBlink=1		local
+int				Count=0			local
+
+int				CanLevel		local
+
+message			startup			local
+#message			damaged			local
+message			pulse			local
+message			user0			local
+message			timer			local
+message			trigger			local
+message			user1			local
+message			user2			local
+message			user3			local
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	SetPulse(0.01);
+	Count=0;
+
+return;
+
+pulse:
+
+	Health=GetThingHealth(Player);
+	Ki=GetInv(player, 14);
+	level=GetInv(player, 20)+1;
+	
+	//Ki=Ki/4
+	//Health=Health/2
+
+	//PL=((((Ki+Health)/5)-1) * level) + (level-1);
+	
+	SetInv(player, 11, PL);
+	SetInv(player, 12, PL);
+	SetInv(player, 15, PL);
+    SetInv(player, 8, PL);
+    SetInv(player, 4, PL);
+	
+	//SetInv(player, 60, PL);
+
+	//For some odd reason, jk doesn't clear the attached to surface of water
+	//flag when you jump out of the water...
+	if(!(GetThingFlags(player) & 0x2000000))
+	{ClearPhysicsFlags(player, 0x100000);}
+
+	//This is where we see if the player is attached to something, flying, or just falling
+	//It comes in handy for all sorts of things, and prevents me from having to c&p this
+	//long ass check into almost every cog
+	attachFlags = GetAttachFlags(player);
+	if((attachFlags & 1) || (attachFlags & 2) || (GetPhysicsFlags(player) & 0x100000))
+	{SetInv(player, 171, 1);}
+	else
+	{
+		if(IsInvActivated(player, 41) || (GetThingFlags(player) & 0x2000000))
+		{SetInv(player, 171, 2);}
+		else
+		{SetInv(player, 171, 0);}
+	}
+	
+	Blocking=SendMessageEx(GetInvCog(player, 32), user1, -1, -1, -1, -1);
+	
+	if(Blocking)
+	{SetInv(player, 171, 0);}
+	
+	if(GetThingFlags(Player) & 0x40000000)
+	{
+		SetInv(player, 171, 0);
+	}
+	
+	if(GetInv(player, 14) >= 400 && CanLevel==1)
+	{Levelup=1;}
+	else
+	{Levelup=0;}
+
+	if(Levelup)
+	{
+		Count=Count+1;
+		
+		if(Count==10)
+		{
+			if(NextBlink)
+			{
+				jkSetSuperFlags(0x1);
+				NextBlink=0;
+			}
+			else
+			{
+				NextBlink=1;
+				jkClearSuperFlags(0x1);
+			}
+			Count=0;
+		}
+	}
+	else
+	{
+		jkClearSuperFlags(0x1);
+		NextBlink=1;
+		Count=0;
+	}
+
+
+	//This space left unintentionally blank
+	
+	//jkStringClear();
+	//jkStringConcatAsciiString("We Are: ");
+	if(attachFlags & 1)
+	{
+		//jkStringConcatAsciiString("Attached surface, ");
+	}
+	
+	if(attachFlags & 2)
+	{
+		//jkStringConcatAsciiString("Attached thing, ");
+	}
+	
+	if(GetPhysicsFlags(player) & 0x100000)
+	{
+		//jkStringConcatAsciiString("Attached water, ");
+	}
+
+	if(GetThingFlags(player) & 0x2000000)
+	{
+		//jkStringConcatAsciiString("In water");
+	}
+	
+	//jkStringOutput(-1, -1);
+	
+return;
+
+user0:
+
+	returnEx(Attached);
+
+return;
+
+user1:
+
+	CanLevel=GetParam(0);
+
+return;
+
+damaged:
+
+	returnEx(GetParam(0));
+
+return;
+
+user2:
+
+	returnEx(CanLevel);
+	
+return;
+
+user3:
+
+	PL=GetParam(0);
+	
+return;
+
+trigger:
+
+	if(GetSourceRef()==10000)
+	{
+		SendTrigger(GetParam(0), 10001, PL, player, -1, -1);
+	}
+
+return;
+
+end

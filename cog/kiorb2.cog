@@ -1,0 +1,109 @@
+# Jedi Knight Cog Script
+#
+# Why do I keep typing that?
+#
+# kiorb2.cog
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+template	AP_tpl=+APGhost	local
+thing		AP_thng1		local
+thing		AP_thng2		local
+thing		Kameball		local
+thing		Parent			local
+thing		Player			local
+
+flex		Dist=0.232305		local
+
+template	Par0=+TrailParsBlue2	local
+template	Par1=+TrailParsGreen2	local
+template	Par2=+TrailParsOrange2	local
+template	Par3=+TrailParsPurple2	local
+template	Par4=+TrailParsRed2	local
+template	Par5=+TrailParsSilver2	local
+template	Par6=+TrailParsTeal2	local
+template	Par7=+TrailParsYellow2	local
+
+template	Ball0=+kiorb2		local
+template	Ball1=+kiorb7		local
+template	Ball2=+kiorb12		local
+template	Ball3=+kiorb17		local
+template	Ball4=+kiorb22		local
+template	Ball5=+kiorb27		local
+template	Ball6=+kiorb32		local
+template	Ball7=+kiorb37		local
+
+keyframe	Anim=ballcharge.key	local
+
+vector		Pos					local
+
+message		startup
+message		created
+message		pulse
+message		timer
+message		trigger
+
+end
+
+code
+
+startup:
+
+	Pos=VectorSet(0, 0, 0.1+Dist);
+
+return;
+
+created:
+
+	for(x=0; x<8; x=x+1)
+	{
+		if(GetThingTemplate(GetSenderRef())==Ball0[x])
+		{SetThingUserData(GetSenderRef(), x);}
+	}
+
+	//SetThingPos(GetSenderRef(), VectorAdd(GetThingPos(GetThingParent(GetSenderRef())), VectorSet(0, 0, 0.1+Dist)));
+	PlayKey(GetSenderRef(), Anim, 5, 0);
+	SetThingPulse(GetSenderRef(), 0.01);
+
+return;
+
+pulse:
+
+	if(GetThingFlags(GetSenderRef()) & 0x200)
+	{
+		ClearThingFlags(GetSenderRef(), 0x200);
+		SetThingPulse(GetSenderRef(), 0);
+		SetThingTimer(GetSenderRef(), 0.05);
+	}
+	
+	//SetThingPos(GetSenderRef(), VectorAdd(GetThingPos(GetThingParent(GetSenderRef())), VectorSet(0, 0, 0.1+Dist)));
+
+	Parent=GetThingParent(GetSenderRef());
+	//AP_thng1=CreateThing(AP_tpl, Parent);
+	//SetThingLook(AP_thng1, GetThingLVec(Parent));
+	//AP_thng2=FireProjectile(AP_thng1, AP_tpl, -1, -1, Pos, '0 0 0', 1.0, 0x20, 0, 0);
+	AP_thng2=FireProjectile(Parent, AP_tpl, -1, -1, Pos, '0 0 0', 1.0, 0x20, 0, 0);
+	TeleportThing(GetSenderRef(), AP_thng2);
+	//DestroyThing(AP_thng1);
+	DestroyThing(AP_thng2);
+
+	if(GetThingFlags(Parent) & 0x200) DestroyThing(GetSenderRef());
+
+return;
+
+timer:
+
+	if(GetSenderRef() != -1)
+	{
+		ParNum=GetThingUserData(GetSenderRef());
+		CreateThing(Par0[ParNum], GetSenderRef());
+		SetThingTimer(GetSenderRef(), 0.05);
+	}
+
+return;
+
+end

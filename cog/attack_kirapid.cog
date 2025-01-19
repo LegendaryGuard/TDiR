@@ -1,0 +1,163 @@
+# Jedi Knight Cog Script
+#
+# Weapon 3: Rapid Fire Ki Attack
+
+symbols
+
+int			bin=174								local
+
+keyframe	RenzokuL0=leftrenzoku.key			local
+keyframe	RenzokuR0=rightrenzoku.key			local
+keyframe	RenzokuL1=leftrenzokufly.key		local
+keyframe	RenzokuR1=rightrenzokufly.key		local
+
+sound       fireSound=renfire.wav				local
+sound		outSound=SwingFist01.wav			local
+
+template    projectile=+renzoku					local
+
+thing       player                              local
+
+flex        fireWait=0.1                        local
+
+int         mode                                local
+int			Flying								local
+int			NextAnim=0							local
+
+vector		RandVec								local
+
+message     activated
+message     deactivated
+message     selected
+message     deselected
+message     autoselect
+message     fire
+
+end
+
+# ========================================================================================
+
+code
+
+fire:
+	player = GetSourceRef();
+
+	Attached=GetInv(player, 171);
+	if(Attached==0) return;
+
+	// Check that the player is still alive.
+	if(GetThingHealth(player) <= 0)
+	{
+		Return;
+	}
+
+	// Check Ammo - If we are out, autoselect best weapon.
+	if(GetInv(player, 14) < 1.0)
+	{
+		PlaySoundThing(outSound, player, 1.0, -1.0, -1.0, 0x80);
+		if(GetAutoSwitch() & 1)
+			SelectWeapon(player, AutoSelectWeapon(player, 1));
+		Return;
+	}
+
+	Flying=GetMajorMode(player);
+	if(Flying>2) Flying=Flying-3; //Compensate for underwater
+
+	RandVec = VectorSet((Rand()-0.5)*5, (Rand()-0.5)*5, 0.0);
+
+	if(NextAnim)
+	{
+		PlayKey(player, RenzokuR0[Flying], 1, 0x38);
+		FireProjectile(player, projectile, fireSound, -1, '0.03 0.1 0.0', RandVec, 1.0, 0x20, -1, -1);
+		NextAnim = 0;
+	}
+	else
+	{
+		PlayKey(player, RenzokuL0[Flying], 1, 0x38);
+		FireProjectile(player, projectile, fireSound, -1, '-0.03 0.1 0.0', RandVec, 1.0, 0x20, -1, -1);
+		NextAnim = 1;
+	}
+	ChangeInv(player, 14, -1.0);
+
+return;
+
+# ........................................................................................
+
+activated:
+	player = GetSourceRef();
+	mode = GetSenderRef();
+
+	ActivateWeapon( player, fireWait, mode );
+return;
+
+# ........................................................................................
+
+deactivated:
+	player = GetSourceRef();
+	mode = GetSenderRef();
+
+	DeactivateWeapon( player, mode );
+return;
+
+# ........................................................................................
+
+selected:
+	if(GetInv(player, bin) != 1) return;	//st00p ass Sequencer chargers,
+											//their bin ammount is also their
+											//ammo ammount, therefore, bin 8 (and 4)
+											//don't act like normal weapons -_-
+	//jkPrintUNIString(player, 7);
+	
+	Print("Ki Fury");
+
+	if(IsInvActivated(player, 41) == 1)
+	{SetArmedMode(player, 1);}
+	else
+	{SetArmedMode(player, 0);}
+
+	// Set flags, etc.
+	jkClearFlags(player, 0x5);
+	SetCurWeapon(player, 4);
+
+   // Check Ammo - If we are out, autoselect best weapon.
+// if(GetInv(player, 14) < 60.0)
+// {
+//    if((GetAutoSwitch() & 1))
+//       SelectWeapon(player, AutoSelectWeapon(player, 1));
+// }
+
+   Return;
+
+# ........................................................................................
+
+deselected:
+
+Return;
+
+# ........................................................................................
+
+autoselect:
+   player = GetSourceRef();
+
+   // If the player has the weapon
+   if(GetInv(player, 2) != 0.0)
+   {
+      // If the player has ammo
+      if(GetInv(player, 11) != 0.0)
+      {
+         ReturnEx(500.0);
+      }
+      else
+      {
+         ReturnEx(-1.0);
+      }
+   }
+   else
+   {
+      ReturnEx(-1.0);
+   }
+
+   Return;
+
+end
+

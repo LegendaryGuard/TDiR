@@ -1,0 +1,6 @@
+# Foley description for lightsaber hitting a wall
+create		meleehit0.wav	0	0.5	2.0	0.7
+create		meleehit1.wav	0	0.5	2.0	0.7
+create		meleehit2.wav	0	0.5	2.0	0.7
+create		meleehit3.wav	0	0.5	2.0	0.7
+

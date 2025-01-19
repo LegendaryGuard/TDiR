@@ -1,0 +1,127 @@
+# Jedi Knight Cog Script
+#
+# seekerball.cog
+#
+# The Ki Beam wasn't workin out so hot, trying to
+# make it an instant impact thing, so the guys were
+# saying they missed the seeker balls from the earlier
+# days, so here they are, Hell Raiser style. ;)
+#
+# Created by: Hell Raiser [CansarMan]
+
+flags=0x240
+
+symbols
+
+template	roshibot=+rbot					local
+
+material	flash=homeball.mat
+
+message		created
+message		trigger
+message		pulse
+message		timer
+
+end
+
+code
+
+created:
+
+	MaterialAnim(flash, 24, 0x1);
+
+	SetThingUserData(GetSenderRef(), -1);
+	SetThingPulse(GetSenderRef(), 0.01);
+	SetThingTimer(GetSenderRef(), 5);
+
+return;
+
+timer:
+
+	DestroyThing(GetSenderRef());
+
+return;
+
+pulse:
+
+	ball=GetSenderRef();
+
+	if(GetThingUserData(ball) == -1)
+	{
+	
+		//Print("Looking");
+	
+	  // Check all things for our victim.
+      victim = -1;
+      maxDot = 0;
+
+      // Search for all players and actors.
+      potential = FirstThingInView(ball, 180, 15, 0x404);
+      if(GetThingType(potential) == 2 && GetThingTemplate(potential) != roshibot &&
+      GetThingParent(GetSenderRef()) != potential) potential = -1;
+      while(potential != -1)
+      {
+         if(
+            HasLOS(ball, potential) &&
+            (potential != ball) &&
+            (VectorDist(GetThingPos(ball), GetThingPos(potential)) <= 15) &&
+            !(GetThingFlags(potential) & 0x200) &&
+            !(GetActorFlags(potential) & 0x100) &&
+            !((jkGetFlags(potential) & 0x20)) &&
+            (potential != GetThingParent(ball))
+           )
+         {
+            dot = ThingViewDot(ball, potential);
+            if(dot > maxDot)
+            {
+               victim = potential;
+               maxDot = dot;
+            }
+         }
+         potential = NextThingInView();
+      }
+
+      // If we have a victim...
+      if(victim != -1)
+      {
+         //jkSetTargetColors(32, 39, 47);
+         //jkSetTarget(victim);
+         //SendMessageEx(GetInvCog(player, 135), user0, 2, victim, 2, -1);
+         
+		 SetThingUserData(ball, victim);
+		 //Print("Found!");
+      }
+      else
+      {
+         //jkEndTarget();
+         SetThingVel(ball, VectorScale(GetThingLVec(ball), 10));
+         
+         //Print("Not Found");
+      }
+	}
+	else
+	{
+		SetThingLook(ball, VectorSub(GetThingPos(GetThingUserData(ball)), GetThingPos(ball)));
+		SetThingVel(ball, VectorScale(GetThingLVec(ball), 10));
+		//Print("Seeking");
+	}
+
+return;
+
+trigger:
+
+	if(GetSourceRef() == 80000)
+	{
+		if(GetThingParent(GetParam(0)) == GetParam(1))
+		{
+			if(GetParam(2) != -1)
+			{SetThingUserData(GetParam(0), GetParam(2));}
+			else
+			{SetThingUserData(GetParam(0), -1);}
+			SetThingPulse(GetParam(0), 0.1);
+		}
+	}
+
+return;
+
+end

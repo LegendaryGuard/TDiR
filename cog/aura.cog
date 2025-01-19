@@ -1,0 +1,46 @@
+# Jedi Knight Cog Script
+#
+# faura.cog
+#
+# Animate the aura mats and attach the aura to the player
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+
+material	Aura0=baura.mat		local
+material	Aura1=gaura.mat		local
+material	Aura2=oaura.mat		local
+material	Aura3=paura.mat		local
+material	Aura4=raura.mat		local
+material	Aura5=saura.mat		local
+material	Aura6=taura.mat		local
+material	Aura7=yaura.mat		local
+material	Aura8=ssjlightning.mat	local
+
+int			a					local
+
+message		created
+message		startup
+
+end
+
+code
+
+startup:
+
+	for(a=0; a<=8; a=a+1)
+	{MaterialAnim(Aura0[a], 12, 0x1);}
+
+return;
+
+created:
+
+	TeleportThing(GetSenderRef(), GetThingParent(GetSenderRef()));
+	SetThingPos(GetSenderRef(), VectorAdd(GetThingPos(GetThingParent(GetSenderRef())), '0 0 -0.02'));
+	SetThingLook(GetSenderRef(), GetThingLook(GetThingParent(GetSenderRef())));
+	AttachThingToThingEx(GetSenderRef(), GetThingParent(GetSenderRef()), 0xc);
+
+return;
+
+end

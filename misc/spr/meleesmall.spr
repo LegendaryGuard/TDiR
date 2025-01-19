@@ -1,0 +1,3 @@
+#material		type	width	height  geo     light   tex	extralight	xoff    yoff	zoff
+meleesmall.mat	0		0.075	0.075    4       0       0  	0.0       	0.0   	 0.0	0.05
+

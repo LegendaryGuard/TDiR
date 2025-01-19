@@ -1,0 +1,209 @@
+# New Camera Positions
+#
+# Created by Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+thing		player				local
+thing		Camera=-1			local
+int			CamMode=0			local
+
+template	camera_Tpl=+APGhost	local
+template	AP_Tpl=+APGhost	local
+
+template	Hud_tpl=+HUD		local
+
+template	ERectile=+RectileRed	local
+
+template	Cam=+camera			local
+
+template	Menu=+menu			local
+
+template	CH=+crosshair	local
+template	CH2=+crosshair2	local
+
+thing		CHPos			local
+
+vector		Position_Vec		local
+
+vector		OldPosVec			local
+vector		OldCamMode			local
+
+vector		VX					local
+vector		VY					local
+vector		VZ					local
+
+message		startup
+message		pulse
+message		newplayer
+message		user0
+message		user1
+message		user2
+message		user3
+message		user4
+
+end
+
+code
+
+startup:
+
+	player = GetLocalPlayerThing();
+	Position_Vec = VectorSet(0.0, -0.4, 0.14); //VectorSet(0.0, -0.1, 0.08)
+	
+	SetPulse(0.01);
+	OldCamMode=-1;
+
+	P2=10; //Our shaking intisity modifier
+
+return;
+
+newplayer:
+
+	//FireProjectile(Player, CH, -1, -1, '0 0.1 0', '0 0 0', 0, 0, 0, 0);
+
+return;
+
+Pulse:
+
+	//VectorLen(GetThingVel(player));
+
+	//if(Camera != -1) DestroyThing(Camera);
+
+	if(GetCurrentCamera()==1) //1
+	{
+		CamMode=CamMode+1;
+		if(CamMode > 3) CamMode=0;
+
+		SetInv(player, 190, CamMode);
+
+		CamMode=3;
+
+		if(CamMode==0)
+		{Position_Vec = VectorSet(0.0, -0.1, 0.08);}
+		else if(CamMode==1)
+		{Position_Vec = VectorSet(0.0, -0.2, 0.1);}
+		else if(CamMode==2)
+		{Position_Vec = VectorSet(0.0, -0.3, 0.12);}
+		else if(CamMode==3)
+		{Position_Vec = VectorSet(0.0, -0.4, 0.14);}
+		else if(CamMode==4)
+		{Position_Vec = VectorSet(0, 0, 0.12);}
+		//PrintInt(CamMode);
+		CycleCamera();
+	}
+
+    //if ((jkGetSaberCam() == 1) && (GetCurrentCamera() == 0) && (GetPrimaryFocus(0) == player))
+    //CycleCamera();
+
+	if(OldCamMode != -1)
+	{
+		CamMode=0;
+		SetInv(player, 190, CamMode);
+		Position_Vec=VectorSet(0.0, -0.05, 0.08);
+	}
+
+	if(GetThingFlags(Player) & 0x40000000)
+	{
+		Camera=CreateThing(camera_tpl, player);
+		//SetThingLook(Camera, VectorSet(VectorX(GetThingLVec(player)), VectorY(GetThingLVec(player)), 0));
+		FireProjectile(Camera, Cam, -1, -1, Position_Vec, '0 0 0', 0, 0, 0, 0);	
+		DestroyThing(Camera);
+	}
+	else
+	{
+		Position_Vec = VectorSet(0.0, -0.4, 0.14);
+		P=Position_Vec;
+		//Shake the camera violently
+		if(P2>0) P2=P2-0.1;
+		P=VectorSet((rand()-0.5)*P2, (rand()-0.5)*P2, (rand()-0.5)*P2);
+		
+		//Hud_Pos=VectorAdd(Position_Vec, VectorSet());
+		//Shakey shakey
+		//Camera=FireProjectile(player, Cam, -1, -1, Position_Vec, P, 0, 0, 0, 0);
+		Camera=FireProjectile(player, Cam, -1, -1, Position_Vec, '0 0 0', 0, 0, 0, 0);
+		
+		FireProjectile(player, Hud_tpl, -1, -1, '0.01 -0.3592 0.119', '0 0 0', 0, 0, 0, 0);
+
+		//SetThingLook(Camera, VectorSub(GetThingPos(player), VectorAdd(GetThingPos(player), P)));
+
+		//Thinger=FireProjectile(Camera, Menu, -1, -1, '0 0.08 0', '0 0 0', 0, 0, 0, 0);
+		if(GetThingHealth(player) > 0)
+		{
+			Victim=SendMessageEx(GetInvCog(player, 116), user0, -1, -1, -1, -1);
+			
+			if(Victim == -1)
+			{				
+				//for(x=0; x<=10; x=x+0.1)
+				//{
+				//	CHThing=FireProjectile(Player, CH, -1, -1, VectorSet(0, x, 0), '0 0 0', 0, 0, 0, 0);
+				//	if(IsThingVisible(CHThing)==0)
+				//	{CHPos=GetThingPos(CHThing);}
+				//	DestroyThing(CHThing);
+				//}
+
+				//RecVec=VectorScale(VectorNorm(VectorSub(CHPos, GetThingPos(Camera))), Dist);
+				//RecVec2=VectorAdd(GetThingPos(Camera), RecVec);
+				//TheRectile=CreateThingAtPos(ERectile, GetThingSector(Camera), RecVec2, VectorSet(0, 0, R));
+				//SetThingLook(TheRectile, RecVec);
+				
+				FireProjectile(Camera, CH, -1, -1, '0 0.1 0', '0 0 0', 0, 0, 0, 0);
+			}
+			//else
+			//{
+			//	RecVec=VectorScale(VectorNorm(VectorSub(GetThingPos(Victim), GetThingPos(Camera))), 0.025);
+			//	RecVec=VectorAdd(GetThingPos(Camera), RecVec);
+			//	CreateThingAtPos(ERectile, GetThingSector(Camera), RecVec, '0 0 0');
+			//}
+			
+		}
+	}
+
+	//Camera = FireProjectile(player, camera_Tpl, -1, -1, Position_Vec, '0 0 0', 0, 0, 0, 0);
+	//if(IsInvActivated(player, 41))
+	//{SetThingLook(player, GetThingLVec(Camera));}
+	//else
+	//{SetThingLook(player, GetThingLVec(player));}
+	//if(CamMode==4) SetThingLook(Camera, VectorSub(GetThingPos(player), GetThingPos(Camera)));
+	//SetCameraFocus(0, Camera);
+	
+return;
+
+user0:
+	SetPulse(0);
+return;
+
+user1:
+	SetPulse(0.01);
+return;
+
+user2:
+
+	OldPosVec=Position_Vec;
+	OldCamMode=CamMode;
+
+return;
+
+user3:
+
+	CamMode=OldCamMode;
+	Position_Vec=OldPosVec;
+	OldCamMode=-1;
+
+return;
+
+user4:
+
+	VX=GetParam(0);
+	VY=GetParam(1);
+	VZ=GetParam(2);
+
+	FireProjectile(Player, CH, -1, -1, '0 0.1 0', '0 0 0', 0, 0, 0, 0);	
+
+	Print("user4");
+
+return;
+
+end

@@ -1,0 +1,170 @@
+# Jedi Knight Cog Script
+#
+# item_targeting.cog
+#
+# A half-assed targeting system, I was bored...
+#
+# Created by Hell Raiser
+#
+# Set the RotVel based on how far away Aimer is from
+# the center of the screen/player.
+#
+# Have dead zone in middle of screen/player
+#
+# Thrust Y adjusts the speed of the player
+
+
+flags=0x240
+
+symbols
+
+template	roshibot=+roshibot	local
+
+template	GhostT=+APGhost	local
+
+template	Cam=+camera			local
+
+template	Bot=+roshibot	local
+
+thing		Follow	local
+
+thing		AimPos			local
+thing		Aimer			local
+
+int			Bin=29			local
+
+thing		player			local
+
+thing		Enemy0			local
+thing		Enemy1			local
+thing		Enemy2			local
+thing		Enemy3			local
+thing		Enemy4			local
+thing		Enemy5			local
+thing		Enemy6			local
+thing		Enemy7			local
+
+int			EnemyCount		local
+
+message		startup
+message		activated
+message		killed
+message		pulse
+
+end
+
+code
+
+startup:
+
+	player = GetLocalPlayerThing();
+	EnemyCount=0;
+
+return;
+
+activated:
+
+	if(IsInvActivated(player, Bin) == 0)
+	{
+		Print("Targeting On");
+		SetInvActivated(player, Bin, 1);
+		SetThingFlags(player, 0x10);
+		Follow=FireProjectile(Player, Bot, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		Aimer=FireProjectile(Player, GhostT, -1, -1, '0 0.5 0.5', '0 0 0', 0, 0, 0, 0);
+		SendMessageEx(GetInvCog(player, 135), user0, 3, Aimer, 2, -1);
+		ClearPhysicsFlags(player, 0x2);
+		SetPulse(0.001);
+	}
+	else
+	{
+		Print("Targeting Off");
+		Call StopTargeting;
+		DestroyThing(Aimer);
+	}
+	
+return;
+
+pulse:
+	
+	Looking=GetThingLVec(Follow);
+	TeleportThing(Follow, Player);
+	SetThingLook(Follow, Looking);
+	FireProjectile(Follow, Cam, -1, -1, '0 -0.1 0', '0 0 0', 0, 0, 0, 0);
+	AimPos=FireProjectile(Player, GhostT, -1, -1, '0 1000 0', '0 0 0', 0, 0, 0, 0);
+	TeleportThing(Aimer, AimPos);
+	DestroyThing(AimPos);
+	
+	PrintVector(GetThingThrust(player));
+	
+	if(VectorY(GetThingThrust(player)) > 0)
+	{
+		SetThingVel(Player, VectorScale(VectorNorm(VectorSub(GetThingPos(Aimer), GetThingPos(Player))), 1.2));
+	}
+	else
+	{
+		StopThing(Player);
+	}
+
+return;
+
+pulse2:
+
+	EnemyCount=0;
+
+	for(x=0; x<8; x=x+1)
+	{Enemy0[x]=-1;}
+
+	// Check all things for our victim.
+	victim = -1;
+	maxDot = 0;
+
+	// Search for all players and actors.
+	potential = FirstThingInView(player, 180, 15, 0x404);
+	if(GetThingType(potential) == 2 && GetThingTemplate(potential) != roshibot) potential = -1;
+	while(potential != -1)
+	{
+		if(
+			HasLOS(player, potential) &&
+			(potential != player) &&
+			(VectorDist(GetThingPos(player), GetThingPos(potential)) <= 15) &&
+			!(GetThingFlags(potential) & 0x200) &&
+			!(GetActorFlags(potential) & 0x100) &&
+			!((jkGetFlags(potential) & 0x20))
+			)
+		{
+			victim = potential;
+			EnemyCount=EnemyCount+1;
+			Enemy0[EnemyCount-1]=victim;
+		}
+		potential = NextThingInView();
+	}
+
+	for(x=0; x<EnemyCount; x=x+1)
+	{
+         SendMessageEx(GetInvCog(player, 135), user0, x+3, Enemy0[x], 0, -1);
+    }
+    
+//	for(x=0; x<8; x=x+1)
+//	{
+//		if(Enemy0[x] == -1)
+//		{SendMessageEx(GetInvCog(player, 135), user0, x+3, -1, -1, -1);}
+//    }
+
+	PrintInt(EnemyCount);
+
+return;
+
+killed:
+
+StopTargeting:
+
+	SetPulse(0);
+	for(x=0; x<8; x=x+1)
+	{
+         SendMessageEx(GetInvCog(player, 135), user0, x+3, -1, -1, -1);
+    }
+	SetInvActivated(player, Bin, 0);	
+
+return;
+
+end

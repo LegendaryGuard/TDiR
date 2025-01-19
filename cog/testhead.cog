@@ -1,0 +1,15 @@
+symbols
+
+message		touched
+
+end
+
+code
+
+touched:
+
+	//StopThing(GetSenderRef());
+
+return;
+
+end

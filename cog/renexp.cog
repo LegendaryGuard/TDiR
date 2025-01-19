@@ -1,0 +1,32 @@
+# Explosion
+
+symbols
+
+template	Sphere0=+SmExp0		local
+template	Sphere1=+SmExp1		local
+
+int			x					local
+
+message		created
+message		pulse
+
+end
+
+code
+
+created:
+
+	SetThingPulse(GetSenderRef(), 0.1);
+
+return;
+
+pulse:
+
+	x=GetThingUserData(GetSenderRef());
+	FireProjectile(GetSenderRef(), Sphere0[x], -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+	SetThingUserData(GetSenderRef(), x+1);
+	if(GetThingUserData(GetSenderRef())==2) DestroyThing(GetSenderRef());
+
+return;
+
+end

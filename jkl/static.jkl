@@ -1,0 +1,410 @@
+#********** World file D:\jedi\Products\JK\Release\Jkl\static.jkl ***** Created 10/30/1996 6:32pm **********
+
+#### Copyright information #####
+SECTION: COPYRIGHT
+................................
+................@...@...@...@...
+.............@...@..@..@...@....
+................@.@.@.@.@.@.....
+@@@@@@@@......@...........@.....
+@@@@@@@@....@@......@@@....@....
+@@.....@.....@......@@@.....@@..
+@@.@@@@@......@.....@@@......@@.
+@@@@@@@@.......@....@@.....@@...
+@@@@@@@@.........@@@@@@@@@@.....
+@@@@@@@@..........@@@@@@........
+@@.....@..........@@@@@.........
+@@.@@@@@.........@@@@@@.........
+@@.....@.........@@@@@@.........
+@@@@@@@@.........@@@@@@.........
+@@@@@@@@.........@@@@@@@........
+@@@...@@.........@@@@@@@........
+@@.@@@.@.........@.....@........
+@@..@..@........@.......@.......
+@@@@@@@@........@.......@.......
+@@@@@@@@.......@........@.......
+@@..@@@@.......@........@.......
+@@@@..@@......@.........@.......
+@@@@.@.@......@.........@.......
+@@....@@........................
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@@@@@@@@@@@.@@@@@@@@@@@@@@@@@@
+@@.@@..@@@@@..@@@@@@@@@@.@@@@@@@
+@@.@.@.@@@@.@.@@@.@..@@...@@@..@
+@@..@@@@@@....@@@..@@@@@.@@@@.@@
+@@@@@@@@...@@.@@@.@@@@@..@@...@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@.copyright.(c).1997.lucasarts.@
+@@@@@@..entertainment.co..@@@@@@
+################################
+
+
+###### Header information ######
+SECTION: HEADER
+# version and global constant settings
+Version 1
+World Gravity 4.00
+Ceiling Sky Z    3.000000
+Horizon Distance 100.000000
+Horizon Pixels per Rev 768.000000
+Horizon Sky Offset   0.000000 0.000000
+Ceiling Sky Offset   0.000000 0.000000
+MipMap Distances	1.000000	2.000000	3.000000	4.000000
+LOD Distances		0.300000	0.600000	0.900000	1.200000
+Perspective distance 2.00
+Gouraud distance 2.00
+################################
+
+
+###### Sound information  ######
+SECTION: SOUNDS
+World sounds 250
+end
+################################
+
+
+##### Material information #####
+SECTION: MATERIALS
+World materials 300
+end
+################################
+
+
+Section: Soundclass
+World soundclasses 30
+0:	ky.snd
+end
+
+###### Models information ######
+#232
+Section: MODELS
+World models 215
+0: AuraBlue.3do
+1: AuraGreen.3do
+2: AuraOrange.3do
+3: AuraPurple.3do
+4: AuraRed.3do
+5: AuraSilver.3do
+6: AuraTeal.3do
+7: AuraYellow.3do
+8: bact.3do
+9: BattleHeadBlue.3do
+10: BeamFireBlue0.3do
+11: BeamFireBlue1.3do
+12: BeamFireBlue2.3do
+13: BeamFireBlue3.3do
+14: BeamFireBlue4.3do
+15: BeamFireGreen0.3do
+16: BeamFireGreen1.3do
+17: BeamFireGreen2.3do
+18: BeamFireGreen3.3do
+19: BeamFireGreen4.3do
+20: BeamFireOrange0.3do
+21: BeamFireOrange1.3do
+22: BeamFireOrange2.3do
+23: BeamFireOrange3.3do
+24: BeamFireOrange4.3do
+25: BeamFirePurple0.3do
+26: BeamFirePurple1.3do
+27: BeamFirePurple2.3do
+28: BeamFirePurple3.3do
+29: BeamFirePurple4.3do
+30: BeamFireRed0.3do
+31: BeamFireRed1.3do
+32: BeamFireRed2.3do
+33: BeamFireRed3.3do
+34: BeamFireRed4.3do
+35: BeamFireSilver0.3do
+36: BeamFireSilver1.3do
+37: BeamFireSilver2.3do
+38: BeamFireSilver3.3do
+39: BeamFireSilver4.3do
+40: BeamFireTeal0.3do
+41: BeamFireTeal1.3do
+42: BeamFireTeal2.3do
+43: BeamFireTeal3.3do
+44: BeamFireTeal4.3do
+45: BeamFireYellow0.3do
+46: BeamFireYellow1.3do
+47: BeamFireYellow2.3do
+48: BeamFireYellow3.3do
+49: BeamFireYellow4.3do
+50: BeamHeadBlue0.3do
+51: BeamHeadBlue1.3do
+52: BeamHeadBlue2.3do
+53: BeamHeadBlue3.3do
+54: BeamHeadBlue4.3do
+55: BeamHeadGreen0.3do
+56: BeamHeadGreen1.3do
+57: BeamHeadGreen2.3do
+58: BeamHeadGreen3.3do
+59: BeamHeadGreen4.3do
+60: BeamHeadOrange0.3do
+61: BeamHeadOrange1.3do
+62: BeamHeadOrange2.3do
+63: BeamHeadOrange3.3do
+64: BeamHeadOrange4.3do
+65: BeamHeadPurple0.3do
+66: BeamHeadPurple1.3do
+67: BeamHeadPurple2.3do
+68: BeamHeadPurple3.3do
+69: BeamHeadPurple4.3do
+70: BeamHeadRed0.3do
+71: BeamHeadRed1.3do
+72: BeamHeadRed2.3do
+73: BeamHeadRed3.3do
+74: BeamHeadRed4.3do
+75: BeamHeadSilver0.3do
+76: BeamHeadSilver1.3do
+77: BeamHeadSilver2.3do
+78: BeamHeadSilver3.3do
+79: BeamHeadSilver4.3do
+80: BeamHeadTeal0.3do
+81: BeamHeadTeal1.3do
+82: BeamHeadTeal2.3do
+83: BeamHeadTeal3.3do
+84: BeamHeadTeal4.3do
+85: BeamHeadYellow0.3do
+86: BeamHeadYellow1.3do
+87: BeamHeadYellow2.3do
+88: BeamHeadYellow3.3do
+89: BeamHeadYellow4.3do
+90: BeamTailBlue0.3do
+91: BeamTailBlue1.3do
+92: BeamTailBlue2.3do
+93: BeamTailBlue3.3do
+94: BeamTailBlue4.3do
+95: BeamTailGreen0.3do
+96: BeamTailGreen1.3do
+97: BeamTailGreen2.3do
+98: BeamTailGreen3.3do
+99: BeamTailGreen4.3do
+100: BeamTailOrange0.3do
+101: BeamTailOrange1.3do
+102: BeamTailOrange2.3do
+103: BeamTailOrange3.3do
+104: BeamTailOrange4.3do
+105: BeamTailPurple0.3do
+106: BeamTailPurple1.3do
+107: BeamTailPurple2.3do
+108: BeamTailPurple3.3do
+109: BeamTailPurple4.3do
+110: BeamTailRed0.3do
+111: BeamTailRed1.3do
+112: BeamTailRed2.3do
+113: BeamTailRed3.3do
+114: BeamTailRed4.3do
+115: BeamTailSilver0.3do
+116: BeamTailSilver1.3do
+117: BeamTailSilver2.3do
+118: BeamTailSilver3.3do
+119: BeamTailSilver4.3do
+120: BeamTailTeal0.3do
+121: BeamTailTeal1.3do
+122: BeamTailTeal2.3do
+123: BeamTailTeal3.3do
+124: BeamTailTeal4.3do
+125: BeamTailYellow0.3do
+126: BeamTailYellow1.3do
+127: BeamTailYellow2.3do
+128: BeamTailYellow3.3do
+129: BeamTailYellow4.3do
+130: blast.3do
+131: bpck.3do
+132: crosshair.3do
+133: dragon.3do
+134: dragonball.3do
+135: dragonmenu.3do
+136: dustring.3do
+137: expsphere0.3do
+138: expsphere1.3do
+139: expsphere2.3do
+140: expsphere3.3do
+141: expsphere4.3do
+142: expsphere5.3do
+143: expsphere6.3do
+144: expsphere7.3do
+145: expsphere8.3do
+146: expsphere9.3do
+147: FlyAuraBlue.3do
+148: FlyAuraGreen.3do
+149: FlyAuraOrange.3do
+150: FlyAuraPurple.3do
+151: FlyAuraRed.3do
+152: FlyAuraSilver.3do
+153: FlyAuraTeal.3do
+154: FlyAuraYellow.3do
+155: HeadBlue.3do
+156: kameball.3do
+157: kameballblue.3do
+158: kameballgreen.3do
+159: kameballorange.3do
+160: kameballpurple.3do
+161: kameballred.3do
+162: kameballsilver.3do
+163: kameballteal.3do
+164: kameballyellow.3do
+165: KiOrbBlue0.3do
+166: KiOrbBlue1.3do
+167: KiOrbBlue2.3do
+168: KiOrbBlue3.3do
+169: KiOrbBlue4.3do
+170: KiOrbGreen0.3do
+171: KiOrbGreen1.3do
+172: KiOrbGreen2.3do
+173: KiOrbGreen3.3do
+174: KiOrbGreen4.3do
+175: KiOrbOrange0.3do
+176: KiOrbOrange1.3do
+177: KiOrbOrange2.3do
+178: KiOrbOrange3.3do
+179: KiOrbOrange4.3do
+180: KiOrbPurple0.3do
+181: KiOrbPurple1.3do
+182: KiOrbPurple2.3do
+183: KiOrbPurple3.3do
+184: KiOrbPurple4.3do
+185: KiOrbRed0.3do
+186: KiOrbRed1.3do
+187: KiOrbRed2.3do
+188: KiOrbRed3.3do
+189: KiOrbRed4.3do
+190: KiOrbSilver0.3do
+191: KiOrbSilver1.3do
+192: KiOrbSilver2.3do
+193: KiOrbSilver3.3do
+194: KiOrbSilver4.3do
+195: KiOrbTeal0.3do
+196: KiOrbTeal1.3do
+197: KiOrbTeal2.3do
+198: KiOrbTeal3.3do
+199: KiOrbTeal4.3do
+200: KiOrbYellow0.3do
+201: KiOrbYellow1.3do
+202: KiOrbYellow2.3do
+203: KiOrbYellow3.3do
+204: KiOrbYellow4.3do
+205: renzoku.3do
+206: rocks.3do
+207: smexp0.3do
+208: smexp1.3do
+209: smexp2.3do
+210: Menu.3do
+211: lightning.3do
+212: dflt.3do
+213: rectile.3do
+214: homeball.3do
+end
+################################
+
+
+#### DON"T FUCK WITH THIS!! ####
+###### Sprite information ######
+Section: SPRITES
+
+World sprites 10
+0: zan.spr
+1: RectileRed.spr
+2: RectileGreen.spr
+3: RectileGrey.spr
+4: RectileOrange.spr
+5: seqx2.spr
+6: debrisx.spr
+7: rldx.spr
+8: conx.spr
+end
+################################
+
+
+##### Keyframe information #####
+Section: KEYFRAMES
+
+World keyframes 99
+end
+################################
+
+
+###### Animation Classes #######
+Section: ANIMCLASS
+
+World puppets 5
+0:	ky.pup
+end
+################################
+
+
+########## COG scripts #########
+Section: cogscripts
+World scripts 999
+end
+################################
+
+
+######### COG placement ########
+Section: cogs
+World cogs 500
+#Num	Script          Symbol values
+end
+################################
+#Kamehameha
+#BigBang
+#FinalFlash
+#GalicGun
+#SpecialBeamCannon
+#Masenko
+#FingerBeam
+#OneHanded
+########### Templates ##########
+Section: TEMPLATES
+World templates 25
+#Name:          Based On:        Params:
+_crap			none			type=ghost
++camera			none			type=cog orient=(0/0/0) thingflags=0x8 collide=0 move=physics cog=camera.cog
++crosshair		none			type=cog orient=(0/0/0) thingflags=0x408 collide=0 model3d=crosshair.3do move=physics timer=0.001
++lookkeep		none			type=ghost thingflags=0x400 cog=keeplook.cog
++APGhost		none			orient=(0.000000/0.000000/0.000000) type=ghost move=physics #model3d=dragonball.3do
++MeleeCam		none			orient=(0/0/0) thingflags=0x800 type=cog collide=0 move=physics size=0.05 movesize=0.05 mass=100
++menu			none			type=cog orient=(0/0/0) thingflags=0x408 collide=0 model3d=menu.3do move=physics timer=0.001
++challange		none			type=cog sprite=challange.spr timer=0.01
++lightning		none			orient=(0/0/0) type=cog thingflags=0x401 light=1 size=0.410831 move=physics angvel=(0/120/0) cog=Aura.cog model3d=lightning.3do timer=1
++RectileRed		none			type=cog sprite=RectileRed.spr timer=0.01
++RectileGreen	none			type=cog sprite=RectileGreen.spr timer=0.01
++RectileGrey	none			type=cog sprite=RectileGrey.spr timer=0.01
++RectileOrange	none			type=cog sprite=RectileOrange.spr timer=0.01
++HUD			none			type=cog orient=(0/180/0) thingflags=0x8 collide=0 move=physics cog=hud.cog model3d=HUD.3do
+_botactor		none			orient=(0.000000/0.000000/0.000000) type=actor collide=1 move=physics thingflags=0x20000000 mass=150.000000 physflags=0x4a4f maxrotvel=200.000000 maxvel=1.000000 health=40.00 maxhealth=40.00 maxrotthrust=90.00 jumpspeed=1.50 eyeoffset=(0.000000/0.000000/0.037000) minheadpitch=-80.00 maxheadpitch=80 lightoffset=(0.000000/0.070000/0.040000) lightintensity=0.80
+botbase			_botactor		type=player thingflags=0x20000409 minheadpitch=-80.00 maxheadpitch=80.00 light=0.200000 model3d=ky.3do size=0.065000 movesize=0.065000 puppet=ky2.pup soundclass=ky.snd cog=kyle.cog surfdrag=3.000000 airdrag=0.500000 staticdrag=0.300000 health=100 maxhealth=100 maxthrust=2.00 typeflags=0x1 error=0.50 fov=0.71 chance=1.00
++roshibot		botbase			type=actor model3d=roshi.3do health=100 maxhealth=100 puppet=ky2.pup physflags=0x4a4e
++exp_pars0		none			orient=(0/0/0) type=particle typeflags=0x3f material=bluepar.mat maxthrust=10.000000 range=0.5 rate=192.000000 elementsize=0.01000 count=256 minsize=0.01000 pitchrange=90 yawrange=90 timer=0.5
+
++force_ltpeice   none             orient=(0.000000/0.000000/0.000000) type=weapon move=physics timer=0.250000 model3d=ligt2.3do size=0.005000 movesize=0.005000 physflags=0x200 maxrotvel=360.000000 angvel=(0.000000/0.000000/360.000000) 
++lightninghit    none             orient=(0.000000/0.000000/0.000000) type=particle move=physics timer=0.200000 typeflags=0x2b material=00ramp4.mat range=0.020000 rate=16.000000 maxthrust=8.000000 elementsize=0.003000 count=16 
++force_lightning _weapon          thingflags=0x1 light=0.100000 timer=0.100000 size=0.005000 movesize=0.005000 vel=(0.000000/1.000000/0.000000) angvel=(0.000000/0.000000/360.000000) explode=+lightninghit fleshhit=+lightninghit trailthing=+force_ltpeice elementsize=0.075000 trailcylradius=0.050000 trailrandangle=30.000000 damage=13.000000 damageclass=0x8 typeflags=0x1840d range=1.500000 
+
+
+#_beam3			none			thingflags=0x408 cog=battlehead.cog light=1 collide=1 orient=(0/0/0) type=actor move=physics mass=100 physflags=0x2 size=0.1 movesize=0.1 angvel=(0/0/0)
+#+head3			_beam3			model3d=BeamHeadBlue0.3do health=1 maxhealth=10000
+#+bbexp			none			orient=(0/0/0) type=weapon damageclass=0x2 move=physics typeflags=0x40040d collide=1 thingflags=0x20000c09 light=0.5 model3d=blast.3do size=0.02 movesize=0.02 mass=1 vel=(0/3.5/0) timer=0.1 damage=1
+#+bbexp2			none			orient=(0/0/0) thingflags=0x1 type=explosion typeflags=0x146 damageclass=0x4 damage=2 range=0.55 blasttime=0.1 timer=0.1 flashrgb=(0/0/256) force=0
+
+#+bbexp			none			orient=(0/0/0) thingflags=0x1 type=explosion typeflags=0x146 damageclass=0x4 damage=50 range=0.5 blasttime=0.1 timer=0.1 flashrgb=(0/0/128) force=0
+
+#+chp			none			type=explosion thingflags=0x400 cog=chpos.cog timer=0.01
+#+crosshair		none			type=weapon orient=(0/0/0) thingflags=0x408 size=0.001 movesize=0.001 mass=1 collide=1 typeflags=0x200d range=1000 explode=+chp fleshhit=+chp
+
+#+KiBeamExp		none			orient=(0/0/0) thingflags=0x400 type=explosion damageclass=0x4 damage=25 range=0.1 soundclass=exp_small.snd model3d=smexp0.3do #cog=kibexp.cog
+#+KiBeamTrail	none			orient=(0.000000/0.000000/0.000000) type=weapon move=physics timer=0.250000 model3d=KiBeam.3do size=0.5000 movesize=0.5000 physflags=0x200 maxrotvel=360.000000 angvel=(0.000000/0.000000/360.000000)
+#+KiBeam			none			orient=(0/0/0) type=weapon damageclass=0x2 move=physics typeflags=0x40040d collide=1 thingflags=0x20000c09 light=0.5 size=0.01 movesize=0.01 mass=0.0001 explode=+KiBeamExp fleshhit=+KiBeamExp vel=(0/100/0) timer=0.1 damage=15 mindamage=5 rate=25 force=1 cog=KiBeam.cog
+#+kitail			none			type=cog orient=(0/0/0) thingflags=0x1 collide=0 model3d=flytail.3do move=physics timer=1.2
+#_charge			none			orient=(0/0/0) thingflags=0x409 type=cog move=physics light=0.5 angvel=(0/0/0) puppet=beamcharge.pup cog=KameCharge.cog
+#_kamecharge		_charge			cog=KameCharge.cog
+#+ffcharge		_charge			cog=FFCharge.cog model3d=kameballblue.3do
+#+bbcharge		_charge			cog=BBCharge.cog model3d=kameballblue.3do
+#+ggcharge		_charge			cog=GGCharge.cog model3d=kameballblue.3do
+#+sbccharge		_charge			cog=SBCcharge.cog model3d=kameballblue.3do
+#+mascharge		_charge			cog=MCharge.cog model3d=kameballblue.3do
+#+fbcharge		_charge			cog=FBCharge.cog model3d=kameballblue.3do
+#+ohcharge		_charge			cog=OHCarge.cog model3d=kameballblue.3do
+#+kameballblue	_kamecharge	model3d=kameballblue.3do
+end
+################################

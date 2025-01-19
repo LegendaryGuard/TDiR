@@ -1,0 +1,9 @@
+# Foley description for thermal detonators
+#
+# class		filename		playflags	minRadius	maxRadius	maxVolume
+#####################################################################################################
+#
+
+create		meow.wav             0x0     	4.5    		10.5		1.0
+
+

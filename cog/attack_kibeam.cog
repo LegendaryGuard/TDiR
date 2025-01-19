@@ -1,0 +1,148 @@
+# Jedi Knight Cog Script
+#
+# Weapon 3: Ki Beam
+
+symbols
+
+keyframe	Blast0=kibeam.key			local
+keyframe	Blast1=kibeamfly.key		local
+
+sound       fireSound=kiblast.wav		local
+
+template	Par=+ypar					local
+template    projectile=+kibeam			local
+
+thing       player						local
+
+flex        fireWait=1                  local
+
+int         mode                        local
+int			Flying						local
+
+message     activated
+message     deactivated
+message     selected
+message     deselected
+message     autoselect
+message     fire
+message		timer
+
+end
+
+# ========================================================================================
+
+code
+
+fire:
+	player = GetSourceRef();
+
+	// Check that the player is still alive.
+	if(GetThingHealth(player) <= 0)
+	{
+		Return;
+	}
+
+	// Check Ammo - If we are out, autoselect best weapon.
+	if(GetInv(player, 14) < 20)
+	{
+		//PlaySoundThing(outSound, player, 1.0, -1.0, -1.0, 0x80);
+		if(GetAutoSwitch() & 1)
+			SelectWeapon(player, AutoSelectWeapon(player, 1));
+		Return;
+	}
+
+
+	FireProjectile(Player, Par, -1, -1, '0 0.09 0.025', '0 0 0', 0, 0, 0, 0);
+	FireProjectile(player, projectile, fireSound, -1, '0 0.09 0.025', '0 0 0', 1.0, 0x20, -1, -1);
+
+	ChangeInv(player, 14, -20.0);
+
+return;
+
+# ........................................................................................
+
+activated:
+	player = GetSourceRef();
+	mode = GetSenderRef();
+
+	//SetTimerEx(GetKeyLen(Blast0[Flying]-0.1), 10, -1, -1);
+	Flying=GetMajorMode(player);
+	if(Flying>2) Flying=Flying-3; //Compensate for underwater
+
+	Beam_Id=PlayKey(player, Blast0[Flying], 1, 0x14);
+	ActivateWeapon( player, 0.5, mode );
+	SetActorFlags(player, 0x40000);
+	
+return;
+
+# ........................................................................................
+
+deactivated:
+	player = GetSourceRef();
+	mode = GetSenderRef();
+
+	DeactivateWeapon( player, mode );
+	StopKey(player, Beam_Id, 0);
+
+	ClearActorFlags(player, 0x40000);
+	
+return;
+
+# ........................................................................................
+
+selected:
+	//jkPrintUNIString(player, 7);
+	
+	Print("Ki Beam");
+
+	if(IsInvActivated(player, 41) == 1)
+	{SetArmedMode(player, 1);}
+	else
+	{SetArmedMode(player, 0);}
+
+	// Set flags, etc.
+	jkClearFlags(player, 0x5);
+	SetCurWeapon(player, 5);
+
+   // Check Ammo - If we are out, autoselect best weapon.
+// if(GetInv(player, 14) < 60.0)
+// {
+//    if((GetAutoSwitch() & 1))
+//       SelectWeapon(player, AutoSelectWeapon(player, 1));
+// }
+
+   Return;
+
+# ........................................................................................
+
+deselected:
+
+Return;
+
+# ........................................................................................
+
+autoselect:
+   player = GetSourceRef();
+
+   // If the player has the weapon
+   if(GetInv(player, 3) != 0.0)
+   {
+      // If the player has ammo
+      if(GetInv(player, 14) != 0.0)
+      {
+         ReturnEx(500.0);
+      }
+      else
+      {
+         ReturnEx(-1.0);
+      }
+   }
+   else
+   {
+      ReturnEx(-1.0);
+   }
+
+   Return;
+
+end
+

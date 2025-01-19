@@ -1,0 +1,80 @@
+# Jedi Knight Cog Script
+#
+# ki_well.COG
+#
+# Ki Script - Ki Well
+#  Bin 14
+#
+# Recharges Ki based on stuff
+#
+# ©2001 Hell Raiser [Jon Harmon]
+# Use of this cog or any others from DBZ: TDIR
+# is prohibited without permission
+
+
+symbols
+
+thing		player				local
+flex		Recharge=0			local
+int			Level				local
+
+message		startup
+message		pulse
+message		user0
+message		user1
+
+end                                                  
+# ========================================================================================
+
+code
+
+startup:
+
+	player = GetLocalPlayerThing();
+	SetPulse(0.1);
+
+return;
+
+# ........................................................................................
+
+pulse:
+	player = GetLocalPlayerThing();
+   
+	// don't do anything if the player is currently dead
+	if(GetThingHealth(player) < 1) Return;
+
+	Level=GetInv(Player, 20);
+
+	//if(IsThingMoving(player))
+	//{Recharge=Level;}
+	//else
+	//{
+	//	if(IsInvActivated(player, 25)) //Charging Ki
+	//	{Recharge=8*Level;}
+	//	else
+	//	{Recharge=2*Level;}
+	//}
+
+	Level=1;
+
+	if(IsInvActivated(player, 25)) //Charging Ki
+	{Recharge=5*Level;}
+	else
+	{Recharge=2.5*Level;}
+
+	if(IsInvActivated(player, 32) == 0) ChangeInv(player, 60, Recharge/2);
+	
+	if((GetInv(player, 60) > 100) && !(IsInvActivated(player, 22)))
+	{SetInv(player, 60, 100);}
+	
+	if(IsInvActivated(player, 42)) Recharge=0;
+
+	ChangeInv(player, 14, Recharge);
+
+	//if(GetInv(player, 14) >= 400) SetInv(player, 14, 400);
+
+return;
+
+end
+
+

@@ -1,0 +1,81 @@
+# Jedi Knight Cog Script
+#
+# character.cog
+#
+# Handles all characters that level up to SSJ and ect.
+#
+# Created by Hell Raiser [Jon Harmon]
+#
+# Fiddle with it, and Di3!
+#================================================================================================#
+
+symbols
+
+thing       player					local
+
+model Trans0=vegeto.3do local
+model Trans1=ssvegeto.3do local
+model Trans2=ssvegeto.3do local
+model Trans3=ssvegeto.3do local
+model Trans4=ssvegeto.3do local
+
+int Color0=2 local
+int Color1=0 local
+int Color2=4 local
+int Color3=4 local
+int Color4=2 local
+int Color5=6 local
+int Color6=0 local
+
+int Anim0=0 local
+int Anim1=1 local
+int Anim2=4 local
+
+message		startup
+message		user0
+message		user1
+message		user2
+
+end
+
+#================================================================================================#
+
+code
+
+user1:
+
+ReturnEx(Color0[GetParam(0)]);
+
+return;
+
+user2:
+
+ReturnEx(Anim0[GetParam(0)]);
+
+return;
+
+startup:
+
+	player = GetLocalPlayerThing();
+	SetThingModel(Player, Trans0);
+Return;
+
+user0:
+
+    if(IsInvActivated(player, 118) == 1)
+    {
+		if(GetParam(0)==0)
+		{SetThingModel(Player, Trans0);}
+		else if (GetParam(0)>=8)
+		{SetThingModel(Player, Trans4);}
+		else if (GetParam(0)>=6)
+		{SetThingModel(Player, Trans3);}
+		else if (GetParam(0)>=4)
+		{SetThingModel(Player, Trans2);}
+		else if (GetParam(0)>=2)
+		{SetThingModel(Player, Trans1);}
+	}
+
+return;
+
+end

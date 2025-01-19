@@ -1,0 +1,85 @@
+# Jedi Knight Cog Script
+#
+# smokin_a_jay.cog  >=)~
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+template	Ball0=+kmhchargeblue	local
+template	Ball1=+kmhchargegreen	local
+template	Ball2=+kmhchargeorange	local
+template	Ball3=+kmhchargepurple	local
+template	Ball4=+kmhchargered		local
+template	Ball5=+kmhchargesilver	local
+template	Ball6=+kmhchargeteal	local
+template	Ball7=+kmhchargeyellow	local
+template	Ball8=+bbchargeblue		local
+template	Ball9=+bbchargegreen	local
+template	Ball10=+bbchargeorange	local
+template	Ball11=+bbchargepurple	local
+template	Ball12=+bbchargered		local
+template	Ball13=+bbchargesilver	local
+template	Ball14=+bbchargeteal	local
+template	Ball15=+bbchargeyellow	local
+template	Ball16=+ffchargeblue	local
+template	Ball17=+ffchargegreen	local
+template	Ball18=+ffchargeorange	local
+template	Ball19=+ffchargepurple	local
+template	Ball20=+ffchargered		local
+template	Ball21=+ffchargesilver	local
+template	Ball22=+ffchargeteal	local
+template	Ball23=+ffchargeyellow	local
+template	Ball24=+ggchargeblue	local
+template	Ball25=+ggchargegreen	local
+template	Ball26=+ggchargeorange	local
+template	Ball27=+ggchargepurple	local
+template	Ball28=+ggchargered		local
+template	Ball29=+ggchargesilver	local
+template	Ball30=+ggchargeteal	local
+template	Ball31=+ggchargeyellow	local
+template	Ball32=+sbcchargeblue	local
+template	Ball33=+sbcchargegreen	local
+template	Ball34=+sbcchargeorange	local
+template	Ball35=+sbcchargepurple	local
+template	Ball36=+sbcchargered	local
+template	Ball37=+sbcchargesilver	local
+template	Ball38=+sbcchargeteal	local
+template	Ball39=+sbcchargeyellow	local
+template	Ball40=+maschargeblue	local
+template	Ball41=+maschargegreen	local
+template	Ball42=+maschargeorange	local
+template	Ball43=+maschargepurple	local
+template	Ball44=+maschargered	local
+template	Ball45=+maschargesilver	local
+template	Ball46=+maschargeteal	local
+template	Ball47=+maschargeyellow	local
+template	Ball48=+fbchargeblue	local
+template	Ball49=+fbchargegreen	local
+template	Ball50=+fbchargeorange	local
+template	Ball51=+fbchargepurple	local
+template	Ball52=+fbchargered		local
+template	Ball53=+fbchargesilver	local
+template	Ball54=+fbchargeteal	local
+template	Ball55=+fbchargeyellow	local
+template	Ball56=+ohchargeblue	local
+template	Ball57=+ohchargegreen	local
+template	Ball58=+ohchargeorange	local
+template	Ball59=+ohchargepurple	local
+template	Ball60=+ohchargered		local
+template	Ball61=+ohchargesilver	local
+template	Ball62=+ohchargeteal	local
+template	Ball63=+ohchargeyellow	local
+
+message		user0
+
+end
+
+code
+
+user0:
+
+	returnEx(Ball0[GetParam(0)]);
+	
+return;
+
+end

@@ -1,0 +1,40 @@
+# Jedi Knight Cog Script
+#
+# melee_flykick.cog
+#
+# Yes, I type that in every cog, wuahaha
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+
+message		created
+message		pulse
+message		removed
+
+end
+
+code
+
+created:
+
+	//SetThingPulse(GetSenderRef(), 0.01);
+	AttachThingToThingEx(GetSenderRef(), GetThingParent(GetSenderRef()), 0x4);
+
+return;
+
+pulse:
+
+	//SetThingLook(
+	SetThingVel(GetSenderRef(), VectorScale(GetThingVel(GetThingParent(GetSenderRef())),1));
+	//TeleportThing(GetSenderRef(), GetThingParent(GetSenderRef()));
+
+return;
+
+removed:
+
+	Print("Owie!");
+
+return;
+
+end

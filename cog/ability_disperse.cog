@@ -1,0 +1,67 @@
+# Jedi Knight pr0n Script
+#
+# ability_disperse.cog
+#
+# Send people back with a shockwave of Ki
+#
+# Created By: Some Stoner Dood
+
+symbols
+
+thing		player				local
+template	Disperse=+Disperse	local
+
+sound		Sound1=disperse2.wav	local
+
+keyframe	DisKey=Disperse.key	local
+
+int			Cost=200			local
+
+message		startup
+message		activated
+message		timer
+message		trigger
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+
+return;
+
+activated:
+
+	if(GetInv(player, 14) < Cost) return;
+
+	PlayKey(player, DisKey, 4, 0x38);
+
+	SetTimerEx(0.5, 1, -1, -1);
+
+	SetBinWait(player, 28, 3.0);
+
+return;
+
+timer:
+
+	AddDynamicTint(player, 0.5, 0.0, 0.0);
+	FireProjectile(player, Disperse, Sound1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+	
+	//SendTrigger(-1, 90123, player, -1, -1, -1);
+	
+	ChangeInv(player, 14, -Cost);
+
+return;
+
+trigger:
+
+	if(GetSourceRef() == 90123)
+	{
+		FireProjectile(GetParam(0), Disperse, Sound1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+	}
+
+return;
+
+end

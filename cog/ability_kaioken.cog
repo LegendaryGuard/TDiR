@@ -1,0 +1,150 @@
+# Jedi Something Cog and stuff
+#
+# ability_kaioken.cog
+#
+# Provide a temporary strength boost
+#
+# Created by, yup, you guessed it, Hell Raiser [Jon Harmon]
+#
+# bin 22
+
+# Use the powerboost bin and the damage multiplier flag in FireProjectile()
+
+symbols
+
+thing		player				local
+
+keyframe	KiCharge=charge.key			local
+sound		Chrg_Snd=rumble.wav			local
+int			ChargeId=-1					local
+int			channel						local
+
+keyframe	Kaioken=ssjtransform2.key	local
+sound		K_Snd=kaiokenloop.wav		local
+int			KaiokenId=-1				local
+int			channel2
+
+sound		Aura=Aurastart.wav			local
+
+int			speed=2						local
+
+int			Cost=100					local
+
+int			Color				local
+
+template	Rock=+rocks			local
+
+message		startup
+message		activated
+message		killed
+message		timer
+message		pulse
+message		selected
+
+end
+
+code
+
+startup:
+
+	ChargeId=-1;
+	player = GetLocalPlayerThing();
+	SetInvActivated(player, 22, 0);
+
+return;
+
+activated:
+
+	if(IsInvActivated(player, 22)) return; //kaioken
+	if(IsInvActivated(player, 42)) return; //use ki
+	if(IsInvActivated(player, 25)) return; //charge ki
+	if(IsInvActivated(player, 118)) return; //level up
+	SetInvActivated(player, 22, 1);
+
+	Print("Strength Boost");
+
+	SendMessage(GetInvCog(player, 20), user0);
+	
+	ChangeInv(player, 14, -cost);
+	
+	ChargeId=PlayKey(player, KiCharge, 4, 0);
+	channel=PlaySoundThing(Chrg_Snd, player, 1.0, -1, -1, 0x81);
+
+	SetActorFlags(player, 0x40000);
+	
+	StopThing(player);
+	if(GetInv(player, 171) == 1) CreateThing(Rock, player);
+
+	SetTimerEx(0.5, 5, -1, -1);
+
+return;
+
+timer:
+
+	if(GetSenderId() == 5)
+	{
+		StopKey(player, ChargeId, 0);
+		KaiokenId=PlayKey(player, Kaioken, 4, 0x38);
+		SetTimerEx(GetKeyLen(Kaioken), 10, -1, -1);
+	}
+
+	if(GetSenderId() == 10)
+	{
+		ChangeSoundVol(channel, 0, 0.5);
+		StopSound(channel, 0.5);
+
+		PlaySoundThing(Aura, player, 0.7, -1, -1, 0x80);
+		channel2=PlaySoundThing(K_Snd, player, 0.7, -1, -1, 0x81);
+		ChangeSoundVol(channel2, 0.75, GetSoundLen(Aura));
+
+		Color=SendMessageEx(GetInvCog(player, 127), User1, 6, -1, -1, -1);
+		SendMessageEx(GetInvCog(player, 130), user1, 6, Color, -1, -1);
+		ClearActorFlags(player, 0x40000);
+		SetActorExtraSpeed(player, speed);
+		SetTimerEx(20, 15, -1, -1);
+		//SetPulse(1);
+	}
+
+	if(GetSenderId() == 15)
+	{
+		call Stop_Effects;
+	}
+
+return;
+
+killed:
+
+	call stop_effects;
+
+return;
+
+pulse:
+
+	if(GetThingHealth-1 >= 0)
+	{SetThingHealth(player, GetThingHealth(player)-1);}	
+
+	//if(GetInv(player, 171) == 1) CreateThing(Rock, player);
+	
+return;
+
+stop_effects:
+
+	SetPulse(0);
+
+	//SendTrigger(-1, 20010, player, Color, 0, -1);
+	SendMessageEx(GetInvCog(player, 130), user0, 6, -1, -1, -1);
+	SetInvActivated(player, 22, 0);
+	ChangeSoundVol(channel2, 0, 0.5); 
+	StopSound(channel2, 0.5);
+	SetActorExtraSpeed(player, 0);
+	SendMessage(GetInvCog(player, 20), user1);
+
+return;
+
+selected:
+
+	//Print("Kaioken");
+
+return;
+
+end

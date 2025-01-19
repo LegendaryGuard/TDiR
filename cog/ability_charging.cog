@@ -1,0 +1,114 @@
+# Jedi Something Cog and stuff
+#
+# ability_charging.cog
+#
+# Charge that thar Ki
+#
+# Created by, yup, you guessed it, Hell Raiser [Jon Harmon]
+
+symbols
+
+thing		player				local
+
+sound		Chrg_Snd=rumble.wav	local
+int			channel				local
+keyframe	KiCharge=charge.key	local
+int			ChargeId=-1			local
+
+int			Color				local
+
+int			Frozen				local
+
+int			CurWeapon			local
+
+template	Rock=+rocks			local
+
+message		startup
+message		activated
+message		deactivated
+message		killed
+message		pulse
+message		selected
+
+end
+
+code
+
+startup:
+
+	ChargeId=-1;
+	player = GetLocalPlayerThing();
+	SetInvActivated(player, 25, 0);
+
+return;
+
+activated:
+
+	if(IsInvActivated(player, 22)) return; //kaioken
+	if(IsInvActivated(player, 42)) return; //use ki
+	if(IsInvActivated(player, 118)) return; //level up
+
+	Print("Charge Ki");
+
+	if(IsInvActivated(player, 25)) return;
+	SetInvActivated(player, 25, 1);
+	ChargeId=PlayKey(player, KiCharge, 1, 0);
+	channel=PlaySoundThing(Chrg_Snd, player, 1.0, -1, -1, 0x81);
+	SetActorFlags(player, 0x40000);
+	Color=SendMessageEx(GetInvCog(player, 127), User1, 3, -1, -1, -1);
+	//SendTrigger(-1, 20010, player, Color, 1, -1);
+	SendMessageEx(GetInvCog(player, 130), user1, 3, Color, -1, -1);
+	if(GetInv(player, 171) == 1) CreateThing(Rock, player);
+	SetPulse(0.5);
+
+return;
+
+deactivated:
+
+	call stop_effects;
+	
+return;
+
+killed:
+
+	call stop_effects;
+
+return;
+
+pulse:
+
+	if(GetInv(player, 14) >= 400)
+	{
+		HealThing(player, 1);
+	}
+
+	Position_Vec=VectorSet(VectorX(P)+((rand()-0.5)/2), VectorY(P)+((rand()-0.5)/2), VectorZ(P));
+	SetPOVShake(Position_Vec, VectorSet(VectorX(Position_Vec), 0, 0), .05, 80.0);
+
+	if(GetInv(player, 171) == 1) CreateThing(Rock, player);
+	
+return;
+
+stop_effects:
+
+	SetPulse(0);
+	StopKey(player, ChargeId, 0);
+	CurWeapon=GetCurWeapon(player);
+	
+	ClearActorFlags(player, 0x40000);
+	
+	//SendTrigger(-1, 20010, player, Color, 0, -1);
+	SendMessageEx(GetInvCog(player, 130), user0, 3, -1, -1, -1);
+	SetInvActivated(player, 25, 0);
+	ChangeSoundVol(channel, 0, 0.5); 
+	StopSound(channel, 0.5);
+
+return;
+
+selected:
+
+	//Print("Charge Ki");
+
+return;
+
+end

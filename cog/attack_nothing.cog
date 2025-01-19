@@ -1,0 +1,45 @@
+# Jedi Knight Cog Script
+#
+# attack_nothing.cog
+#
+# This gets selected when the player can't do anything or when
+# in tourny mode so you can fly around, ala Quake3
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+
+thing		player			local
+
+template	FireTpl=+bryarbolt	local
+
+message		startup
+message		activated
+message		deactivated
+message		selected
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+
+return;
+
+activated:
+
+return;
+
+deactivated:
+
+return;
+
+selected:
+
+	SetCurWeapon(player, 2);
+
+return;
+
+end

@@ -1,0 +1,316 @@
+# Lock-on
+#
+# Created by Hell Raiser [Jon Harmon]
+
+symbols
+
+thing       player                           local
+thing       victim=-1                           local
+thing       potential                        local
+
+thing		dummy							 local
+
+template	Ghost=+APGhost					local
+
+thing		Middle=-1						local
+thing		Left=-1							local
+thing		right=-1						local
+
+vector		VectorL							local
+vector		VectorR							local
+
+model		Cube=dflt.3do					local
+
+int			LockOn=0						 local
+
+flex		VecX							 local
+flex		VecY							 local
+flex		VecZ							 local
+
+vector		PlayerRotVel					 local
+vector		PlayerThrust					 local
+
+vector		PlayerLook						local
+
+flex        dot                              local
+flex        maxDot                           local
+
+int         active=0                         local
+
+message     startup
+message     activated
+message     deactivated
+message     pulse
+message     newplayer
+message     killed
+message		selected
+message		user0
+message		user1
+message		trigger
+message		leave
+
+end
+
+# ========================================================================================
+
+code
+
+startup:
+   player = GetlocalPlayerThing();
+   //SetThingUserData(player, -1);
+   Victim=-1;
+
+   Middle=-1;
+   Left=-1;
+   Right=-1;
+   PlayerDot=-1;
+
+   Return;
+
+# ........................................................................................
+
+activated:
+
+   if(active || LockOn) return;
+
+   victim = -1;
+   active = 1;
+   //SetInvActivated(player, 116, 1);
+   SetPulse(0.33);
+
+   Return;
+
+# ........................................................................................
+
+pulse:
+
+   if(LockOn==0)
+   {
+      // Check all things for our victim.
+      victim = -1;
+      maxDot = 0;
+
+      // Search for all players and actors.
+      potential = FirstThingInView(player, 140, 15, 0x404);
+      while(potential != -1)
+      {
+         if(
+            HasLOS(player, potential) &&
+            (potential != player) &&
+            (VectorDist(GetThingPos(player), GetThingPos(potential)) <= 15) &&
+            !(GetThingFlags(potential) & 0x200) &&
+            !(GetActorFlags(potential) & 0x100) &&
+            !((jkGetFlags(potential) & 0x20))
+           )
+         {
+            dot = ThingViewDot(player, potential);
+            if(dot > maxDot)
+            {
+               victim = potential;
+               maxDot = dot;
+            }
+         }
+         potential = NextThingInView();
+      }
+
+      // If we have a victim...
+      if(victim != -1)
+      {
+         jkSetTargetColors(32, 39, 47);
+         jkSetTarget(victim);
+      }
+      else
+      {
+         jkEndTarget();
+      }
+   }
+   else
+	{
+		//if(!(GetThingFlags(victim) & 0x200))
+		if(HasLOS(player, victim) && (victim != player) && (!(GetThingFlags(victim) & 0x200)))
+		{
+
+			if(GetThingFlags(player) & 0x40000000) return;
+
+			ZDiff=VectorZ(GetThingPos(player))-VectorZ(GetThingPos(Victim));
+
+			ZDiff2=ZDiff;
+			if(ZDiff2 < 0) ZDiff2 = -ZDiff2;
+
+			if(ZDiff > 1) ZDiff=2;
+			
+			if(ZDiff < -1) ZDiff=-2;
+
+			//PrintFlex(ZDiff);
+
+			upVel = VectorSet(0.0, 0.0, -ZDiff);
+		    playerVel = VectorSet(VectorX(GetThingVel(player)), VectorY(GetThingVel(player)), 0);
+   	    	newVel = VectorAdd(upVel, playerVel);
+
+			UpThrust=SendMessageEx(GetInvCog(player, 34), user1, -1, -1, -1, -1);
+			DownThrust=SendMessageEx(GetInvCog(player, 33), user1, -1, -1, -1, -1);
+
+			PlayerLook=VectorSub(GetThingPos(victim), GetThingPos(player));
+
+
+    		Left=FireProjectile(Middle, Ghost, -1, -1, '-0.02 0.1 0', '0 0 0', 0, 0, 0, 0);
+    		//SetThingModel(left, cube);
+		    Right=FireProjectile(Middle, Ghost, -1, -1, '0.02 0.1 0', '0 0 0', 0, 0, 0, 0);
+			
+			if(!(GetActorFlags(player) & 0x40000) && (IsInvActivated(player, 32)==0) && IsInvActivated(player, 41) && UpThrust==0 && DownThrust==0)
+         	{
+				//DetachThing(player);
+         		if(!(GetActorFlags(player) & 0x40000)) SetThingVel(player, newVel);
+         	}
+		}
+		else
+		{call stop_power;}
+	}
+
+   Return;
+
+# ........................................................................................
+
+deactivated:
+
+   if(active==0 && LockOn==1)
+   {
+      call Stop_Power;
+      Return;
+   }
+
+   if((victim == -1) || (GetThingHealth(player) <= 0))
+   {call stop_power;}
+   else
+   {
+      jkEndTarget();
+      jkSetTargetColors(21, 22, 23);
+      jkSetTarget(victim);
+      SetPulse(0);
+      LockOn=1;
+	  Active=0;
+	  SetThingLook(Player,VectorSub(GetThingPos(victim), GetThingPos(player)));
+      //dummy = FireProjectile(player, Rectile, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+	  //AttachThingToThing(dummy, victim);
+	  //AttachThingToThingEx(dummy, victim, 0x8);
+
+      //ParseArg(player, "minheadpitch=0.00");
+      //ParseArg(player, "maxheadpitch=0.00");
+	  //SetActorFlags(player, 0x12);
+	  SetActorFlags(player, 0x2);
+	  SetInvActivated(player, 116, 1);
+      SetPulse(0.01);
+	  //SetThingUserData(player, victim);
+      Print("Locked ON");
+	  SetActorFlags(player, 0x40000000);
+      //XPlane0=FireProjectile(player, plane, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+      //XPlane1=FireProjectile(player, plane, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+      
+      Middle=FireProjectile(player, Ghost, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+      PlayerDot=FireProjectile(player, Ghost, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+	  SetThingLook(Middle, GetThingLVec(player));
+   }
+
+   Return;
+
+# ........................................................................................
+
+user0:
+
+	returnEx(Victim);
+
+return;
+
+# ........................................................................................
+
+trigger:
+
+	if(GetSourceRef() == 3001)
+	{
+		if(GetParam(1) == player && GetParam(0)==victim)
+		{SendTrigger(-1, 3000, victim,-1,-1,-1);}
+	}
+
+return;
+
+# ........................................................................................
+
+selected:
+
+	jkPrintUNIString(player, 252);
+
+return;
+
+# ........................................................................................
+
+killed:
+
+   if(GetSenderRef() != player) Return;
+
+   call stop_power;
+
+return;
+
+newplayer:
+
+return;
+
+# ........................................................................................
+
+leave:
+
+	if(victim==GetSenderRef())
+	{call stop_power;}
+
+return;
+
+# ........................................................................................
+
+stop_power:
+   SetPulse(0);
+   LockOn=0;
+   SetInvActivated(player, 116, 0);
+   active = 0;
+   jkEndTarget();
+   //SetThingUserData(player, -1);
+   //DestroyThing(dummy);
+
+   //Reset our victims melee variables
+   //SendTrigger(victim, 2000, -1,-1,0,-1);
+   VecX = VectorX(GetThingLVec(player));
+   VecY = VectorY(GetThingLVec(player));
+   if(victim != -1) SetThingLook(Player, VectorSet(VecX, VecY, 0));
+   victim=-1;
+   ParseArg(player, "minheadpitch=-80.00");
+   ParseArg(player, "maxheadpitch=80.00");
+
+   ClearThingFlags(player, 0x40000000);
+   ClearActorFlags(player,0x10);
+
+   if(Left != -1)
+   {
+      DestroyThing(Left);
+      Left=-1;
+   }
+   
+   if(Right != -1)
+   {
+      DestroyThing(Right);
+      Left=-1;
+   }
+   
+   if(Middle != -1)
+   {
+      DestroyThing(Middle);
+      Middle=-1;
+   }
+
+   if(PlayerDot != -1)
+   {
+   	  DestroyThing(PlayerDot);
+   	  PlayerDot=-1;
+   }
+   
+   Return;
+
+end

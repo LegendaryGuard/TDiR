@@ -1,0 +1,50 @@
+symbols
+
+thing		Player				local
+
+template	Rbot=+roshibot		local
+template	Blast=+kiblast		local
+
+template	BattleBeam=+head3	local
+
+template	Battle=+bbexp		local
+template	Battle2=+bbexp2		local
+
+thing		Bot					local
+
+template	Ghost=+PosGhost		local
+
+template	rail=+battlerail	local
+
+int			Mode				local
+
+message		activated
+message		created
+message		pulse
+message		sighted
+message		selected
+message		damaged
+message		killed
+message		damaged
+message		startup
+
+end
+
+code
+
+startup:
+
+	Player=GetLocalPlayerThing();
+
+return;
+
+activated:
+
+	BotGhost=FireProjectile(player, Ghost, -1, -1, '0 1 0', '0 0 0', 0, 0, 0, 0);
+	Bot=FireProjectile(BotGhost, Rbot, -1, -1, '0 1 0', '0 0 0', 0, 0, 0, 0);
+	DestroyThing(BotGhost);
+	SetThingType(Bot, 2);
+
+return;
+
+end

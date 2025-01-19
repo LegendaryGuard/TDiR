@@ -1,0 +1,124 @@
+# Jedi Knight Cog Script
+#
+# new_crouch.cog
+#
+# It's a new crouch button, so all my neat shiznat works, duh =P
+#
+# Created by: Hell Raiser [That one guy]
+
+symbols
+
+thing		player				local
+
+keyframe	Crouch=crouch2.key	local
+
+int			CrouchId			local
+int			Crouching			local
+int			Attached			local
+
+message		startup
+message		activated
+message		deactivated
+message		pulse
+message		user0
+message		user1
+
+end
+
+code
+
+startup:
+
+	Player=GetLocalPlayerThing();
+	Thrust=0;
+	Crouching=0;
+	CrouchId=-1;
+
+return;
+
+activated:
+
+	SetInvAvailable(player, 34, 0);
+	if(IsInvActivated(player, 33)) return;
+	SetInvActivated(player, 33, 1);
+
+	Thrust=0;
+
+	if(IsInvActivated(player, 42) || IsInvActivated(player, 22))
+	{
+		if(IsInvActivated(player, 42))
+		{Speed2=2;}
+		else if(IsInvActivated(player, 22))
+		{Speed2=2.5;}
+		
+		Speed=Speed2+(GetInv(player, 20)/2);
+	}
+	else
+	{Speed=1.5;}
+
+	Attached=GetInv(player, 171);
+	if((Attached==1) && !(IsInvActivated(player, 32)) && !(GetPhysicsFlags(player) & 0x100000))
+	{	
+		SetActorFlags(player, 0x40000);
+		if(CrouchId == -1) CrouchId=PlayKey(player, Crouch, 2, 0x14);
+	}
+	else if(Attached==2)
+	{
+		Thrust=1;
+	}
+
+	SetPulse(0.01);
+	
+	Crouching=1;
+	
+return;
+
+pulse:
+
+	if(IsInvActivated(player, 32))
+	{
+		if(CrouchId != -1)
+		{
+			StopKey(player, CrouchId, 0);
+			CrouchId=-1;
+			return;
+		}
+	}
+
+	Attached=GetInv(player, 171);
+
+	if((Attached !=2) && !(GetPhysicsFlags(player) & 0x100000)) return;
+	if(IsInvActivated(player, 32)) return;
+	if(!(GetActorFlags(player) & 0x40000)) ApplyForce(player, '0 0 -20');
+
+return;
+
+deactivated:
+
+	SetInvAvailable(player, 34, 1);
+	SetInvActivated(player, 33, 0);
+
+	SetPulse(0);
+	Crouching=0;
+	if(Attached==1)	ClearActorFlags(player, 0x40000);
+	if(CrouchId != -1)
+	{
+		StopKey(player, CrouchId, 0);
+		CrouchId=-1;
+	}
+
+return;
+
+user0:
+
+	returnEx(Thrust);
+
+return;
+
+user1:
+
+	returnEx(Crouching);
+
+return;
+
+end

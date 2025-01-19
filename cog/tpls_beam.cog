@@ -1,0 +1,158 @@
+# Jedi Knight Cog Script
+#
+# smokin_a_jay.cog  >=)~
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+
+template    Fire0=+beamfire0    local
+template    Fire1=+beamfire1    local
+template    Fire2=+beamfire2    local
+template    Fire3=+beamfire3    local
+template    Fire4=+beamfire4    local
+template    Fire5=+beamfire5    local
+template    Fire6=+beamfire6    local
+template    Fire7=+beamfire7    local
+template    Fire8=+beamfire8    local
+template    Fire9=+beamfire9    local
+template    Fire10=+beamfire10    local
+template    Fire11=+beamfire11    local
+template    Fire12=+beamfire12    local
+template    Fire13=+beamfire13    local
+template    Fire14=+beamfire14    local
+template    Fire15=+beamfire15    local
+template    Fire16=+beamfire16    local
+template    Fire17=+beamfire17    local
+template    Fire18=+beamfire18    local
+template    Fire19=+beamfire19    local
+template    Fire20=+beamfire20    local
+template    Fire21=+beamfire21    local
+template    Fire22=+beamfire22    local
+template    Fire23=+beamfire23    local
+template    Fire24=+beamfire24    local
+template    Fire25=+beamfire25    local
+template    Fire26=+beamfire26    local
+template    Fire27=+beamfire27    local
+template    Fire28=+beamfire28    local
+template    Fire29=+beamfire29    local
+template    Fire30=+beamfire30    local
+template    Fire31=+beamfire31    local
+template    Fire32=+beamfire32    local
+template    Fire33=+beamfire33    local
+template    Fire34=+beamfire34    local
+template    Fire35=+beamfire35    local
+template    Fire36=+beamfire36    local
+template    Fire37=+beamfire37    local
+template    Fire38=+beamfire38    local
+template    Fire39=+beamfire39    local
+
+template    Beam0=+beamhead0    local
+template    Beam1=+beamhead1    local
+template    Beam2=+beamhead2    local
+template    Beam3=+beamhead3    local
+template    Beam4=+beamhead4    local
+template    Beam5=+beamhead5    local
+template    Beam6=+beamhead6    local
+template    Beam7=+beamhead7    local
+template    Beam8=+beamhead8    local
+template    Beam9=+beamhead9    local
+template    Beam10=+beamhead10    local
+template    Beam11=+beamhead11    local
+template    Beam12=+beamhead12    local
+template    Beam13=+beamhead13    local
+template    Beam14=+beamhead14    local
+template    Beam15=+beamhead15    local
+template    Beam16=+beamhead16    local
+template    Beam17=+beamhead17    local
+template    Beam18=+beamhead18    local
+template    Beam19=+beamhead19    local
+template    Beam20=+beamhead20    local
+template    Beam21=+beamhead21    local
+template    Beam22=+beamhead22    local
+template    Beam23=+beamhead23    local
+template    Beam24=+beamhead24    local
+template    Beam25=+beamhead25    local
+template    Beam26=+beamhead26    local
+template    Beam27=+beamhead27    local
+template    Beam28=+beamhead28    local
+template    Beam29=+beamhead29    local
+template    Beam30=+beamhead30    local
+template    Beam31=+beamhead31    local
+template    Beam32=+beamhead32    local
+template    Beam33=+beamhead33    local
+template    Beam34=+beamhead34    local
+template    Beam35=+beamhead35    local
+template    Beam36=+beamhead36    local
+template    Beam37=+beamhead37    local
+template    Beam38=+beamhead38    local
+template    Beam39=+beamhead39	  local
+
+template    Tail0=+beamTail0    local
+template    Tail1=+beamTail1    local
+template    Tail2=+beamTail2    local
+template    Tail3=+beamTail3    local
+template    Tail4=+beamTail4    local
+template    Tail5=+beamTail5    local
+template    Tail6=+beamTail6    local
+template    Tail7=+beamTail7    local
+template    Tail8=+beamTail8    local
+template    Tail9=+beamTail9    local
+template    Tail10=+beamTail10    local
+template    Tail11=+beamTail11    local
+template    Tail12=+beamTail12    local
+template    Tail13=+beamTail13    local
+template    Tail14=+beamTail14    local
+template    Tail15=+beamTail15    local
+template    Tail16=+beamTail16    local
+template    Tail17=+beamTail17    local
+template    Tail18=+beamTail18    local
+template    Tail19=+beamTail19    local
+template    Tail20=+beamTail20    local
+template    Tail21=+beamTail21    local
+template    Tail22=+beamTail22    local
+template    Tail23=+beamTail23    local
+template    Tail24=+beamTail24    local
+template    Tail25=+beamTail25    local
+template    Tail26=+beamTail26    local
+template    Tail27=+beamTail27    local
+template    Tail28=+beamTail28    local
+template    Tail29=+beamTail29    local
+template    Tail30=+beamTail30    local
+template    Tail31=+beamTail31    local
+template    Tail32=+beamTail32    local
+template    Tail33=+beamTail33    local
+template    Tail34=+beamTail34    local
+template    Tail35=+beamTail35    local
+template    Tail36=+beamTail36    local
+template    Tail37=+beamTail37    local
+template    Tail38=+beamTail38    local
+template    Tail39=+beamTail39    local
+
+message		user0
+message		user1
+message		user2
+
+end
+
+code
+
+user0:
+
+	returnEx(Fire0[GetParam(0)]);
+	
+return;
+
+user1:
+
+	returnEx(Beam0[GetParam(0)]);
+
+return;
+
+user2:
+
+	returnEx(Tail0[GetParam(0)]);
+	
+return;
+
+end

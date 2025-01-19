@@ -1,0 +1,269 @@
+# Jedi Knight Cog Script
+#
+# new_jump.cog
+#
+# Can't seem to get anything to work right with JKs
+# jump crap, so here's a new jump button >=)
+
+symbols
+
+thing		player			local
+
+sound		Jump0=jump1.wav			local
+sound		Jump1=jump2.wav			local
+
+int			speed			local
+int			attached		local
+
+template	AP_Tpl=+APGhost	local
+
+int			speed2			local
+
+int			Thrust			local
+
+vector		UpVel			local
+vector		PlayerVel		local
+vector		NewVel			local
+
+int			Jump			local
+
+int			Double			local
+int			DashId			local
+
+int			Dashing			local
+
+message		user0
+message		user1
+message		user2
+message		startup
+message		activated
+message		deactivated
+message		pulse
+message		timer
+message		killed
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	Thrust=0;
+	Jump=0;
+	Double=0;
+	Dashing=0;
+
+return;
+
+activated:
+
+	SetInvAvailable(player, 33, 0);
+	if(IsInvActivated(player, 34)) return;
+	if(GetActorFlags(player) & 0x40000) return;
+	SetInvActivated(player, 34, 1);
+
+	Double=Double+1;
+	SetTimerEx(0.5, 1, -1, -1);	
+	
+	Dashing=0;
+	
+	if(Double==2 && IsInvActivated(player, 32)==0)
+	{
+		KillTimerEx(1);
+		StopThing(player);
+		if(IsInvActivated(player, 41)==0)
+		{
+			ClearPhysicsFlags(player, 0x401);
+			SetPhysicsFlags(Player, 0x2000);
+		}
+		//PlaySoundThing(jump0, player, 1.0, -1, -1, 0x4080);
+
+		if(GetInv(player, 134) == 0) ApplyForce(Player, VectorScale(GetThingLVec(player), 800));
+
+		Dashing=1;
+
+		DashId=PlayMode(player, 15);
+
+		Victim=SendMessageEx(GetInvCog(player, 116), user0, -1, -1, -1, -1);
+
+		//if(Victim==-1 && GetInv(player, 134) == 0)
+		//{SetTimerEx(3, 2, -1, -1);}
+		
+		SetPulse(0.01);
+		return;
+	}
+
+	Thrust=0;
+
+	if(IsInvActivated(player, 42) || IsInvActivated(player, 22))
+	{
+		if(IsInvActivated(player, 42))
+		{Speed2=2;}
+		else if(IsInvActivated(player, 22))
+		{Speed2=2;}
+		
+		Speed=Speed2+(GetInv(player, 20)/2);
+	}
+	else
+	{Speed=1.5;}
+
+	Attached=GetInv(player, 171);
+	if((Attached==1) && !(GetActorFlags(player) & 0x40000) && !(IsInvActivated(player, 32)))
+	{	
+		if(IsInvActivated(player, 42))
+		{PlaySoundThing(jump1, player, 1.0, -1, -1, 0x4080);}
+		else
+		{PlaySoundThing(jump0, player, 1.0, -1, -1, 0x4080);}
+		
+		upVel = VectorSet(0.0, 0.0, Speed);
+		playerVel = GetThingVel(player);
+		newVel = VectorAdd(upVel, playerVel);
+		DetachThing(player);
+		SetThingVel(player, newVel);
+	}
+	else if(Attached==2)
+	{
+		Thrust=1;
+	}
+
+	SetPulse(0.01);
+	
+	Jump=1;
+	
+return;
+
+pulse:
+
+	if(Double==2)
+	{
+
+		Look=FireProjectile(player, AP_Tpl, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+
+		if(!(IsInvActivated(player, 42))) 
+		{
+			if(GetInv(player, 134) == 1)
+			{
+				Victim=SendMessageEx(GetInvCog(player, 117), user0, -1, -1, -1, -1);
+				if(GetThingFlags(Victim) & 0x40000000)
+				{SetThingVel(Player, VectorScale(GetThingLVec(Look), 10));}
+				else
+				{SetThingVel(Player, VectorScale(GetThingLVec(Look), 5));}
+				ChangeInv(player, 14, -2.5);
+			}
+			else
+			{
+				SetThingVel(Player, VectorScale(GetThingLVec(Look), 5));
+				ChangeInv(player, 14, -5); //Ki or stamina.......
+			}
+		}
+		else
+		{
+			SetThingVel(Player, VectorScale(GetThingLVec(Look), 15));
+		}
+
+		DestroyThing(Look);
+		
+		if((GetActorFlags(player) & 0x40000) || GetInv(player, 14) < 2.5)
+		{
+			SetPulse(0);
+			call deactivated;
+		}
+
+		//Victim=SendMessageEx(GetInvCog(player, 116), user0, -1, -1, -1, -1);
+		//if(Victim != -1)
+		//{
+		//	//SetThingVel(Player, VectorScale(GetThingLVec(player), 3));
+
+		//	//Distance=VectorDist(GetThingPos(player), GetThingPos(Victim));
+		//	//if(Distance > 5) Distance=5;
+
+		//	//if(GetThingFlags(Victim) & 40000000)
+		//	//{SetThingVel(Player, VectorScale(VectorNorm(VectorSub(GetThingPos(victim), GetThingPos(player))), 5));}
+		//	//else
+			
+		//	//It's ok...... needs more spiff
+			
+		//	//SetThingLook(player, VectorSub(GetThingPos(victim), GetThingPos(player)));
+		//}
+		//else
+		//{SetThingVel(Player, VectorScale(GetThingLVec(player), 5));}
+		
+		return;
+	}
+
+	Attached=GetInv(player, 171);
+
+	if(Attached!=2) return;
+	if(IsInvActivated(player, 32)) return;
+	if(!(GetActorFlags(player) & 0x40000)) ApplyForce(player, '0 0 20');
+
+return;
+
+killed:
+
+	StopThing(player);
+
+deactivated:
+
+	SetInvAvailable(player, 33, 1);
+	SetInvActivated(player, 34, 0);
+
+	SetPulse(0);
+	Thrust=0;
+	Jump=0;
+	Dashing=0;
+	
+	if(Double==2)
+	{
+		KillTimerEx(2);
+		SetTimerEx(0.001, 2, -1, -1);
+		if(Victim != -1) StopThing(player);
+		SetThingLook(player, VectorSet(VectorX(GetThingLVec(player)), VectorY(GetThingLVec(player)), 0));
+	}
+
+return;
+
+timer:
+
+	if(GetSenderID()==1)
+	{Double=0;}
+	else if(GetSenderID()==2)
+	{
+		StopKey(player, DashId, 0);
+		if(IsInvActivated(player, 41)==0)
+		{
+			SetPhysicsFlags(player, 0x401);
+			ClearPhysicsFlags(player, 0x2000);
+		}
+		SetInvAvailable(player, 33, 1);
+		SetInvActivated(player, 34, 0);
+
+		SetPulse(0);
+		Thrust=0;
+		Jump=0;
+		Double=0;
+		Dashing=0;
+	}
+
+return;
+
+user0:
+
+	returnEx(Thrust);
+
+return;
+
+user1:
+
+	returnEx(Jump);
+	
+return;
+
+user2:
+
+	returnEx(Dashing);
+	
+return;
+
+end

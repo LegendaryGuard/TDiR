@@ -1,0 +1,229 @@
+# JK Script, yadda yadda
+# Fire the +bbexp from the attack cog
+# let this run locally on the fire
+# computer only
+
+
+#flags=0x240
+
+symbols
+
+template	Battle=+bbexp		local
+template	Battle2=+bbexp2		local
+template	Rbot=+roshibot		local
+
+template	Ghost=+PosGhost		local
+
+template	Exp4=+Explode8		local
+
+template	WP=walkplayer		local
+
+model		BigBeam=size5spike.3do local
+
+model		PosMod=smexp2.3do local
+
+message		created
+message		touched
+message		pulse
+message		damaged
+message		timer
+
+int			temp			local
+int			temp1			local
+
+end
+
+code
+
+created:
+
+	SetThingModel(GetSenderRef(), BigBeam);
+	SetThingType(GetSenderRef(), 10);
+
+	//eh, don't really need to run this for other computer projectiles
+	if(GetLocalPlayerThing() != GetThingParent(GetSenderRef())) return;
+
+	SetThingUserData(GetSenderRef(), -1);
+
+	//Print("================IF YOU CAN READ THIS, THEN YOUR BEAM IS WORKING================");
+	SetThingVel(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), 2));
+	//SetThingPulse(GetSenderRef(), 0.1);
+
+
+//***************Total rewrite***************
+//
+// When the beams collide fire our 'coordinator'
+// projectile from the lowest player number.
+// Also have the parents look for this projectile (check the parent to make sure it's not somebody elses!)
+// and tell their beam where it needs to go.
+//
+// Have the non-'coordinator' FP communicate to
+// the 'coordinator' computer, and it will take care
+// of the rest.
+//
+// Separate this into a different cog, put whats
+// here into beamhead.cog, if anything applies, heh.
+//
+// Set things to type 10 that you want ubersynced
+
+return;
+
+touched:
+
+	if(GetSourceRef() == GetThingParent(GetSenderRef()))
+	{
+		//FireProjectile(GetSenderRef(), Battle2, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		DestroyThing(GetSenderRef());
+		Print("NOOOOOOOOOoooooooooooooooooo!");
+		return;
+	}
+	
+	if(GetThingTemplate(GetSourceRef()) != WP && GetThingType(GetSourceRef()) == 10 && !(GetThingFlags(GetSenderRef()) & 0x20000))
+	{
+		Print("OMGZ BATTLE!");
+		StopThing(GetSenderRef());
+		SetThingPulse(GetSenderRef(), 0.1);
+		//SetThingTimer(GetSenderRef(), 5);
+		//FireProjectile(GetSenderRef(), Battle, -1, -1, '0 0 0', '0 0 0', temp, 0x2, 0, 0);
+		//SetThingUserData(GetSenderRef(), GetSourceRef());
+	}
+	
+	if(GetThingTemplate(GetSourceRef()) == WP && GetSourceRef() != GetThingParent(GetSenderRef()))
+	{
+		FireProjectile(GetSenderRef(), Exp4, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		DestroyThing(GetSenderRef());
+	}
+
+	//if(GetThingType(GetSourceRef()) == 2) StopThing(GetSenderRef());
+
+	//SetThingLook(BeamP, VectorSub(GetThingPos(Bot), GetThingPos(Player)));
+	//SetThingLook(GetSenderRef(), VectorSub(GetThingPos(GetThingParent(GetSourceRef())), GetThingPos(GetThingParent(GetSenderRef()))));
+
+	//if(GetSourceRef() == Rbot)
+	//{
+		//DestroyThing(GetSenderRef());
+	//}
+	
+	//if(GetThingType(GetSourceRef()) == 10)
+	//{
+	//	if(GetThingParent(GetSenderRef()) != GetSourceRef())
+	//	{
+	//		Print("OMGZ DIE!");
+	//		//FireProjectile(GetSenderRef(), Battle, -1, -1, '0 0 0', '0 0 0', 420420, 0x2, 0, 0);
+	//		DestroyThing(GetSenderRef());
+	//	}
+	//}
+
+return;
+
+damaged:
+
+	//PrintInt(Battle);
+	//PrintInt(GetThingTemplate(GetSourceRef()));
+	if(GetThingTemplate(GetSourceRef()) == Battle2)
+	{
+		Print("KABOOOOOOOM!");
+		//PrintInt(GetParam(0));
+		//FireProjectile(GetSenderRef(), Battle2, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		DestroyThing(GetSenderRef());
+		return;
+	}
+
+	if(GetThingTemplate(GetSourceRef()) == Battle)
+	{
+		temp1=GetThingHealth(GetSenderRef())-GetParam(0);
+		
+		//ClearThingFlags(GetSenderRef(), 0x40000);
+		//SetThingTimer(GetSenderRef(), 1);
+		
+		//Print("Stop meh!");
+		//SetThingLook(GetSenderRef(), VectorScale(VectorSub(GetThingPos(GetThingParent(GetSenderRef())), GetThingPos(GetSenderRef())), -1));
+		temp1=GetThingHealth(GetSenderRef())-GetParam(0);
+
+		Parent=GetThingParent(GetSenderRef());
+		Beam=GetSenderRef();
+
+		if(temp1 < -1) temp1=-1;
+		
+		if(temp1 > 1) temp1=1;
+
+		//Set its velocity based off the LVec of its parent scaled by the distance
+		//between them, +/- then set it's LVec to it's velocity.
+		//
+		ZPos=VectorAdd(VectorScale(GetThingLVec(Parent), temp1+VectorDist(GetThingPos(Parent), GetThingPos(Beam))), GetThingPos(Parent));
+
+		//if(GetThingUserData(GetSenderRef()) != -1) DestroyThing(GetThingUserData(GetSenderRef()));
+
+		//new_thing=CreateThingAtPos(Ghost, GetThingSector(GetSenderRef()), ZPos, '0 0 0'); 
+		//SetThingModel(new_thing, PosMod);
+		//SetThingUserData(GetSenderRef(), new_thing);
+
+		//^^^Z-axis pos of where we need to center ourselves^^^
+		//ZDir=VectorScale(VectorNorm(VectorSub(ZPos, GetThingPos(Beam))), temp1); // - direction we need to center towards at 1jku/s
+		ZDir=VectorSub(ZPos, GetThingPos(Beam));
+		//MoveVec=VectorScale(VectorNorm(VectorSub(GetThingPos(Parent), ZPos)), -temp1); //Forwards or backwards
+
+		SetThingVel(Beam, ZDir);
+		//SetThingVel(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), temp1));
+
+		//PrintFlex(temp1);
+		//ApplyForce(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), -GetParam(0)));
+		//PrintInt(GetParam(0));
+		//FireProjectile(GetSenderRef(), Battle, -1, -1, '0 0 0', '0 0 0', temp1, 0x2, 0, 0);
+	}
+	
+	returnEx(0);
+
+return;
+
+pulse:
+
+	//PrintInt(GetThingHealth(GetSenderRef()));
+	//temp=rand()+(GetThingHealth(GetSenderRef())/10000);
+	temp=GetThingHealth(GetSenderRef());
+	//PrintInt(temp);
+	//ApplyForce(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), temp));
+	//SetThingLook(GetSenderRef(), VectorScale(VectorSub(GetThingPos(GetThingParent(GetSenderRef())), GetThingPos(GetSenderRef())), -1));
+
+	//if(VectorLen(VectorScale(GetThingLVec(GetSenderRef()), temp)) >= VectorLen(GetThingVel(GetSenderRef())))
+	//SetThingVel(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), temp));
+
+	//The damage scalar is giving random damage numbers =\ (because it was an explosion, now it's a weapon, HAHAHAHA!)
+	FireProjectile(GetSenderRef(), Battle, -1, -1, '0 0 0', '0 0 0', temp, 0x2, 0, 0);
+
+	//if(VectorDist(GetThingPos(GetSenderRef()), GetThingPos(GetThingUserData(GetSenderRef()))) > 0.3)
+	//{
+	//	SetThingVel(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), VectorLen(GetThingVel(GetSenderRef()))));
+	//	return;
+	//}
+
+return;
+
+timer:
+
+	FireProjectile(GetSenderRef(), Exp4, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+	DestroyThing(GetSenderRef());
+
+return;
+
+tooched:
+
+	ApplyForce(GetSenderRef(), VectorScale(GetThingLVec(GetSenderRef()), -120));
+
+	//PrintInt(GetSenderRef());
+
+	//SetThingPulse(GetSenderRef(), 1);
+
+	//if(GetLifeLeft(GetSenderRef()) > GetLifeLeft(GetSourceRef()))
+	//{SetThingThrust(GetSenderRef(), VectorSet(0, (GetLifeLeft(GetSenderRef())-GetLifeLeft(GetSourceRef()))+1, 0));}
+	//else
+	//SetThingThrust(GetSenderRef(), VectorSet(0, GetLifeLeft(GetSenderRef())-GetLifeLeft(GetSourceRef()), 0));
+
+	//if(GetLifeLeft(GetSenderRef()) > GetLifeLeft(GetSourceRef()))
+	//{SetThingVel(GetSenderRef(), VectorScale(GetThingLVec(), GetLifeLeft(GetSenderRef())-GetLifeLeft(GetSourceRef())+0.01));}
+	//else
+	//{SetThingVel(GetSenderRef(), VectorScale(GetThingLVec(), GetLifeLeft(GetSenderRef())-GetLifeLeft(GetSourceRef())));}	
+
+return;
+
+end

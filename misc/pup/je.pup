@@ -1,0 +1,40 @@
+#puppet file for Jerec (JE.3do)
+Mode=0					# Idle
+stand      	kystand.key     0x00	0	0	# standing
+walk       	kywalk.key      0x01	2	2	# walk
+run         	kyrun0.key      0x01	2	2	# run
+walkback   	kybackp0.key    0x01	2	2	# walk backwards
+strafeleft 	kystrafl.key    0x01	2	2	# strafe left
+straferight	kystrafr.key    0x01	2	2	# strafe right
+death      	kyftdeth.key    0x14	5	5	# die
+death2     	kyexdth0.key    0x14	5	5	# alt. die
+hit        	kyhit0.key      0x28	1	3	# hit (recoil)
+jump		kyjump.key      0x38	2	2	# submode 10 = jumping
+rising		kyjump.key      0x04	2	2	# submode 10 = jumping
+drop		kydrop.key      0x04	2	2	# submode 11 = dropping
+land		kyland.key      0x38	3	3	# landing
+fall		kyfall.key      0x04	2	2       # submode 12 = falling
+choke		kychoke0.key    0x28	4	4	# submode 19 = choke
+leap		kyjumpf.key     0x00	2	2	# submode 20 = leaping
+turnleft        kyturnr.key     0x00    2       2       # submode 21 = shufflin' left
+turnright	kyturnl.key	0x00	2	2	# submode 22 = shufflin' right
+fire       	kyfire.key      0x28	1	4	# Big
+fire2       	kyfirebg.key    0x28	1	4	# Huge
+block           kyfire.key      0x28    1       3
+block2          kyfire.key      0x28    1       3
+magic		kysbforc.key    0x28	1	3	# submode 17 = use force power (pull)
+magic2		kysbforc.key    0x28	1	3	# submode 17 = use force power (pull)
+magic3		kysbforc.key    0x28	1	3	# submode 17 = use force power (pull)
+mode=1, basedon=0               	# weapon drawn
+mode=2, basedon=1			# weapon drawn
+
+joints
+0=1	# 0 = head
+1=13	# 1 = neck
+2=23	# 2 = torso
+3=20	# 3 = primary weapon fire
+4=20	# 4 = secondard weapon fire
+5=17	# 5 = primary weapon aiming joint
+6=17	# 6 = secondary weapon aiming joint
+end
+

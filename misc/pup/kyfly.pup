@@ -1,0 +1,102 @@
+# Puppet control file for player character
+# submode	keyframe	       flags    lopri	hipri
+
+Mode=0		# Default mode
+stand		stance.key	        0x00	0	0
+walk		walk.key	        0x01	2	2	# submode 1 = walk
+run			run.key		        0x01	2	2	# submode 2 = run
+walkback	walkback.key	    0x01	2	2	# submode 3 = walk backwards
+strafeleft	strafeleft.key	    0x01	2	2	# submode 4 = strafe left
+straferight	straferight.key	    0x01	2	2	# submode 5 = strafe right
+death		kyftdeth.key	    0x14	5	5	# submode 6 = small death
+death2		kyexdth0.key	    0x14	5	5	# submode 7 = big death
+rising		kyjump.key	        0x00	3	3	# submode 10 = jumping
+drop		kydrop.key	        0x00	2	2	# submode 11 = dropping
+fall		kyfall.key	        0x00	2	2   # submode 12 = falling
+land		kyland.key	        0x38	3	3	# landing
+activate	kyusew0.key	        0x28	1 	3	# submode 13 = activate or use on wall
+crouchforward   crouch.key	    0x01	2	2	# submode 14 = crouched
+windup		diskcharge.key	    0x14	1	3	# submode 38 = throw
+toss		diskthrow.key	    0x28	1	3	# submode 15 = throw
+leap		kyjumpf.key	        0x00	3	3	# submode 20 = leaping
+turnleft    kyturnr.key	        0x01    3   2   # submode 21 = shufflin' left
+turnright	kyturnl.key	        0x01	3	2	# submode 22 = shufflin' right
+crouchback	kycrchbk.key	    0x01	2	2	# submode 23 = crouched backwards
+fidget		stance.key	        0x20	1	1	# submode 33 = fidget1
+fidget2		stance.key	        0x20	1	1	# submode 34 = fidget2
+place		flyh.key	        0x28	2	2	# submode 16
+magic2		ssjtransform1.key	0x28	5	5	# submode 35
+magic3		ssjtransform2.key	0x28	5	5	# submode 36
+hit			stance.key	        0x28	1	1	# mixin 9 = hit
+
+Mode=1, BasedOn=0		# Mode 1 = Flying
+stand		floatstand.key	0x00	0	0
+walk		floatwalk.key	0x01	2	2	# walk
+run			floatrun.key	0x01	2	2	# swim
+walkback	floatback.key	0x01	2	2	# backwards
+strafeleft	floatleft.key	0x01	2	2	# strafe left
+straferight	floatright.key	0x01	2	2	# strafe right
+turnleft	floatstand.key	0x01	2	2	# shuffle (treading water)
+turnright	floatstand.key	0x01	2	2	# shuffle (treading water)
+hit			floatstand.key	0x00	2	2
+land		floatstand.key  0x38	3	3	# landing
+crouchforward   floatstand.key	    0x01	2	2	# submode 14 = crouched
+crouchback	floatstand.key	    0x01	2	2	# submode 23 = crouched backwards
+
+Mode=2, BasedOn=0		# Mode 2 = saber
+stand		kystand1.key	0x00	0	0	# submode 0 = standing
+walk		kywalkS.key	0x01	2	2	# submode 1 = walk
+run 		kyrun1.key	0x01	2	2	# submode 2 = run
+walkback	kybackp1.key	0x01	2	2	# submode 3 = backward walk
+death		kyswdeth.key	0x14	5	5	# submode 6 = small death
+fidget		kyidle1.key	0x20	1	1	# submode 24 = fidget1
+fidget2		kyidle1b.key	0x20	1	1	# submode 25 = fidget2
+
+Mode=3, BasedOn=0		# Mode 3 = unarmed swimming
+stand		floatstand.key	0x00	0	0	# treading water
+walk		floatwalk.key	0x00	2	2	# walk
+run		floatrun.key	0x00	2	2	# swim
+walkback	floatback.key	0x00	2	2	# backwards
+strafeleft	floatleft.key	0x00	2	2	# strafe left
+straferight	floatright.key	0x00	2	2	# strafe right
+death		kysbdeth.key	0x14	5	5	# death
+death2		kysbdeth.key	0x14	5	5	# death2
+hit		kysbhit.key	0x28	1	4	# mixin 9 = hit (upper body only)
+rising		kysbtred.key	0x00	2	2	# up
+drop		kysbtred.key	0x00	2	2	# down
+fall		kysbtred.key	0x00	2	2	#
+turnleft	floatstand.key	0x00	2	2	# shuffle (treading water)
+turnright	floatstand.key	0x00	2	2	# shuffle (treading water)
+
+Mode=4, BasedOn=3		# Mode 4 = gun swimming
+
+Mode=5, BasedOn=3		# Mode 5 = saber swim
+
+joints
+#0=0		# 0 = head
+#1=-1		# 1 = neck
+#2=-1		# 2 = torso
+#3=-1		# 3 = primary weapon fire
+#4=-1		# 4 = secondard weapon fire
+#5=-1		# 5 = primary weapon aiming joint
+#6=-1		# 6 = secondary weapon aiming joint
+7=0		# aim pitch
+8=0		# aim Yaw
+
+#0=15	# 0 = head
+#1=-1	# 1 = neck
+#2=15	# 2 = torso
+#3=12	# 3 = primary weapon fire
+#4=12	# 4 = secondard weapon fire
+#5=13	# 5 = primary weapon aiming joint
+#6=7		# 6 = secondary weapon aiming joint
+
+#0=15	# 0 = head
+#1=16	# 1 = neck
+#2=17	# 2 = torso
+#3=12	# 3 = primary weapon fire
+#4=12	# 4 = secondard weapon fire
+#5=13	# 5 = primary weapon aiming joint
+#6=7	# 6 = secondary weapon aiming joint
+
+end

@@ -1,0 +1,75 @@
+# Jedi Knight Cog Script
+#
+# db1.cog
+#
+# Powerup cog for the 1 star dragonball
+
+symbols
+
+int         bin2=181						local
+
+thing       powerup							local
+thing       player							local
+
+int         bin=60							local
+sound       pickupsnd=thrmlpu2.wav			local
+sound       respawnsnd=Activate01.wav		local
+
+template	DBModel=DragonBall0				local
+thing		DB								local
+
+message		created
+message     touched
+message     taken
+message		pulse
+
+end
+
+# ========================================================================================
+
+code
+
+created:
+
+	powerup = GetSenderRef();
+	PlaySoundThing(respawnsnd, powerup, 0.6, 5.0, 10.0, 0);
+	SetThingPulse(powerup, 0.01);
+
+return;
+
+pulse:
+
+	SetThingLook(GetSenderRef(), VectorSub(GetThingPos(GetPrimaryFocus(0)), GetThingPos(GetSenderRef())));
+
+return;
+
+touched:
+
+	player = GetSourceRef();
+	powerup = GetSenderRef();
+
+	TakeItem(powerup, player);
+
+return;
+
+# ........................................................................................
+
+taken:
+
+	player = GetSourceRef();
+	powerup = GetSenderRef();
+
+	//Print("Dragonball");
+	jkPrintUNIString(player, bin2);
+
+	PlaySoundThing(pickupsnd, powerup, 1.0, -1, -1, 0);
+	AddDynamicTint(player, 1.0, 0.5, 0.0);
+
+	ChangeInv(player, bin, 1);
+	SetInv(player, bin2, 1);
+
+return;
+
+end
+
+

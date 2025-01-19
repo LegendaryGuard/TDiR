@@ -1,0 +1,293 @@
+# Lock-on
+#
+# Created by Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+thing       player                           local
+thing       victim=-1                           local
+thing       potential                        local
+
+thing		dummy							 local
+
+template	Ghost=+APGhost					local
+
+template	roshibot=+roshibot					local
+
+thing		Middle=-1						local
+thing		Left=-1							local
+thing		right=-1						local
+
+vector		VectorL							local
+vector		VectorR							local
+
+model		Cube=dflt.3do					local
+
+int			LockOn=0						 local
+
+flex		VecX							 local
+flex		VecY							 local
+flex		VecZ							 local
+
+vector		PlayerRotVel					 local
+vector		PlayerThrust					 local
+
+vector		PlayerLook						local
+
+flex        dot                              local
+flex        maxDot                           local
+
+int         active=0                         local
+
+message     startup
+message     activated
+message     deactivated
+message     pulse
+message     newplayer
+message     killed
+message		selected
+message		user0
+message		user1
+message		trigger
+message		leave
+
+end
+
+# ========================================================================================
+
+code
+
+startup:
+   player = GetlocalPlayerThing();
+   //SetThingUserData(player, -1);
+   Victim=-1;
+
+   Middle=-1;
+   Left=-1;
+   Right=-1;
+   PlayerDot=-1;
+
+   Return;
+
+# ........................................................................................
+
+activated:
+
+   if(active || LockOn) return;
+
+   victim = -1;
+   active = 1;
+   //SetInvActivated(player, 116, 1);
+   SetPulse(0.33);
+
+   Return;
+
+# ........................................................................................
+
+pulse:
+
+   if(LockOn==0)
+   {
+      // Check all things for our victim.
+      victim = -1;
+      maxDot = 0;
+
+      // Search for all players and actors.
+      potential = FirstThingInView(player, 140, 15, 0x404);
+      if(GetThingType(potential) == 2 && GetThingTemplate(potential) != roshibot) potential = -1;
+      while(potential != -1)
+      {
+         if(
+            HasLOS(player, potential) &&
+            (potential != player) &&
+            (VectorDist(GetThingPos(player), GetThingPos(potential)) <= 15) &&
+            !(GetThingFlags(potential) & 0x200) &&
+            !(GetActorFlags(potential) & 0x100) &&
+            !((jkGetFlags(potential) & 0x20))
+           )
+         {
+            dot = ThingViewDot(player, potential);
+            if(dot > maxDot)
+            {
+               victim = potential;
+               maxDot = dot;
+            }
+         }
+         potential = NextThingInView();
+      }
+
+      // If we have a victim...
+      if(victim != -1)
+      {
+         //jkSetTargetColors(32, 39, 47);
+         //jkSetTarget(victim);
+         SendMessageEx(GetInvCog(player, 135), user0, 2, victim, 2, -1);
+      }
+      else
+      {
+         SendMessageEx(GetInvCog(player, 135), user0, 2, -1, -1, -1);
+      }
+   }
+   else
+	{
+		//if(!(GetThingFlags(victim) & 0x200))
+		//if(HasLOS(player, victim) && (victim != player) && (!(GetThingFlags(victim) & 0x200)))
+		if((victim != player) && (!(GetThingFlags(victim) & 0x200)) && GetInv(player, 134) == 0)
+		{
+
+			if(GetThingFlags(player) & 0x40000000) return;
+
+			if(IsInvActivated(player, 32))
+			{
+				Centered=1;
+				if(GetInv(player, 171) == 2)
+				{
+					SetThingLook(Player, VectorSub(GetThingPos(Victim), GetThingPos(player)));
+				    ParseArg(player, "minheadpitch=0.00");
+				   	ParseArg(player, "maxheadpitch=0.00");
+					SetActorFlags(player, 0x2);
+				}
+				else
+				{
+					Look=VectorSub(GetThingPos(Victim), GetThingPos(player));
+				    ParseArg(player, "minheadpitch=-80.00");
+				   	ParseArg(player, "maxheadpitch=80.00");
+					SetThingLook(player, VectorSet(VectorX(Look), VectorY(Look), 0));					
+				}
+				return;
+			}
+			else if(Centered==1)
+			{
+				SetThingLook(player, VectorSet(VectorX(Look), VectorY(Look), 0));
+				Centered=0;
+			}
+			
+		}
+		else
+		{call stop_power;}
+	}
+
+   Return;
+
+# ........................................................................................
+
+deactivated:
+
+   if(active==0 && LockOn==1)
+   {
+      call Stop_Power;
+      Return;
+   }
+
+   if((victim == -1) || (GetThingHealth(player) <= 0))
+   {call stop_power;}
+   else
+   {
+      
+	  SendMessageEx(GetInvCog(player, 135), user0, 2, victim, 3, -1);
+      
+      SetPulse(0);
+      LockOn=1;
+	  Active=0;
+	  SetThingLook(Player,VectorSub(GetThingPos(victim), GetThingPos(player)));
+
+      //ParseArg(player, "minheadpitch=0.00");
+      //ParseArg(player, "maxheadpitch=0.00");
+	  SetActorFlags(player, 0x2);
+	  SetInvActivated(player, 116, 1);
+	  Centered=0;
+      SetPulse(0.01);
+      Print("Locked ON");
+	  SetActorFlags(player, 0x40000000);
+
+	Look=VectorSub(GetThingPos(Victim), GetThingPos(player));
+	SetThingLook(player, VectorSet(VectorX(Look), VectorY(Look), 0));
+      
+   }
+
+   Return;
+
+# ........................................................................................
+
+user0:
+
+	returnEx(Victim);
+
+return;
+
+# ........................................................................................
+
+trigger:
+
+	if(GetSourceRef() == 3001)
+	{
+		if(GetParam(1) == player && GetParam(0)==victim)
+		{SendTrigger(-1, 3000, victim,-1,-1,-1);}
+	}
+
+return;
+
+# ........................................................................................
+
+selected:
+
+	jkPrintUNIString(player, 252);
+
+return;
+
+# ........................................................................................
+
+killed:
+
+   if(GetSenderRef() != player) Return;
+
+   call stop_power;
+
+return;
+
+newplayer:
+
+return;
+
+# ........................................................................................
+
+leave:
+
+	if(victim==GetSenderRef())
+	{call stop_power;}
+
+return;
+
+# ........................................................................................
+
+stop_power:
+   SetPulse(0);
+   LockOn=0;
+   SetInvActivated(player, 116, 0);
+   active = 0;
+
+   SendMessageEx(GetInvCog(player, 135), user0, 2, -1, -1, -1);
+
+   //Reset our victims melee variables
+   //SendTrigger(victim, 2000, -1,-1,0,-1);
+   VecX = VectorX(GetThingLVec(player));
+   VecY = VectorY(GetThingLVec(player));
+   if(victim != -1) SetThingLook(Player, VectorSet(VecX, VecY, 0));
+   victim=-1;
+   ParseArg(player, "minheadpitch=-80.00");
+   ParseArg(player, "maxheadpitch=80.00");
+
+   ClearThingFlags(player, 0x40000000);
+   //ClearActorFlags(player, 0x10);
+
+   Return;
+   
+user1:
+
+	call Stop_Power;
+	
+return;
+
+end

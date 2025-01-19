@@ -1,0 +1,35 @@
+# Jedi Knight Cog Script
+#
+# kitrail.cog
+#
+# Leave a trail behind the renzoku and ki blast projectiles
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+template	Trail=+kitrail		local
+
+message		created
+message		pulse
+
+end
+
+code
+
+created:
+
+	CreateThing(Trail, GetSenderRef());
+	SetThingPulse(GetSenderRef(), 0.1);
+
+return;
+
+pulse:
+
+	CreateThing(Trail, GetSenderRef());
+
+return;
+
+end

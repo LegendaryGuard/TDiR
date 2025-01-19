@@ -1,0 +1,522 @@
+# Jedi Knight Cog Script
+#
+# Attack 5: Ki Orb
+#
+# Created by: Hell Raiser [Jon Harmon]
+#
+# Bug: Somehow you can cause the charge sound to loop
+# by letting go of charge just as the first ball should
+# be created.
+
+symbols
+
+thing		Ball					local
+
+template	Orb0=+kiorb0	local
+template	Orb1=+kiorb1	local
+template	Orb2=+kiorb2	local
+template	Orb3=+kiorb3	local
+template	Orb4=+kiorb4	local
+template	Orb5=+kiorb5	local
+template	Orb6=+kiorb6	local
+template	Orb7=+kiorb7	local
+template	Orb8=+kiorb8	local
+template	Orb9=+kiorb9	local
+template	Orb10=+kiorb10	local
+template	Orb11=+kiorb11	local
+template	Orb12=+kiorb12	local
+template	Orb13=+kiorb13	local
+template	Orb14=+kiorb14	local
+template	Orb15=+kiorb15	local
+template	Orb16=+kiorb16	local
+template	Orb17=+kiorb17	local
+template	Orb18=+kiorb18	local
+template	Orb19=+kiorb19	local
+template	Orb20=+kiorb20	local
+template	Orb21=+kiorb21	local
+template	Orb22=+kiorb22	local
+template	Orb23=+kiorb23	local
+template	Orb24=+kiorb24	local
+template	Orb25=+kiorb25	local
+template	Orb26=+kiorb26	local
+template	Orb27=+kiorb27	local
+template	Orb28=+kiorb28	local
+template	Orb29=+kiorb29	local
+template	Orb30=+kiorb30	local
+template	Orb31=+kiorb31	local
+template	Orb32=+kiorb32	local
+template	Orb33=+kiorb33	local
+template	Orb34=+kiorb34	local
+template	Orb35=+kiorb35	local
+template	Orb36=+kiorb36	local
+template	Orb37=+kiorb37	local
+template	Orb38=+kiorb38	local
+template	Orb39=+kiorb39	local
+
+
+template	Par0=+OrbParsBlue		local
+template	Par1=+OrbParsGreen		local
+template	Par2=+OrbParsOrange		local
+template	Par3=+OrbParsPurple		local
+template	Par4=+OrbParsRed		local
+template	Par5=+OrbParsTeal		local
+template	Par6=+OrbParsSilver		local
+template	Par7=+OrbParsYellow		local
+
+thing		Pars					local
+
+flex		Dist0=0.097099				local
+flex		Dist1=0.149862				local
+flex		Dist2=0.232305				local
+flex		Dist3=0.361123				local
+flex		Dist4=0.5624				local
+
+keyframe	bcharge0=spiritcharge.key	local
+keyframe	bcharge1=kiorbcharge.key	local
+keyframe	bcharge2=spiritchargeflying.key	local
+keyframe	bcharge3=kiorbchargeflying.key	local
+
+keyframe	bfire0=spiritthrow.key		local
+keyframe	bfire1=kiorbthrow.key		local
+keyframe	bfire2=spiritthrowflying.key	local
+keyframe	bfire3=kiorbthrowflying.key		local
+
+
+
+int			bchargeID=-1						local
+int			bfireID=-1							local
+
+int			Size=-1								local
+int			AddPower=0							local
+int			Fired=0								local
+int			FireAgain=1							local
+int			Wait=0								local
+int			Effect=0							local
+int			PulseMode=0							local
+int			bin=178								local
+int			Stuff=0								local
+
+int			MultiStat							local
+int			Ki									local
+int			Color=0								local
+
+template	Ghost=+APGhost						local
+thing		FireThing							local
+vector		FireVec								local
+
+sound		mountSound=SwingFist01.wav			local
+sound		dismountSound=SwingFist01.wav		local
+
+sound       chargeSound=ballcharge.wav			local
+sound       fireSound=ballfire.wav				local
+sound       outSound=SwingFist01.wav			local
+
+flex        fireWait=2                        local
+flex        delayTime=0                         local
+flex        error                               local
+
+int			Color=-1							local
+
+thing       player                              local
+thing		Attack								local
+thing		OldAttack							local
+
+int         channel=-1                          local
+int         channel2=-1                          local
+
+int			Attached							local
+
+template	DummyTpl=+Dummy						local
+thing		Dummy								local
+int			Geo									local
+
+flex		PulseTime=2						local
+
+message     startup
+message     activated
+message     pulse
+message     deactivated
+message     selected
+message     deselected
+message     newplayer
+message     autoselect
+message     killed
+message     timer
+message		user0
+message		user1
+message		user7
+
+end
+
+# ========================================================================================
+
+code
+
+startup:
+
+	player = GetLocalPlayerThing();
+	Effect=0;
+	Attack=-1;
+	ParNum=0;
+	Color=-1;
+
+return;
+
+# ........................................................................................
+
+activated:
+
+	//SendMessage(GetInvCog(player, 172), user0);
+
+	CanFire=GetInv(Player, 149);
+	if(CanFire==0) return;
+
+	Attached=GetInv(player, 171);
+	if(Attached==0) return;
+	
+	mode = GetSenderRef();
+	
+	if(mode==1) return;
+	
+	// Check Ammo - If we are out, autoselect best weapon.
+	if(GetInv(player, 14) < 80)
+	{
+		if((GetAutoSwitch() & 1))
+			SelectWeapon(player, AutoSelectWeapon(player, 1));
+		else
+			PlaySoundThing(outSound, player, 1.0, -1, -1, 0x80);
+		return;
+	}
+
+	ActivateWeapon(player, 0, mode);
+	//Print("Activated");
+
+	if(channel == -1)
+	{
+		channel = PlaySoundThing(chargeSound, player, 0.0, 5, 25, 0x181);
+
+		if(channel != -1)
+		{
+			ChangeSoundPitch(channel, 0.5, 0.01);
+			ChangeSoundVol(channel, 0.8, 0.5);
+			ChangeSoundPitch(channel, 1.0, 1);
+		}
+			
+		Flying=GetMajorMode(player);
+		if(Flying>2) Flying=Flying-3; //Compensate for underwater
+
+		//Hide the player and create dummy actor
+		//so when looking up/down while charging
+		//doesn't move the arms.
+
+		//Geo=GetThingCurGeoMode(player);
+		//SetThingCurGeoMode(player, 0);
+		//Dummy=FireProjectile(Player, DummyTpl, -1, -1, '0 0 0', '0 0 0', 1.0, 0x20, 0, 0);
+		//Dummy=CreateThing(DummyTpl, player);
+		//SetThingUserData(Dummy, player);
+		//SetThingModel(Dummy, GetThingModel(player));
+
+		Pars=FireProjectile(Player, Par0[Color], -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+
+		Animation2=Animation+(Flying*2);
+		bchargeID=PlayKey(Player, bcharge0[Animation2], 4, 0x14); //Try this->0x14
+
+		Fired=0;
+		Size=-1;
+		Attack=-1;
+		PulseMode=1;
+		PulseTime=2;
+		SetPulse(PulseTime);
+		SetInv(player, 147, 1);
+
+		SendMessageEx(GetInvCog(player, 180), user1, 0, -1, -1, -1);
+		//SendMessage(GetInvCog(player, 126), user2);
+	}
+
+return;
+
+# ........................................................................................
+
+deactivated:
+
+	//Print("Deactivated");
+
+	//if(Attached==0) return;
+
+	//mode = GetSenderRef();
+	//if(mode==1) return;
+
+	delayTime = DeactivateWeapon(player, mode);
+	//Print("Dectivated");
+	//PrintFlex(delayTime);
+
+    //if((delayTime < PulseTime) && (Attack == -1))
+    if(Attack == -1)
+    {
+		//DestroyThing(Chrg);
+		//DestroyThing(Dummy);
+		//DestroyThing(Pars);
+		Effect=0;
+		Call Stop_Effects;
+
+		if(Fired==0)
+		{
+			SetPulse(0);
+			SetInv(Player, 149, 1);
+			SendMessageEx(GetInvCog(player, 180), user2, -1, -1, -1, -1);
+		}
+
+       	return;
+    }
+
+	if(channel != -1)
+	{
+		StopSound(channel, 0);
+		channel = -1;
+	}
+
+	// Make sure both keys are up before continuing.
+	//if (GetCurWeaponMode() != -1) Return;
+
+	SetMountWait(player, 1);
+
+	//DestroyThing(Chrg);
+	StopKey(player, bchargeID, 0);
+	bchargeID=-1;
+
+	Flying=GetMajorMode(player);
+	if(Flying>2) Flying=Flying-3; //Compensate for underwater
+
+	//DestroyThing(Dummy);
+	//SetThingCurGeoMode(player, Geo);
+
+	Animation2=Animation+(Flying*2);
+	bfireID=PlayKey(player, bfire0[Animation2], 1, 0x38);
+
+	//Add in check for closeness to walls, ect
+	SetPulse(0);
+	StopSound(channel, 0.1);
+	//channel = -1;
+	
+	channel2 = PlaySoundThing(FireSound, player, 0.8, 5, 25, 0x180);
+	//SetInv(player, 13, 0);
+
+	SetThingFlags(Attack, 0x200);
+	SetLifeLeft(Attack, 10);
+	FireThing=FireProjectile(player, ghost, -1, -1, VectorSet(0, 0, 0.1+Dist0[Size]), '0 0 0', 0, 0, 0, 0);
+	FireVec=GetThingLVec(FireThing);
+	SetCollideType(Attack, 1);
+	if(Attack != 0 && Attack != -1) PlaySoundThing(chargeSound, Attack, 1.0, -1, -1, 0x181);
+
+	Sleep(0.1);
+
+	SetThingVel(Attack, VectorScale(FireVec, 10));
+	DestroyThing(FireThing);
+	
+	Fired=1;
+	
+	//I know this is fk'ed up to send a trigger, but JK doesn't do it's job all the time
+	//SendTrigger(-1, 20000, Attack, VectorX(FireVec), VectorY(FireVec), VectorZ(FireVec));
+	
+	Attack=-1;
+
+	//SendMessage(GetInvCog(player, 126), user3);
+
+	//SetLifeLeft(Pars, 0.01);
+	//SendMessageEx(GetInvCog(player, 172), user1, Attack, 10, -1, -1);
+
+	SetInv(Player, 149, 0);
+	PulseMode=0;
+	PulseTime=3;
+	SetPulse(PulseTime);
+	SetInv(player, 147, 0);
+
+return;
+
+# ........................................................................................
+
+pulse:
+
+	if(Pulsemode == 1)
+	{
+		if(GetInv(player, 14) > 120) // Return;
+		{
+			Size=Size+1;
+
+			if(Size<=4)
+			{
+				OldAttack=Attack;
+				//FireProjectile(player, projectile, fireSound, -1, '0 0.1 0.0', '0 0 0', 1.0, 0x20, -1, -1);
+				ColorSize=(Color*5)+Size;
+				Attack=FireProjectile(player, Orb0[ColorSize], -1, -1, VectorSet(0, 0, 0.1+Dist0[Size]), '0 0 0', 0, 0x0, 0, 0);
+				SetLifeLeft(Attack, 0);
+				if(OldAttack != -1) DestroyThing(OldAttack);
+				//PrintInt(Attack);
+				ChangeInv(player, 14, -80);
+				ChangeInv(player, 13, 40);
+				PulseTime=PulseTime+0.5;
+				SetPulse(PulseTime);
+			}
+			else
+			{Size=4;}
+		}
+	}
+	else
+	{
+		Size=Size-1;
+		//PrintInt(Size);
+		ChangeInv(player, 13, -40);
+		if(Size==-1) 
+		{
+			SetInv(Player, 149, 1);
+			SetPulse(0);
+			//Print("j00 can fire!");
+			SendMessageEx(GetInvCog(player, 180), user2, -1, -1, -1, -1);
+			Fired=0;
+		}
+	}
+
+return;
+
+# ........................................................................................
+
+selected:
+
+	//jkPrintUNIString(player, 7);
+	
+	Print("Ki Orb");
+
+	if(IsInvActivated(player, 41) == 1)
+	{SetArmedMode(player, 1);}
+	else
+	{SetArmedMode(player, 0);}
+
+	// Set flags, etc.
+	jkClearFlags(player, 0x5);
+	SetCurWeapon(player, 6);
+
+   // Check Ammo - If we are out, autoselect best weapon.
+// if(GetInv(player, 14) < 60.0)
+// {
+//    if((GetAutoSwitch() & 1))
+//       SelectWeapon(player, AutoSelectWeapon(player, 1));
+// }
+
+	//Get custom stuff from the character.cog
+	
+	Color=SendMessageEx(GetInvCog(player, 127), User1, 0, -1, -1, -1);
+	Animation=SendMessageEx(GetInvCog(player, 127), User2, 0, -1, -1, -1);
+
+	//Color=Color+1;
+	
+	//if(Color>7) Color=0;
+	
+   Return;
+
+# ........................................................................................
+
+deselected:
+
+	//returnEx(0);
+	//SetInv(player, 13, 0);
+	//Size=-1;
+	//SetPulse(0);   
+	call Stop_Effects;
+
+return;
+
+# ........................................................................................
+
+killed:
+
+	if (player == GetSenderRef())
+	{
+		if(bchargeID != -1) SendMessage(GetInvCog(player, 126), user3);
+		Call Stop_Effects;
+		SetInv(player, 147, 0);
+	}
+
+return;
+
+# ........................................................................................
+
+newplayer:
+//   // Make sure that if the player is respawning, the old mount isn't playing anymore.
+//   if (trackID != -1)
+//   {
+//      jkStopPOVKey(player, trackID, 0);
+//      trackID = -1;
+//   }
+
+   Return;
+
+# ........................................................................................
+
+autoselect:
+   // If the player has the weapon
+   if(GetInv(player, 178) != 0.0)
+   {
+      // If the player has ammo
+      if(GetInv(player, 14) > 80.0)
+      {
+         ReturnEx(700.0);
+      }
+      else
+      {
+         ReturnEx(-1.0);
+      }
+   }
+   else
+   {
+      ReturnEx(-1.0);
+   }
+
+   Return;
+
+Stop_Effects:
+
+	if(channel != -1)
+	{
+		StopSound(channel, 0.1);
+		channel = -1;
+	}
+
+	if(bchargeID != -1)
+	{
+		StopKey(player, bchargeID, 0);
+		bchargeID = -1;
+	}
+	
+	if(bfireID != -1)
+	{
+		StopKey(player, bfireID, 0);
+		bfireID = -1;
+	}
+
+	//ParseArg(player, "pup=ky.pup");
+
+	//sometimes there's no keyframe applied to the model
+	//this fixes that
+	//PlayMode(player, 0);
+
+return;
+
+damaged:
+
+	if(GetSenderRef() == Player)
+	{
+	}
+	
+return;
+
+user7:
+
+	//Print("Stop Charging!");
+	//PrintInt(GetCurWeaponMode(player));
+	
+	Call deactivated;
+
+return;
+
+end
+

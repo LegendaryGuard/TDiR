@@ -1,0 +1,166 @@
+# Jedi Knight Cog Script
+#
+# Weapon 3: Rapid Fire Ki Attack
+
+symbols
+
+keyframe	Blast0=kikou.key			local
+keyframe	Blast1=kikouflying.key		local
+
+sound       fireSound=kiblast.wav           local
+
+template    projectile=+seekerball			local
+
+thing       player                          local
+
+flex        fireWait=3                      local
+
+int         mode                            local
+int			Flying							local
+
+message     activated
+message     deactivated
+message     selected
+message     deselected
+message     autoselect
+message     fire
+message		timer
+
+end
+
+# ========================================================================================
+
+code
+
+timer:
+
+	if(GetSenderID()==1)
+	{
+		Projy=FireProjectile(player, projectile, fireSound, -1, '0 0.1 0.0', '0 0 0', 1.0, 0x20, -1, -1);
+		ChangeInv(player, 14, -25.0);
+	}
+	else if(GetSenderID()==2)
+	{
+		//SendTrigger(something);
+		//Print("GO KABOOM!");
+		Victim=SendMessageEx(GetInvCog(player, 116), user0, -1, -1, -1, -1);
+		SendTrigger(-1, 80000, Projy, player, Victim, -1);
+	}
+	
+return;
+
+# ........................................................................................
+
+fire:
+
+	SetTimerEx(1.01, 2, -1, -1);
+	
+return;
+
+activated:
+	player = GetSourceRef();
+	mode = GetSenderRef();
+
+	ActivateWeapon(player, firewait, mode);
+
+return;
+
+# ........................................................................................
+
+deactivated:
+	player = GetSourceRef();
+	mode = GetSenderRef();
+
+	delaytime=DeactivateWeapon(player, mode);
+	
+	if(delaytime<1)
+	{
+		KillTimerEx(2);
+
+		Attached=GetInv(player, 171);
+		if(Attached==0) return;
+
+		// Check that the player is still alive.
+		if(GetThingHealth(player) <= 0)
+		{
+			Return;
+		}
+
+		// Check Ammo - If we are out, autoselect best weapon.
+		if(GetInv(player, 14) < 1.0)
+		{
+			PlaySoundThing(outSound, player, 1.0, -1.0, -1.0, 0x80);
+			if(GetAutoSwitch() & 1)
+				SelectWeapon(player, AutoSelectWeapon(player, 1));
+			Return;
+		}
+
+		Flying=GetMajorMode(player);
+		if(Flying>2) Flying=Flying-3; //Compensate for underwater
+
+		PlayKey(player, Blast0[Flying], 1, 0x38);
+		SetTimerEx(0.25, 1, -1, -1);
+
+		ChangeInv(player, 14, -25.0);
+	}
+	
+return;
+
+# ........................................................................................
+
+selected:
+	//jkPrintUNIString(player, 7);
+	
+	Print("Seeker Balls");
+
+	if(IsInvActivated(player, 41) == 1)
+	{SetArmedMode(player, 1);}
+	else
+	{SetArmedMode(player, 0);}
+
+	// Set flags, etc.
+	jkClearFlags(player, 0x5);
+	SetCurWeapon(player, 5);
+
+   // Check Ammo - If we are out, autoselect best weapon.
+// if(GetInv(player, 14) < 60.0)
+// {
+//    if((GetAutoSwitch() & 1))
+//       SelectWeapon(player, AutoSelectWeapon(player, 1));
+// }
+
+   Return;
+
+# ........................................................................................
+
+deselected:
+
+Return;
+
+# ........................................................................................
+
+autoselect:
+   player = GetSourceRef();
+
+   // If the player has the weapon
+   if(GetInv(player, 3) != 0.0)
+   {
+      // If the player has ammo
+      if(GetInv(player, 14) != 0.0)
+      {
+         ReturnEx(500.0);
+      }
+      else
+      {
+         ReturnEx(-1.0);
+      }
+   }
+   else
+   {
+      ReturnEx(-1.0);
+   }
+
+   Return;
+
+end
+

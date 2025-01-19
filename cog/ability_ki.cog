@@ -1,0 +1,167 @@
+# Jedi Knight Cog Script
+#
+# ability_ki.cog
+#
+# Ki Script - Ki Button
+#  Basic Power
+#  Bin 21
+#
+# Toggles the use of Ki on/off
+#
+# ©2001 Hell Raiser [Jon Harmon]
+# Use of this cog or any others from DBZ: TDIR
+# is prohibited without permission
+
+symbols
+
+thing       player						local
+sound		LoopSnd=auraloop.wav		local
+
+flex		speed=2						local
+vector		thrust						local
+
+int         attachFlags					local
+int			color						local
+int         channel=-1					local
+int			fly=0						local
+
+int			ChargeKi					local
+int			Kaioken						local
+int			Levelup						local
+
+keyframe	FlyKi=Kifly.key				local
+int			KiID=-1						local
+
+message     startup
+message     activated
+message     pulse
+message     newplayer
+message     killed
+message     selected
+
+end
+
+# ========================================================================================
+
+code
+
+startup:
+	player = GetLocalPlayerThing();
+	SetPulse(0);
+	fly=0;
+	SetInvActivated(player, 21, 0);
+
+return;
+
+# ........................................................................................
+
+activated:
+
+	if(IsInvActivated(player, 22)) return; //kaioken
+	if(IsInvActivated(player, 25)) return; //charge ki
+	if(IsInvActivated(player, 118)) return; //level up
+
+	if(IsInvActivated(player, 42)==0)
+	{
+		//SetInvActivated(player, 21, 1);
+		SetInvActivated(player, 42, 1);
+		channel = PlaySoundThing(LoopSnd, player, 0.8, -1, -1, 0x81);
+		Color=SendMessageEx(GetInvCog(player, 127), User1, 5, -1, -1, -1);
+		//SendTrigger(-1, 20010, player, Color, 1, -1);
+		SendMessageEx(GetInvCog(player, 130), user1, 5, Color, -1, -1);
+		SetActorExtraSpeed(player, speed);
+		Fly=0;
+		SetPulse(0.5);
+		Print("Ki On");
+	}
+	else
+	{
+		Print("Ki Off");
+		Call Stop_Effects;
+	}
+
+return;
+
+# ........................................................................................
+
+pulse:
+
+	Dashing=SendMessageEx(GetInvCog(player, 34), user2, -1, -1, -1, -1);
+
+	if(Dashing == 1)
+	{
+		if(fly==0)
+		{
+			SendMessageEx(GetInvCog(player, 130), user0, 5, -1, -1, -1);
+			Color=SendMessageEx(GetInvCog(player, 127), User1, 5, -1, -1, -1);
+			SendMessageEx(GetInvCog(player, 130), user1, 7, Color, -1, -1);
+			fly=1;
+			KiID=PlayKey(player, FlyKi, 2, 0x0);
+			//ApplyForce(player, VectorScale(GetThingVel(player), 3));
+		}
+	}
+	else
+	{
+		if(fly)
+		{
+			SendMessageEx(GetInvCog(player, 130), user0, 7, -1, -1, -1);
+			Color=SendMessageEx(GetInvCog(player, 127), User1, 5, -1, -1, -1);
+			SendMessageEx(GetInvCog(player, 130), user1, 5, Color, -1, -1);
+			fly=0;
+			if(KiID!=-1)
+			{
+				StopKey(player, KiID, 0);
+				KiID=-1;
+			}
+		}
+	}
+
+	if(GetThingHealth(player) < 1)
+	{
+		if(channel != -1) StopSound(channel, 0.1);
+		SetPulse(0);
+	}
+
+return;
+
+# ........................................................................................
+
+selected:
+   //jkPrintUNIString(player, 21);
+	//print("Use Ki");
+return;
+
+# ........................................................................................
+
+killed:
+	if(GetSenderRef() != player) Return;
+
+	call Stop_Effects;
+	
+return;
+
+newplayer:
+
+return;
+
+Stop_Effects:
+
+	SetPulse(0);
+	SendMessageEx(GetInvCog(player, 130), user0, 5, -1, -1, -1);
+	if(Fly) SendMessageEx(GetInvCog(player, 130), user0, 7, -1, -1, -1);
+	SetActorExtraSpeed(player, 0);
+	//SetInvActivated(player, 21, 0);
+	SetInvActivated(player, 42, 0);
+	ChangeSoundVol(channel, 0, 0.5); 
+	StopSound(channel, 0.5);
+	if(KiID!=-1)
+	{
+		StopKey(player, KiID, 0);
+		KiID=-1;
+	}
+
+return;
+
+end
+
+

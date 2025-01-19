@@ -1,0 +1,93 @@
+bactivated:
+
+	BHeadP=FireProjectile(player, Head, -1, -1, '0 0.6 0', '0 0 0', 0, 0, 0, 0);
+
+return;
+
+bactivated:
+
+	Rbot=FireProjectile(player, AP_Tpl, -1, -1, '0 2 0', '0 0 0', 0, 0, 0, 0);
+	SetThingLook(Rbot, VectorSub(GetThingPos(player), GetThingPos(Rbot)));
+	Go=0;
+	SetTimer(3);
+
+return;
+
+btimer:
+
+	TB=0;
+	TP=0;
+
+	BHeadB=FireProjectile(Rbot, Head, -1, -1, '0 0.6 0', '0 0 0', 0, 0, 0, 0);
+	Rbot2=FireProjectile(player, AP_Tpl, -1, -1, '0 1 0', '0 0 0', 0, 0, 0, 0);
+	BHeadP=FireProjectile(Rbot2, Head, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+
+	CaptureThing(BHeadB);
+	CaptureThing(BHeadP);
+	
+	SetThingLook(BHeadB, VectorSub(GetThingPos(BHeadP), GetThingPos(BHeadB)));
+	SetThingLook(BHeadP, VectorSub(GetThingPos(BHeadB), GetThingPos(BHeadP)));
+
+	SetThingThrust(BHeadB, '0 1 0');
+	SetThingThrust(BHeadP, '0 2 0');
+
+	Go=1;
+
+	SetPulse(0.01);
+	
+return;
+
+btouched:
+
+	if(GetSenderRef()==BHeadB && TB==0)
+	{
+		StopThing(BHeadB);
+		TB=1;
+		SetThingThrust(BHeadB, '0 5 0');
+		Print("TB!");
+	}
+
+	if(GetSenderRef()==BHeadP && TP==0)
+	{
+		StopThing(BHeadP);
+		TP=1;
+		SetThingThrust(BHeadP, '0 10 0');
+		Print("TP!");
+	}
+
+return;
+
+bdamaged:
+
+	returnEx(0);
+
+return;
+
+bpulse:
+
+	jkStringClear();
+	jkStringConcatAsciiString("P - ");
+	jkStringConcatInt(GetThingHealth(BHeadP));
+	jkStringConcatAsciiString("   B - ");
+	jkStringConcatInt(GetThingHealth(BHeadB));
+	jkStringOutput(-1, -1);
+
+return;
+
+	if(TB)
+	{SetThingThrust(BHeadB, '0 10 0');}
+	else
+	{SetThingThrust(BHeadB, '0 0.5 0');}
+	
+	if(TP)
+	{SetThingThrust(BHeadP, '0 20 0');}
+	else
+	{SetThingThrust(BHeadP, '0 1 0');}
+
+	//SetThingVel(BHeadB, VectorScale(GetThingLVec(BHeadB), 0.1));
+	//SetThingVel(BHeadP, VectorScale(GetThingLVec(BHeadP), 0.2));
+	//SetThingLook(BHeadB, VectorSub(GetThingPos(BHeadP), GetThingPos(BHeadB)));
+	//SetThingLook(BHeadP, VectorSub(GetThingPos(BHeadB), GetThingPos(BHeadP)));
+
+
+return;

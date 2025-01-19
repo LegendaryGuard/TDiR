@@ -1,0 +1,302 @@
+# Jedi Knight Cog Script
+#
+# ability_levelup.cog
+#
+# Handles leveling up
+
+symbols
+
+thing       player                           local
+
+flex        cost=400.0                       local
+int         rank                             local
+flex        mana                             local
+flex  		Duration						local
+
+sound       ChargeSnd=rumble.wav        local
+sound		StartSnd=aurastart.wav		local
+sound		LoopSnd=auraloop.wav		local
+sound		DownSnd=powerdown.wav		local
+
+keyframe	KiCharge=charge.key			local
+keyframe	LevelupLong=ssjtransform1.key		local
+keyframe	LevelupShort=ssjtransform2.key		local
+
+template	Rock=+rocks			local
+template	Ring=+dustring		local
+template	Flash=+levelupflash	local
+
+template	Ltning=+lightning	local
+
+thing		RingThng=-1			local
+
+int         soundChannel=-1                  local
+int			soundChannel2					local
+
+int			ChargeId=-1						local
+int			LevelupId=-1					local
+
+int			numtimes=0						local
+int			PowerDown=0						local
+int			ModelNum						local
+
+int			running=0						local
+
+int			Level							local
+
+int			CanLevel						local
+
+int			MaxLevel						local
+
+int                       color             local
+
+message     startup
+message     activated
+message		deactivated
+message     newplayer
+message     killed
+message     selected
+message     user0
+message		timer
+message		pulse
+
+end
+
+# ========================================================================================
+
+code
+
+startup:
+	player = GetLocalPlayerThing();
+	SetInvActivated(player, 118, 0);
+	NumTimes=0;
+	MaxLevel=0;
+	running=0;
+	powerdown=0;
+	SendMessageEx(GetInvCog(player, 127), user0,0,-1,-1,-1);
+	SetInv(Player, 20, 0);
+
+return;
+
+activated:
+
+	if(IsInvActivated(player, 118)) return;	
+	if(IsInvActivated(player, 22)) return; //kaioken
+	if(IsInvActivated(player, 42)) return; //use ki
+	if(IsInvActivated(player, 25)) return; //charge ki
+
+	if(running) return;
+
+	jkPrintUNIString(player, 251);
+
+	SetInvActivated(player, 118, 1);
+	
+	//PrintInt(NumTimes);
+	//PrintInt(PowerDown);
+	
+	if((PowerDown==0) && (NumTimes > 0)) SetTimerEx(2, 569, -1, -1);
+	ActivateBin(player, 0, 118);
+
+return;
+
+# ........................................................................................
+
+timer:
+
+	if(GetSenderId() == 569)
+	{
+		PowerDown=1;
+		SendMessageEx(GetInvCog(player, 127), user0,0,-1,-1,-1);
+		soundChannel = PlaySoundThing(DownSnd, player, 1.0, -1, -1, 0x80);
+		SetInv(player, 20, 0);
+	}
+	
+	if(GetSenderId() == 1)
+	{
+		//RingThng=FireProjectile(player, Ring, -1, -1, '0 0 0.1', 0, 0, 0, 0, 0); 
+		if(GetInv(player, 171) == 1) RingThng=CreateThingAtPos(Ring, GetThingSector(player), VectorSub(GetThingPos(player), '0 0 0.11'), GetThingLVec(player));
+		StopKey(Player, ChargeId, 0);
+		PlayKey(player, LevelupLong, 5, 0x38);
+		SetTimerEx(0.8, 2, -1, -1);
+	}
+	
+	if(GetSenderId() == 2)
+	{
+		Color=SendMessageEx(GetInvCog(player, 127), User1, 4, -1, -1, -1);
+		//AddDynamicAdd(player, 255, 255, 255);
+		FireProjectile(player, Flash, -1, -1, '0 0 0', '0 0 0', NumTimes+1, 0x2, 0, 0);
+		SendMessageEx(GetInvCog(player, 130), user1, 4, Color, -1, -1);
+		if(numtimes>=3)
+		{
+			KillTimerEx(100);
+			SetTimerEx(3 + rand(), 100, -1, -1);
+		}
+		StopSound(soundChannel, 0);
+		soundChannel=PlaySoundThing(StartSnd, player, 1.0, -1, -1, 0x80);
+		soundChannel2=PlaySoundThing(LoopSnd, player, 0.0, -1, -1, 0x81);
+		ChangeSoundVol(soundchannel2, 1, GetSoundLen(StartSnd));
+
+		SetTimerEx(2, 3, -1, -1);
+		Call Finish_Up;
+		
+		//ChangeSoundVol(channel, 0, 0.5); 
+		//StopSound(channel, 0.5);
+	}
+	
+	if(GetSenderId() == 3)
+	{
+		ClearActorFlags(player, 0x40008);
+		SetPulse(0);
+		SendMessageEx(GetInvCog(player, 130), user0, 4, -1, -1, -1);
+		ChangeSoundVol(SoundChannel2, 0, 0.5); 
+		StopSound(SoundChannel2, 0.5);
+		if(RingThng != -1)
+		{
+			DestroyThing(RingThng);
+			RingThng=-1;
+		}
+		Call newplayer;
+		running=0;
+		SetInvActivated(player, 118, 0);
+	}
+
+	if(GetSenderId() == 4)
+	{
+		PlaySoundThing(StartSnd, player, 1.0, -1, -1, 0x80);
+		SetInv(player, 20, NumTimes);
+		SendMessageEx(GetInvCog(player, 127), user0, NumTimes,0 ,-1 ,-1);
+		Color=SendMessageEx(GetInvCog(player, 127), User1, 4, -1, -1, -1);
+		SendMessageEx(GetInvCog(player, 130), user1, 4, Color, -1, -1);
+		SetTimerEx(1, 5, -1, -1);
+	}
+	
+	if(GetSenderId() == 5)
+	{
+		SendMessageEx(GetInvCog(player, 130), user0, 4, -1, -1, -1);
+		SetInvActivated(player, 118, 0);
+	}
+
+	if(GetSenderId() == 100)
+	{
+		SetTimerEx(3 + rand(), 100, -1, -1);
+		if(PowerDown) return;
+		FireProjectile(player, Ltning, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+	}
+
+	if(GetSenderId() == 200)
+	{
+		SendMessageEx(GetInvCog(player, 60), user1, 1, -1, -1, -1);
+		CanLevel=1;
+	}
+
+return;
+
+pulse:
+
+	if(GetInv(player, 171) == 1) CreateThing(Rock, player);
+
+return;
+
+deactivated:
+
+	Duration=DeactivateBin(player, 118);
+
+	if(IsInvActivated(player, 22)) return; //kaioken
+	if(IsInvActivated(player, 42)) return; //use ki
+	if(IsInvActivated(player, 25)) return; //charge ki
+
+	if(running) return;
+
+	//PrintFlex(Duration);
+
+	if((Duration >= 2))
+	{
+		SetInvActivated(Player, 118, 0);
+		return;		
+	}
+
+	KillTimerEx(569);
+
+	if(GetThingHealth(player) > 0)
+	{
+		if(PowerDown==1)
+		{
+			PowerDown=0;
+			StopThing(player);
+			SetTimerEx(GetKeyLen(LevelupShort), 4, -1, -1);
+			PlayKey(player, LevelupShort, 5, 0x38);
+			return;
+		}
+
+		//PrintInt(CanLevel);
+
+		if(CanLevel==0)
+		{
+			SetInvActivated(player, 118, 0);
+			return;
+		}
+
+
+		mana = GetInv(player, 14);
+		if(mana >= cost)
+		{
+			ChangeInv(player, 14, -cost);
+
+			StopThing(player);
+		
+			running=1;
+			ChargeId=PlayKey(player, KiCharge, 3, 0);
+			soundChannel=PlaySoundThing(ChargeSnd, player, 1.0, -1, -1, 0x81);
+			SetActorFlags(player, 0x40008);
+			if(GetInv(player, 171) == 1) CreateThing(Rock, player);
+			SetPulse(0.5);
+			SetTimerEx(2, 1, -1, -1);
+		}
+		else
+		{SetInvActivated(player, 118, 0);}
+	}
+
+return;
+
+Finish_Up:
+
+	NumTimes=NumTimes+1;
+	
+	SendMessageEx(GetInvCog(player, 127), user0,NumTimes,1,-1,-1); //Change model
+	HealThing(player, 100.0);
+	SetInv(player, 60, 100);
+
+	SetInv(player, 20, NumTimes);
+
+	//enable whatever
+	
+return;
+
+# ........................................................................................
+
+selected:
+   //jkPrintUNIString(player, 251);
+   Return;
+
+# ........................................................................................
+
+killed:
+
+	if(GetSenderRef() != player) Return;
+	SetInvActivated(player, 118, 0);
+
+newplayer:
+
+	CanLevel=0;
+	SendMessageEx(GetInvCog(player, 60), user1, 0, -1, -1, -1); //Tell system.cog you can't level
+	KillTimerEx(200);
+	SetTimerEx(10, 200, -1, -1);
+
+return;
+
+end
+
+
+
+
+

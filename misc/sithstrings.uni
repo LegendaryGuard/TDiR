@@ -1,0 +1,61 @@
+MSGS 25	  # <--- DON'T FORGET TO UPDATE THIS COUNT
+
+#	"<key>"		<unused number>	"<string>"
+
+#***************************
+#	Error Messages
+#***************************
+	"ERROR"				0	"Error"
+
+
+#***************************
+#	General Messages
+#***************************
+
+	"ON"									0	"On"
+	"OFF"									0	"Off"
+
+
+#***************************
+#	Gameplay Messages
+#***************************
+
+
+	"PRESS_ACTIVATE_TO_RESTORE"	0	"Press FIRE to restore last saved position"
+   "PRESS_ACTIVATE_TO_RESTART"   0  "Press FIRE to restart this level."
+	"PRESS_ACTIVATE_TO_RESPAWN"	0 	"Press FIRE to return to the game"
+
+   "GAME_SAVED"                  0  "Game saved."
+	
+   "%s_IS_%s"							0	"%s is %s"
+
+	"FLYING_ON"							0	"Fly mode on"
+	"FLYING_OFF"						0	"Fly mode off"
+
+	"RECORDING_OPENED"				0	"Recording opened"
+	"RECORDING_CLOSED"				0	"Recording closed"
+
+#***************************
+#	Multiplayer Messages
+#***************************
+
+	"%s_HAS_LEFT_THE_GAME"		0		"%s has left the planet"
+	"%s_HAS_JOINED_THE_GAME"	0		"%s has arrived"
+
+	"%s_SAYS_%s"				0		"%s says, '%s'"
+
+	"%s_WAS_KILLED_BY_%s"		0		"%s has been defeated by %s"
+	"%s_DIED"					0		"%s died"
+	"%s_COMMITTED_SUICIDE0"		0		"%s has been sent to the next dimension"
+	"%s_COMMITTED_SUICIDE1"		0		"%s's power level was not high enough"
+	"%s_COMMITTED_SUICIDE2"		0		"%s needs to find King Ki"
+	"%s_COMMITTED_SUICIDE3"		0		"%s needs a sensu bean"
+
+	"SERVER_LEFT_GAME"			0		"Server has left the battle. Leaving..."
+	"MULTI_TIMELIMIT"				0		"Time limit reached -- end of battle"
+	"MULTI_SCORELIMIT"			0		"Next battle ground -- end of battle"
+	"MULTI_EJECTED"				0		"You have been annihilated from the battle -- leaving"
+
+END
+
+

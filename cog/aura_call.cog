@@ -1,0 +1,106 @@
+# Jedi Knight Cog Script
+#
+# aura_call.cog
+#
+# Yes, I typed all that =P
+#
+# Created by: Hell Raiser [Jon Harmon]
+
+symbols
+
+template	Aura0=+aura0			local
+template	Aura1=+aura1			local
+template	Aura2=+aura2			local
+template	Aura3=+aura3			local
+template	Aura4=+aura4			local
+template	Aura5=+aura5			local
+template	Aura6=+aura7			local
+
+template	FAura0=+faura0			local
+template	FAura1=+faura1			local
+template	FAura2=+faura2			local
+template	FAura3=+faura3			local
+template	FAura4=+faura4			local
+template	FAura5=+faura5			local
+template	FAura6=+faura7			local
+
+thing		CurAura					local
+
+int			AuraOn					local
+
+thing		Lvl						local
+thing		Chg						local
+thing		Ki						local
+thing		Fly						local
+thing		Str						local
+
+
+message		user0
+message		user1
+message		startup
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	Lvl=-1;
+	Chg=-1;
+	Ki=-1;
+	Fly=-1;
+	Str=-1;	
+
+return;
+
+user0:
+
+	SetThingLight(player, 0.01, 0.1); 
+
+	if(GetParam(0)==3)
+	{
+		if(Chg != -1) DestroyThing(Chg);
+		Chg=-1;
+	}
+	else if(GetParam(0)==4)
+	{
+		if(Lvl != -1) DestroyThing(Lvl);
+		Lvl=-1;
+	}
+	else if(GetParam(0)==5)
+	{
+		if(Ki != -1) DestroyThing(Ki);
+		Ki=-1;
+	}
+	else if(GetParam(0)==6)
+	{
+		if(Str != -1) DestroyThing(Str);
+		Str=-1;
+	}
+	else if(GetParam(0)==7)
+	{
+		if(Fly != -1) DestroyThing(Fly);
+		Fly=-1;
+	}
+
+return;
+
+user1:
+
+	SetThingLight(player, 2.0, 0.1);
+
+	if(GetParam(0)==3)
+	{Chg=FireProjectile(player, Aura0[GetParam(1)], -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);}
+	else if(GetParam(0)==4)
+	{Lvl=FireProjectile(player, Aura0[GetParam(1)], -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);}
+	else if(GetParam(0)==5)
+	{Ki=FireProjectile(player, Aura0[GetParam(1)], -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);}
+	else if(GetParam(0)==6)
+	{Str=FireProjectile(player, Aura0[GetParam(1)], -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);}
+	else if(GetParam(0)==7)
+	{Fly=FireProjectile(player, FAura0[GetParam(1)], -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);}
+	
+return;
+
+end

@@ -1,0 +1,46 @@
+# Jedi Knight Cog Script
+#
+# ability_powerdown.cog
+#
+# Created by: Son of the Damned
+
+symbols
+
+thing		player				local
+
+int			GoingDown			local
+
+message		startup
+message		activated
+message		deactivated
+message		pulse
+
+end
+
+code
+
+startup:
+
+	player=GetLocalPlayerThing();
+	
+return;
+
+activated:
+
+	SetPulse(0.1);
+
+return;
+
+deactivated:
+
+	SetPulse(0);
+
+return;
+
+pulse:
+
+	
+
+return;
+
+end

@@ -1,0 +1,9 @@
+# Foley description for raildet explosion
+#
+# class		filename		playflags	minRadius	maxRadius	maxVolume
+#####################################################################################################
+#
+
+create		explosion4.wav            0x0     	1.5    		4.5		3.0
+
+

@@ -1,0 +1,18 @@
+# [LucasArts]: This file is blank, it is just used to generate a puppet.
+#
+# [HR]: Cryptic ain't it?  Made me go like this when I first read it: @_@
+#
+# It _should_ say:
+# This file is blank so that mother *bleep*'in keys will play on a god *bleep*'ed 3do
+#
+# Open up Beam[Color].3do and the beam cogs and you'll figure it out. ;P
+joints
+0=1 #Size 4
+1=2 #Size 3
+2=3 #Size 2
+3=4 #Size 1
+4=5 #Size 0
+end
+
+
+

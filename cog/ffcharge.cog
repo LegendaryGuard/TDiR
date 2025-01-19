@@ -1,0 +1,89 @@
+# Kamehameha Charging Pos Sync
+#
+# Created By: Hell Raiser [Jon Harmon]
+
+flags=0x240
+
+symbols
+
+template	AP_tpl=+APGhost	local
+thing		AP_thng1		local
+thing		AP_thng2		local
+thing		Kameball		local
+thing		Parent			local
+thing		Player			local
+
+keyframe	Rot=beamcharge.key	local
+
+vector		Opos			local
+
+template	FFTpl0=+ffchargeblue	local
+template	FFTpl1=+ffchargegreen	local
+template	FFTpl2=+ffchargeorange	local
+template	FFTpl3=+ffchargepurple	local
+template	FFTpl4=+ffchargered		local
+template	FFTpl5=+ffchargesilver	local
+template	FFTpl6=+ffchargeteal	local
+template	FFTpl7=+ffchargeyellow	local
+
+template	FF2Tpl0=+ff2chargeblue	local
+template	FF2Tpl1=+ff2chargegreen	local
+template	FF2Tpl2=+ff2chargeorange	local
+template	FF2Tpl3=+ff2chargepurple	local
+template	FF2Tpl4=+ff2chargered		local
+template	FF2Tpl5=+ff2chargesilver	local
+template	FF2Tpl6=+ff2chargeteal	local
+template	FF2Tpl7=+ff2chargeyellow	local
+
+message		startup
+message		created
+message		pulse
+message		removed
+
+end
+
+code
+
+startup:
+
+	Player=GetLocalPlayerThing();
+
+return;
+
+created:
+
+	//DestroyThing(GetSenderRef());
+
+	for(x=0;x<8;x=x+1)
+	{
+		if(GetThingTemplate(GetSenderRef())==FFTpl0[x])
+		{SetThingUserData(GetSenderRef(), FireProjectile(GetThingParent(GetSenderRef()), FF2Tpl0[x], -1, -1, '-0.081 0.025 0.143', '0 0 0', 1.0, 0x20, 0, 0));}
+	}
+
+	PlayKey(GetSenderRef(), Rot, 5, 0);
+	SetThingPulse(GetSenderRef(), 0.01);
+	
+return;
+
+pulse:
+
+	Parent=GetThingParent(GetSenderRef());
+	AP_thng1=CreateThing(AP_tpl, Parent);
+	SetThingLook(AP_thng1, GetThingLVec(Parent));
+	AP_thng2=FireProjectile(AP_thng1, AP_tpl, -1, -1, '0.081 0.025 0.143', '0 0 0', 1.0, 0x20, 0, 0);
+	//SetThingPos(GetSenderRef(), GetThingPos(AP_thng2));
+	TeleportThing(GetSenderRef(), AP_thng2);
+	DestroyThing(AP_thng1);
+	DestroyThing(AP_thng2);
+
+	if(GetThingFlags(Parent) & 0x200) DestroyThing(GetSenderRef());
+
+return;
+
+removed:
+
+	DestroyThing(GetThingUserData(GetSenderRef()));
+
+return;
+
+end

@@ -1,0 +1,71 @@
+# Jedi Knight Cog Script
+#
+# POW_BACTA.COG
+#
+# POWERUP Script - Bacta tank
+#
+# [YB & CYW]
+#
+# (C) 1997 LucasArts Entertainment Co. All Rights Reserved
+
+
+symbols
+
+thing       powerup                          local
+thing       player                           local
+int         bin=40                           local
+sound       pickupsnd=BactaPu1.wav           local
+sound       respawnsnd=Activate01.wav        local
+flex        amount                           local
+
+message     touched
+message     taken
+message     respawn
+
+end
+
+# ========================================================================================
+
+code
+
+touched:
+   player = GetSourceRef();
+   amount = GetInv(player, bin);
+
+   if (amount < GetInvMax(player, bin))
+   {
+      powerup = GetSenderRef();
+      TakeItem(powerup, player);
+   }
+
+   Return;
+
+# ........................................................................................
+
+taken:
+   player = GetSourceRef();
+   powerup = GetSenderRef();
+
+   // Print("Bacta Tank");
+   jkPrintUNIString(player, bin);
+
+   // Do effects.
+   PlaySoundThing(pickupsnd, powerup, 1.0, -1, -1, 0);
+   AddDynamicTint(player, 0.0, 0.0, 0.2);
+
+   // Increment powerup amount.
+   ChangeInv(player, bin, 1.0);
+   SetInvAvailable(player, bin, 1);
+
+   Return;
+
+# ........................................................................................
+
+respawn:
+   powerup = GetSenderRef();
+   PlaySoundThing(respawnsnd, powerup, 0.6, 5.0, 10.0, 0);
+
+   Return;
+
+end
+

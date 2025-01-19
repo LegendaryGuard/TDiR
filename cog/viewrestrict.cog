@@ -1,0 +1,44 @@
+# Jedi Knight Cog Script
+#
+# viewrestrict.cog
+#
+# Prevent the player from moving the view
+# while firing a beam
+#
+# Not really, bendy beams work now, so this just
+# destroys it when the beam head is destroyed
+
+flags=0x240
+
+symbols
+
+vector		ViewVec			local
+vector		PlayerLook		local
+
+message		created
+message		pulse
+
+end
+
+code
+
+created:
+
+	//if(GetLocalPlayerThing() != GetThingParent(GetSenderRef())) return;
+
+	//if(GetCurWeapon(GetThingParent(GetSenderRef())) != 8) SetThingPulse(GetSenderRef(), 0.01);
+
+	SetThingPulse(GetSenderRef(), 0.01);
+
+return;
+
+pulse:
+
+	if(GetThingParent(GetSenderRef()) == GetSenderRef())
+	{
+		DestroyThing(GetSenderRef());
+	}
+
+return;
+
+end

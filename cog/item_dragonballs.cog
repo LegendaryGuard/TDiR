@@ -1,0 +1,280 @@
+# Jedi Knight Cog Script
+# Thanks to Hell Raisers original ki blast cog.
+# Call the dragon! [Shred18 2003]
+
+symbols
+
+keyframe	Blast0=kikou.key			local
+keyframe	Blast1=kikouflying.key		local
+
+sound       fireSound=kiblast.wav           local
+
+template    projectile=+dragon				local
+template    explosion=+dragonExplode				local
+template    explosion2=+dragonExplode				local
+
+thing       player                          local
+
+flex        fireWait=1                      local
+
+int         mode                            local
+int			Flying		local
+int		wishing			local
+int		wish1			local
+int		wish2			local
+int		wish3			local
+int		dragon			local
+int		finalwish=1		local
+
+material	black=blackmat.mat	local
+template	test=+orbparred2	local
+
+message     activated
+message     deactivated
+message     selected
+message     deselected
+message     autoselect
+message     fire
+message		timer
+
+end
+
+# ========================================================================================
+
+code
+
+fire:
+	player = GetSourceRef();
+
+	Attached=GetInv(player, 171);
+	if(Attached==0) return;
+
+	// Check that the player is still alive.
+	if(GetThingHealth(player) <= 0)
+	{
+		Return;
+	}
+
+if(wishing != 0)
+{
+	return;
+}
+
+if(wish1==1)
+{
+print("I need POWER!");
+finalwish = 1;
+return;
+}
+
+if(wish2==1)
+{
+print("give me STRENGTH!");
+finalwish = 2;
+return;
+}
+
+if(wish3==1)
+{
+print("Make me IMMORTAL!");
+finalwish = 3;
+	return;
+}
+
+	// Check Ammo - If we are out, autoselect best weapon.
+	if(GetInv(player, 181) == 0.0 | GetInv(player, 182) == 0.0 | GetInv(player, 183) == 0.0 | GetInv(player, 184) == 0.0 | GetInv(player, 185) == 0.0 | GetInv(player, 186) == 0.0 | GetInv(player, 187) == 0.0)
+	{
+		PlaySoundThing(outSound, player, 1.0, -1.0, -1.0, 0x80);
+		if(GetAutoSwitch() & 1)
+			SelectWeapon(player, AutoSelectWeapon(player, 1));
+		Return;
+	}
+
+
+	Flying=GetMajorMode(player);
+	if(Flying>2) Flying=Flying-3; //Compensate for underwater
+
+	PlayKey(player, Blast0[Flying], 1, 0x38);
+
+	SetTimerEx(0.25, 1, -1, -1);
+
+return;
+
+timer:
+
+if(GetSenderId()==1)
+{
+wishing = 1;
+	dragon = FireProjectile(player, projectile, fireSound, -1, '0 3.1 0.0', '0 0 0', 1.0, 0x20, -1, -1);
+		 FireProjectile(dragon, explosion, -1, -1, '0 3.1 0.0', '0 0 0', 1.0, 0x20, -1, -1);
+SetTimerEx(4, 2, -1, -1);
+}
+if(GetSenderId()==2)
+{
+	print("What is your desire?");
+SetTimerEx(2, 3, -1, -1);
+}
+if(GetSenderId()==3)
+{
+wishing = 0;
+	print("power?");
+wish1 = 1;
+SetTimerEx(2, 4, -1, -1);
+}
+if(GetSenderId()==4)
+{
+wish1 = 0;
+	print("strength?");
+wish2 = 1;
+SetTimerEx(2, 5, -1, -1);
+}
+if(GetSenderId()==5)
+{
+wish2 = 0;
+	print("immortality?");
+wish3 = 1;
+SetTimerEx(2, 6, -1, -1);
+}
+if(GetSenderId()==6)
+{
+wish3 = 0;
+	print("Enough!");
+FireProjectile(dragon, explosion2, -1, -1, '0 0 0.0', '0 0 0', 1.0, 0x20, -1, -1);
+destroything(dragon);
+	ChangeInv(player, 181, -1.0);
+	ChangeInv(player, 182, -1.0);
+	ChangeInv(player, 183, -1.0);
+	ChangeInv(player, 184, -1.0);
+	ChangeInv(player, 185, -1.0);
+	ChangeInv(player, 186, -1.0);
+	ChangeInv(player, 187, -1.0);
+
+wishing = 0;
+SetTimerEx(1, 7, -1, -1);
+}
+
+if(GetSenderId()==7)
+{
+if(finalwish == 3)
+{
+SetActorFlags(player,0x8);
+SetTimerEx(50, 8, -1, -1);
+print("You are immortal for a time. Use it well.");
+}
+
+if(finalwish == 2)
+{
+jkSetSaberInfo(player, black, black, 0.05, 0.05, 0.1, test, test, test);
+	jkSetFlags(player, 0x5);
+	SetActorFlags(player, 0x2000);
+SetTimerEx(60, 9, -1, -1);
+print("You are stronger for a time. Use it well.");
+}
+
+if(finalwish == 1)
+{
+ParseArg(player, "maxthrust=7.00");
+jkSetSuperFlags(4); 
+SetTimerEx(60, 10, -1, -1);
+print("You are more powerful for a time. Use it well.");
+}
+}
+
+
+if(GetSenderId()==8)
+{
+ClearActorFlags(player,0x8);
+}
+if(GetSenderId()==9)
+{
+jkSetFlags(player, 0x8);
+ClearActorFlags(player,0x2000);
+}
+
+if(GetSenderId()==10)
+{
+ParseArg(player, "maxthrust=2.00");
+jkSetSuperFlags(4);
+}
+
+	
+return;
+
+# ........................................................................................
+
+activated:
+	player = GetSourceRef();
+	mode = GetSenderRef();
+
+	ActivateWeapon( player, fireWait, mode );
+return;
+
+# ........................................................................................
+
+deactivated:
+	player = GetSourceRef();
+	mode = GetSenderRef();
+
+	DeactivateWeapon( player, mode );
+return;
+
+# ........................................................................................
+
+selected:
+	//jkPrintUNIString(player, 7);
+	
+	Print("Dragon Balls");
+
+	if(IsInvActivated(player, 41) == 1)
+	{SetArmedMode(player, 1);}
+	else
+	{SetArmedMode(player, 0);}
+
+	// Set flags, etc.
+	jkClearFlags(player, 0x5);
+	SetCurWeapon(player, 9);
+
+   // Check Ammo - If we are out, autoselect best weapon.
+// if(GetInv(player, 14) < 60.0)
+// {
+//    if((GetAutoSwitch() & 1))
+//       SelectWeapon(player, AutoSelectWeapon(player, 1));
+// }
+
+   Return;
+
+# ........................................................................................
+
+deselected:
+
+if(wishing != 0){return;}
+
+Return;
+
+# ........................................................................................
+
+autoselect:
+   player = GetSourceRef();
+
+   // If the player has the weapon
+   if(GetInv(player, 9) != 0.0)
+   {
+      // If the player has ammo
+      if(GetInv(player, 181) != 0.0 & GetInv(player, 182) != 0.0 & GetInv(player, 183) != 0.0 & GetInv(player, 184) != 0.0 & GetInv(player, 185) != 0.0 & GetInv(player, 186) != 0.0 & GetInv(player, 187) != 0.0)
+      {
+         ReturnEx(500.0);
+      }
+      else
+      {
+         ReturnEx(-1.0);
+      }
+   }
+   else
+   {
+      ReturnEx(-1.0);
+   }
+
+   Return;
+
+end
+

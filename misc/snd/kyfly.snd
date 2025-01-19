@@ -1,0 +1,54 @@
+# Kyle foley description
+#
+# class		filename		playflags	minRadius	maxRadius	maxVolume
+#####################################################################################################
+#
+enterwater	splash1.wav		0x0     1.0     3.0	0.7
+enterwaterslow	fsout1.wav		0x0	0.5	1.5	0.4
+
+exitwater	fsout1.wav		0x0
+exitwaterslow	fsout1.wav		0x0
+
+#falling		nimbus1.wav		0x010000       1.5     2.5
+#landhurt	landhard01.wav		0x0            1.5     2.5
+#splattered	landhard01.wav		0x0            1.5     2.5
+#hitdamaged	landhard01.wav		0x0            1.5     2.5
+
+hurtimpact	  gokuhurt.wav		0x014000         0.3     1.0
+hurtimpact	 gokuhurt.wav		0x014000         0.5     2.0
+hurtimpact	 gokuhurt.wav		0x014000         1.0     4.0
+hurtimpact	 gokuhurt.wav		0x014000         1.0     4.0
+
+hurtenergy	  gokuhurt.wav		0x014000         0.3     1.0
+hurtenergy	 gokuhurt.wav		0x014000         0.5     2.0
+hurtenergy	 gokuhurt.wav		0x014000         1.0     4.0
+hurtenergy	 gokuhurt.wav		0x014000         1.0     4.0
+
+hurtfire	  gokuhurt.wav		0x014000         0.3     1.0
+hurtfire	 gokuhurt.wav		0x014000         0.5     2.0
+hurtfire	 gokuhurt.wav		0x014000         1.0     4.0
+hurtfire	 gokuhurt.wav		0x014000         1.0     4.0
+
+hurtmagic	  gokuhurt.wav		0x014000         0.3     1.0
+hurtmagic	 gokuhurt.wav		0x014000         0.5     2.0
+hurtmagic	 gokuhurt.wav		0x014000         1.0     4.0
+hurtmagic	 gokuhurt.wav		0x014000         1.0     4.0
+
+hurtspecial	  gokuhurt.wav		0x010000         0.3     1.0
+hurtspecial	 gokuhurt.wav		0x010000         0.5     2.0
+hurtspecial	 gokuhurt.wav		0x010000         1.0     4.0
+hurtspecial	 gokuhurt.wav		0x010000         1.0     4.0
+
+death1		death.wav		0x010100         1.0     4.0
+death2		death.wav		0x010100         1.0     4.0
+
+drowning	i00ky71t.wav		0x010100         0.3     1.0
+#drowning	i00ky71z.wav		0x010100         0.3     1.0
+drowned		KWaterDeath1.wav	0x010100         0.3     1.0
+deathUnder	  kylgnb.wav		0x010200         0.3     1.0
+breath		i00ky106.wav		0x010000         0.3     1.0
+gasp		i00ky106.wav		0x010000	 0.5     2.0
+
+corpsehit	bodyfall03.wav		0x0     0.8     4.0
+deflected	LtSaberHit12.wav
+deflected	LtSaberHit15.wav

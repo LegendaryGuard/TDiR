@@ -1,0 +1,138 @@
+symbols
+
+thing		Player				local
+
+template	Rbot=+roshibot		local
+template	Blast=+kiblast		local
+
+template	BattleBeam=+head3	local
+
+template	Battle=+bbexp		local
+template	Battle2=+bbexp2		local
+
+thing		Bot					local
+
+template	Ghost=+PosGhost		local
+
+template	rail=+battlerail	local
+
+int			Mode				local
+
+message		activated
+message		created
+message		pulse
+message		sighted
+message		selected
+message		damaged
+message		killed
+message		damaged
+message		startup
+
+end
+
+code
+
+startup:
+
+	Mode=1;
+
+return;
+
+created:
+
+	Player=GetLocalPlayerThing();
+	//SetThingPulse(GetSenderRef(), 1);
+
+return;
+
+activated:
+
+	//PrintInt(Mode);
+
+	Player=GetSourceRef();
+
+	if(Mode == -5)
+	{
+		BotGhost=FireProjectile(player, Ghost, -1, -1, '0 1 0', '0 0 0', 0, 0, 0, 0);
+		Bot=FireProjectile(BotGhost, Rbot, -1, -1, '0 1 0', '0 0 0', 0, 0, 0, 0);
+		DestroyThing(BotGhost);
+		SetThingType(Bot, 2);
+	}
+	if(Mode == 1)
+	{
+		//SetThingLook(Bot, VectorSub(GetThingPos(player), GetThingPos(Bot)));
+		//GhostB=FireProjectile(Bot, Ghost, -1, -1, '0 1 0', '0 0 0', 0, 0, 0, 0);
+		FireProjectile(player, rail, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		GhostP=FireProjectile(player, Ghost, -1, -1, '0 1 0', '0 0 0', 0, 0, 0, 0);
+		
+		//BeamB=FireProjectile(GhostB, BattleBeam, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		BeamP=FireProjectile(GhostP, BattleBeam, -1, -1, '0 0 0', '0 0 0', 0, 0, 0, 0);
+		//SetThingHealth(BeamP, 100);
+		//SetThingUserData(BeamB, 1);
+		SetPulse(0.01);
+	}
+	
+	if(Mode >= 2)
+	{
+		//SetThingUserData(BeamB, GetThingUserData(BeamB)+0.5);
+		HealThing(BeamP, 0.1);
+		//temp=GetThingHealth(BeamP);
+		//FireProjectile(GetSenderRef(), Battle, -1, -1, '0 0 0', '0 0 0', temp, 0x2, 0, 0);
+
+	}
+	
+	Mode=Mode+1;
+	
+	//FireProjectile(player, Rbot, -1, -1, '0 1 0', '0 0 0', 0, 0, 0, 0);
+	//ApplyForce(Bot, VectorScale(GetThingLVec(Bot), 120));
+	
+
+return;
+
+pulse:
+
+	jkStringClear();
+	jkStringConcatAsciiString("Roshi Beam: ");
+	jkStringConcatFlex(GetThingHealth(BeamB));
+	jkStringConcatAsciiString(" Player Beam: ");
+	jkStringConcatFlex(GetThingHealth(BeamP));
+	//jkStringOutput(-1, -1);
+	
+	if(GetThingHealth(BeamP) == -1)
+	{
+		Mode = 1;
+		SetPulse(0);
+		return;
+	}
+	
+	//HealThing(BeamB, 0.1);
+	
+return;
+
+killed:
+
+	if(GetSenderRef() != Bot) return;
+	
+	PlayMode(Bot, 6);
+	
+return;
+
+selected:
+
+	Print("Roshibot EXPERIMENTAL");
+
+return;
+
+sighted:
+
+	Print("Don't look at me!");
+
+return;
+
+damaged:
+
+	returnEx(0);
+
+return;
+
+end

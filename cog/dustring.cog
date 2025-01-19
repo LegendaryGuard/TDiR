@@ -1,0 +1,21 @@
+# JK Cog
+#
+# Eh
+
+symbols
+
+material	Dust=dustring.mat		local
+
+message		startup
+
+end
+
+code
+
+startup:
+
+	MaterialAnim(Dust, 12, 0x1);
+
+return;
+
+end
